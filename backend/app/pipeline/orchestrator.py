@@ -158,8 +158,36 @@ class PipelineOrchestrator:
             )
 
         doc_gen_data = agent3_res.data
-        updated_docs = doc_gen_data.get("updates", [])
+        raw_updated_docs = doc_gen_data.get("updates", [])
         unified_diff = doc_gen_data.get("unified_diff", "")
+
+        # Documentation Safety: Filter out empty or unchanged documents
+        updated_docs = []
+        for u in raw_updated_docs:
+            clean_path = u.get("doc_path", "").replace("\\", "/").strip().lstrip("/")
+            if ".." in clean_path.split("/"):
+                logger.warning(f"Rejected unsafe document path traversal attempt: {u.get('doc_path')}")
+                continue
+            orig = u.get("original_content", "")
+            upd = u.get("updated_content", "")
+            # Only include if content was actually changed and is non-empty
+            if upd and upd != orig and u.get("action") != "no_change":
+                u["doc_path"] = clean_path
+                updated_docs.append(u)
+
+        if not updated_docs:
+            logger.info(
+                f"Execution {execution_id}: Agent 3 generated 0 substantive document modifications. Marking SKIPPED."
+            )
+            return await execution_service.update_execution_progress(
+                db,
+                execution_id,
+                update_in={
+                    "status": ExecutionStatus.SKIPPED,
+                    "updated_documents": [],
+                    "generated_diff": "",
+                },
+            )
 
         # Step 7: Update status to COMMITTING
         await execution_service.update_execution_progress(

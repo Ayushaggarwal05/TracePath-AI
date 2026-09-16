@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Production Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: tracepath-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tracepath
+      POSTGRES_USER: tracepath_user
+      POSTGRES_PASSWORD: tracepath_password_change_me
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tracepath_user -d tracepath"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Multi-Agent Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tracepath-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "false"
+      DATABASE_URL: postgresql+asyncpg://tracepath_user:tracepath_password_change_me@postgres:5432/tracepath
+      SYNC_DATABASE_URL: postgresql://tracepath_user:tracepath_password_change_me@postgres:5432/tracepath
+      SECRET_KEY: change_this_to_a_secure_random_32_character_secret_key
+      CORS_ORIGINS: '["http://localhost:3000","http://localhost:5173","http://localhost:80"]'
+      GITHUB_APP_ID: ${GITHUB_APP_ID:-}
+      GITHUB_APP_CLIENT_ID: ${GITHUB_APP_CLIENT_ID:-}
+      GITHUB_APP_CLIENT_SECRET: ${GITHUB_APP_CLIENT_SECRET:-}
+      GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET:-}
+      AGENT_1_MODEL: ${AGENT_1_MODEL:-gpt-4o-mini}
+      AGENT_1_API_KEY: ${AGENT_1_API_KEY:-}
+      AGENT_2_MODEL: ${AGENT_2_MODEL:-gpt-4o}
+      AGENT_2_API_KEY: ${AGENT_2_API_KEY:-}
+      AGENT_3_MODEL: ${AGENT_3_MODEL:-gpt-4o}
+      AGENT_3_API_KEY: ${AGENT_3_API_KEY:-}
+
+  # React TypeScript Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tracepath-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  postgres_data:
