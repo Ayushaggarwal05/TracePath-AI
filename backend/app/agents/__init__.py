@@ -1,34 +1,43 @@
 from app.agents.base import AgentExecutionResult, BaseAgent
 from app.agents.change_analyzer import (
-    ChangeAnalysisOutput,
-    ChangeAnalyzerAgent,
+    AnalysisAgent,
+    AnalysisOutput,
     change_analyzer_agent,
 )
 from app.agents.impact_planner import (
-    DocImpactTarget,
-    ImpactPlannerAgent,
-    ImpactPlannerOutput,
+    DecisionAgent,
+    DecisionOutput,
+    DocumentDecision,
     impact_planner_agent,
 )
 from app.agents.doc_generator import (
     DocGeneratorAgent,
     DocGeneratorOutput,
     GeneratedDocUpdate,
+    compute_unified_diff,
     doc_generator_agent,
 )
+from app.agents.llm_client import LLMClient, extract_json_from_response
 
 __all__ = [
+    # Base & Client
     "BaseAgent",
     "AgentExecutionResult",
-    "ChangeAnalyzerAgent",
+    "LLMClient",
+    "extract_json_from_response",
+    # Agent 1
+    "AnalysisAgent",
+    "AnalysisOutput",
     "change_analyzer_agent",
-    "ChangeAnalysisOutput",
-    "ImpactPlannerAgent",
+    # Agent 2
+    "DecisionAgent",
+    "DecisionOutput",
+    "DocumentDecision",
     "impact_planner_agent",
-    "DocImpactTarget",
-    "ImpactPlannerOutput",
+    # Agent 3
     "DocGeneratorAgent",
-    "doc_generator_agent",
-    "GeneratedDocUpdate",
     "DocGeneratorOutput",
+    "GeneratedDocUpdate",
+    "compute_unified_diff",
+    "doc_generator_agent",
 ]

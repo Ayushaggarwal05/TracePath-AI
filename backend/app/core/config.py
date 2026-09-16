@@ -13,11 +13,14 @@ class EnvironmentType(str, Enum):
 
 class AgentConfig(BaseSettings):
     """Configuration for an independent AI Agent."""
+    name: str = "Agent"
     model: str = "gpt-4o"
     api_key: Optional[str] = None
     base_url: Optional[str] = None
     temperature: float = 0.2
     max_tokens: int = 4096
+    timeout_seconds: float = 60.0
+    mock_mode: bool = False
 
 
 class Settings(BaseSettings):
@@ -30,7 +33,7 @@ class Settings(BaseSettings):
 
     # Core App Settings
     PROJECT_NAME: str = "TracePath AI Backend"
-    VERSION: str = "0.1.0"
+    VERSION: str = "0.2.0"
     API_V1_STR: str = "/api/v1"
     ENVIRONMENT: EnvironmentType = EnvironmentType.DEVELOPMENT
     DEBUG: bool = True
@@ -51,28 +54,37 @@ class Settings(BaseSettings):
     DB_MAX_OVERFLOW: int = 10
     DB_ECHO: bool = False
 
-    # GitHub App Integration Settings (Phase 2)
+    # GitHub App Integration Settings
     GITHUB_APP_ID: Optional[str] = None
     GITHUB_APP_CLIENT_ID: Optional[str] = None
     GITHUB_APP_CLIENT_SECRET: Optional[str] = None
     GITHUB_APP_PRIVATE_KEY: Optional[str] = None
     GITHUB_WEBHOOK_SECRET: Optional[str] = None
 
-    # AI Agents (Phase 2 - 3 Independent Agents)
-    # Agent 1: Change Analyzer
-    AGENT_CHANGE_ANALYZER_MODEL: str = "gpt-4o-mini"
-    AGENT_CHANGE_ANALYZER_API_KEY: Optional[str] = None
-    AGENT_CHANGE_ANALYZER_BASE_URL: Optional[str] = None
+    # =========================================================================
+    # THREE INDEPENDENT AI AGENT CONFIGURATIONS
+    # =========================================================================
+    
+    # AGENT 1: Analysis Agent
+    AGENT_1_MODEL: str = "gpt-4o-mini"
+    AGENT_1_API_KEY: Optional[str] = None
+    AGENT_1_BASE_URL: Optional[str] = None
+    AGENT_1_TEMPERATURE: float = 0.1
+    AGENT_1_TIMEOUT: float = 60.0
 
-    # Agent 2: Impact Planner
-    AGENT_IMPACT_PLANNER_MODEL: str = "gpt-4o"
-    AGENT_IMPACT_PLANNER_API_KEY: Optional[str] = None
-    AGENT_IMPACT_PLANNER_BASE_URL: Optional[str] = None
+    # AGENT 2: Differential / Decision Agent
+    AGENT_2_MODEL: str = "gpt-4o"
+    AGENT_2_API_KEY: Optional[str] = None
+    AGENT_2_BASE_URL: Optional[str] = None
+    AGENT_2_TEMPERATURE: float = 0.1
+    AGENT_2_TIMEOUT: float = 60.0
 
-    # Agent 3: Doc Generator & Validator
-    AGENT_DOC_GENERATOR_MODEL: str = "gpt-4o"
-    AGENT_DOC_GENERATOR_API_KEY: Optional[str] = None
-    AGENT_DOC_GENERATOR_BASE_URL: Optional[str] = None
+    # AGENT 3: Documentation Generator
+    AGENT_3_MODEL: str = "gpt-4o"
+    AGENT_3_API_KEY: Optional[str] = None
+    AGENT_3_BASE_URL: Optional[str] = None
+    AGENT_3_TEMPERATURE: float = 0.2
+    AGENT_3_TIMEOUT: float = 90.0
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
@@ -88,27 +100,39 @@ class Settings(BaseSettings):
         return self.ENVIRONMENT == EnvironmentType.PRODUCTION
 
     @property
-    def change_analyzer_config(self) -> AgentConfig:
+    def agent_1_config(self) -> AgentConfig:
         return AgentConfig(
-            model=self.AGENT_CHANGE_ANALYZER_MODEL,
-            api_key=self.AGENT_CHANGE_ANALYZER_API_KEY,
-            base_url=self.AGENT_CHANGE_ANALYZER_BASE_URL,
+            name="AnalysisAgent",
+            model=self.AGENT_1_MODEL,
+            api_key=self.AGENT_1_API_KEY,
+            base_url=self.AGENT_1_BASE_URL,
+            temperature=self.AGENT_1_TEMPERATURE,
+            timeout_seconds=self.AGENT_1_TIMEOUT,
+            mock_mode=not bool(self.AGENT_1_API_KEY),
         )
 
     @property
-    def impact_planner_config(self) -> AgentConfig:
+    def agent_2_config(self) -> AgentConfig:
         return AgentConfig(
-            model=self.AGENT_IMPACT_PLANNER_MODEL,
-            api_key=self.AGENT_IMPACT_PLANNER_API_KEY,
-            base_url=self.AGENT_IMPACT_PLANNER_BASE_URL,
+            name="DecisionAgent",
+            model=self.AGENT_2_MODEL,
+            api_key=self.AGENT_2_API_KEY,
+            base_url=self.AGENT_2_BASE_URL,
+            temperature=self.AGENT_2_TEMPERATURE,
+            timeout_seconds=self.AGENT_2_TIMEOUT,
+            mock_mode=not bool(self.AGENT_2_API_KEY),
         )
 
     @property
-    def doc_generator_config(self) -> AgentConfig:
+    def agent_3_config(self) -> AgentConfig:
         return AgentConfig(
-            model=self.AGENT_DOC_GENERATOR_MODEL,
-            api_key=self.AGENT_DOC_GENERATOR_API_KEY,
-            base_url=self.AGENT_DOC_GENERATOR_BASE_URL,
+            name="DocGeneratorAgent",
+            model=self.AGENT_3_MODEL,
+            api_key=self.AGENT_3_API_KEY,
+            base_url=self.AGENT_3_BASE_URL,
+            temperature=self.AGENT_3_TEMPERATURE,
+            timeout_seconds=self.AGENT_3_TIMEOUT,
+            mock_mode=not bool(self.AGENT_3_API_KEY),
         )
 
 
