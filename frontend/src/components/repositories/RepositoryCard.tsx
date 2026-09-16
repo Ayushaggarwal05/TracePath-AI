@@ -4,7 +4,7 @@ import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
 import { getAutomationStatusStyle } from '../../utils/statusStyles';
-import { GitBranch, Lock, Globe, Settings, Play, Pause, ExternalLink } from 'lucide-react';
+import { GitBranch, Lock, Globe, Settings, Play, Pause, ExternalLink, ChevronRight } from 'lucide-react';
 
 interface RepositoryCardProps {
   repository: Repository;
@@ -12,6 +12,7 @@ interface RepositoryCardProps {
   onSelect?: (id: string) => void;
   onToggleAutomation: (repo: Repository) => void;
   onOpenSettings: (repo: Repository) => void;
+  onViewDetail?: (repo: Repository) => void;
   isToggling?: boolean;
 }
 
@@ -21,6 +22,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
   onSelect,
   onToggleAutomation,
   onOpenSettings,
+  onViewDetail,
   isToggling = false,
 }) => {
   const status = repository.automation?.status || 'INACTIVE';
@@ -45,9 +47,12 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
             )}
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h4 className="text-base font-semibold text-slate-100 truncate hover:text-brand-400 transition-colors">
+                <button
+                  onClick={() => onViewDetail?.(repository)}
+                  className="text-base font-semibold text-slate-100 truncate hover:text-brand-400 transition-colors text-left"
+                >
                   {repository.name}
-                </h4>
+                </button>
                 {repository.is_private ? (
                   <span title="Private"><Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" /></span>
                 ) : (
@@ -114,21 +119,34 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
           </button>
         </div>
 
-        <Button
-          size="sm"
-          variant={status === 'ACTIVE' ? 'secondary' : 'primary'}
-          onClick={() => onToggleAutomation(repository)}
-          isLoading={isToggling}
-          leftIcon={
-            status === 'ACTIVE' ? (
-              <Pause className="w-3.5 h-3.5" />
-            ) : (
-              <Play className="w-3.5 h-3.5" />
-            )
-          }
-        >
-          {status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
-        </Button>
+        <div className="flex items-center gap-2">
+          {onViewDetail && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onViewDetail(repository)}
+              rightIcon={<ChevronRight className="w-3.5 h-3.5" />}
+            >
+              Workspace
+            </Button>
+          )}
+
+          <Button
+            size="sm"
+            variant={status === 'ACTIVE' ? 'secondary' : 'primary'}
+            onClick={() => onToggleAutomation(repository)}
+            isLoading={isToggling}
+            leftIcon={
+              status === 'ACTIVE' ? (
+                <Pause className="w-3.5 h-3.5" />
+              ) : (
+                <Play className="w-3.5 h-3.5" />
+              )
+            }
+          >
+            {status === 'ACTIVE' ? 'Pause' : 'Activate'}
+          </Button>
+        </div>
       </div>
     </Card>
   );

@@ -7,6 +7,7 @@ import { ConnectGitHubPage } from './pages/ConnectGitHubPage';
 import { RepositorySelectPage } from './pages/RepositorySelectPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { RepositoriesPage } from './pages/RepositoriesPage';
+import { RepositoryDetailPage } from './pages/RepositoryDetailPage';
 import { ActivityPage } from './pages/ActivityPage';
 import { SettingsPage } from './pages/SettingsPage';
 
@@ -16,12 +17,19 @@ export type AppRoute =
   | 'select-repos'
   | 'dashboard'
   | 'repositories'
+  | 'repository-detail'
   | 'activity'
   | 'settings';
 
 export const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<AppRoute>('dashboard');
+  const [selectedRepoId, setSelectedRepoId] = useState<string | null>('repo-1');
   const { user } = useUser();
+
+  const handleOpenRepoDetail = (repoId: string) => {
+    setSelectedRepoId(repoId);
+    setCurrentRoute('repository-detail');
+  };
 
   // Route Rendering
   if (currentRoute === 'landing') {
@@ -54,17 +62,29 @@ export const App: React.FC = () => {
     );
   }
 
+  const activeSidebarRoute =
+    currentRoute === 'repository-detail' ? 'repositories' : (currentRoute as 'dashboard' | 'repositories' | 'activity' | 'settings');
+
   return (
     <DashboardLayout
       user={user}
-      activeRoute={currentRoute as 'dashboard' | 'repositories' | 'activity' | 'settings'}
+      activeRoute={activeSidebarRoute}
       onRouteChange={(route) => setCurrentRoute(route as AppRoute)}
     >
       {currentRoute === 'dashboard' && (
         <DashboardPage onNavigate={(route) => setCurrentRoute(route as AppRoute)} />
       )}
       {currentRoute === 'repositories' && (
-        <RepositoriesPage onImportClick={() => setCurrentRoute('connect')} />
+        <RepositoriesPage
+          onImportClick={() => setCurrentRoute('connect')}
+          onSelectRepo={handleOpenRepoDetail}
+        />
+      )}
+      {currentRoute === 'repository-detail' && (
+        <RepositoryDetailPage
+          repositoryId={selectedRepoId || 'repo-1'}
+          onBack={() => setCurrentRoute('repositories')}
+        />
       )}
       {currentRoute === 'activity' && <ActivityPage />}
       {currentRoute === 'settings' && <SettingsPage />}

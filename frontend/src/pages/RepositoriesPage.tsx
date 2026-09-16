@@ -14,10 +14,12 @@ import { GitBranch, Plus } from 'lucide-react';
 
 interface RepositoriesPageProps {
   onImportClick: () => void;
+  onSelectRepo?: (repoId: string) => void;
 }
 
 export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
   onImportClick,
+  onSelectRepo,
 }) => {
   const { repositories, setRepositories, loading } = useRepositories();
   const { togglingId, toggleAutomation } = useAutomation();
@@ -110,7 +112,7 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
         <div>
           <h2 className="text-2xl font-bold text-slate-100 tracking-tight">Connected Repositories</h2>
           <p className="text-xs text-slate-400 mt-0.5 font-mono">
-            Manage documentation automation and target branch configurations per repository
+            Manage documentation automation, view workspaces, and configure sync rules
           </p>
         </div>
 
@@ -161,6 +163,7 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
               onSelect={handleSelect}
               onToggleAutomation={handleToggleClick}
               onOpenSettings={setSettingsRepo}
+              onViewDetail={onSelectRepo ? () => onSelectRepo(repo.id) : undefined}
               isToggling={togglingId === repo.id}
             />
           ))}
