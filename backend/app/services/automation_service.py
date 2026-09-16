@@ -29,7 +29,7 @@ class AutomationService:
         automation = await self.get_automation_by_repo_id(db, repo_id)
         
         automation.activate()
-        await db.flush()
+        await db.commit()
         await db.refresh(automation)
 
         return AutomationToggleResponse(
@@ -45,7 +45,7 @@ class AutomationService:
         automation = await self.get_automation_by_repo_id(db, repo_id)
         
         automation.deactivate()
-        await db.flush()
+        await db.commit()
         await db.refresh(automation)
 
         return AutomationToggleResponse(
@@ -63,6 +63,7 @@ class AutomationService:
     ) -> RepositoryAutomation:
         automation = await self.get_automation_by_repo_id(db, repo_id)
         updated = await automation_repo.update(db, db_obj=automation, obj_in=update_data)
+        await db.commit()
         return updated
 
 

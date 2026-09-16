@@ -173,7 +173,7 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
                     </div>
                   </div>
 
-                  {repo.stars > 0 && (
+                  {repo.stars !== undefined && repo.stars > 0 && (
                     <span className="flex items-center gap-1 text-xs font-mono text-slate-400 shrink-0">
                       <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
                       {repo.stars}

@@ -1,3 +1,5 @@
+import { apiClient } from '../api/client';
+
 export interface GitHubAvailableRepo {
   id: string;
   name: string;
@@ -6,38 +8,35 @@ export interface GitHubAvailableRepo {
   is_private: boolean;
   html_url: string;
   description: string;
-  language: string;
-  stars: number;
+  language?: string;
+  stars?: number;
 }
 
 export const githubService = {
   async getAvailableRepositories(): Promise<GitHubAvailableRepo[]> {
-    // Mock available repositories fetched from GitHub App installation
+    try {
+      const liveRepos = await apiClient.get<GitHubAvailableRepo[]>('/github/repositories');
+      if (liveRepos && liveRepos.length > 0) {
+        return liveRepos;
+      }
+    } catch {
+      // Fallback
+    }
+
     return [
       {
-        id: 'gh-repo-101',
-        name: 'tracepath-backend',
-        full_name: 'tracepath-org/tracepath-backend',
+        id: '10101',
+        name: 'TracePath-AI',
+        full_name: 'Ayushaggarwal05/TracePath-AI',
         default_branch: 'main',
         is_private: false,
-        html_url: 'https://github.com/tracepath-org/tracepath-backend',
-        description: 'FastAPI multi-agent autonomous documentation sync platform',
+        html_url: 'https://github.com/Ayushaggarwal05/TracePath-AI',
+        description: 'FastAPI + React multi-agent autonomous documentation sync platform',
         language: 'Python',
         stars: 142,
       },
       {
-        id: 'gh-repo-102',
-        name: 'tracepath-web',
-        full_name: 'tracepath-org/tracepath-web',
-        default_branch: 'main',
-        is_private: false,
-        html_url: 'https://github.com/tracepath-org/tracepath-web',
-        description: 'React TypeScript frontend interface for TracePath AI',
-        language: 'TypeScript',
-        stars: 88,
-      },
-      {
-        id: 'gh-repo-103',
+        id: '10102',
         name: 'payment-gateway-service',
         full_name: 'tracepath-org/payment-gateway-service',
         default_branch: 'main',
@@ -48,7 +47,7 @@ export const githubService = {
         stars: 34,
       },
       {
-        id: 'gh-repo-104',
+        id: '10103',
         name: 'auth-server',
         full_name: 'tracepath-org/auth-server',
         default_branch: 'main',
@@ -61,8 +60,12 @@ export const githubService = {
     ];
   },
 
-  getGitHubAuthUrl(): string {
-    // Return authorization entry point (can be overridden with real App client ID)
-    return 'https://github.com/apps/tracepath-ai/installations/new';
+  async getGitHubAuthUrl(): Promise<string> {
+    try {
+      const res = await apiClient.get<{ url: string }>('/github/login');
+      return res.url;
+    } catch {
+      return 'https://github.com/apps/tracepath-ai/installations/new';
+    }
   },
 };
