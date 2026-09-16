@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Execution, ExecutionStatus } from '../types/execution';
 import { executionService } from '../services/executionService';
 
@@ -14,10 +14,13 @@ export function useExecutions(params?: {
   const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const isFirstLoad = useRef(true);
 
-  const fetchExecutions = useCallback(async () => {
+  const fetchExecutions = useCallback(async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) {
+        setLoading(true);
+      }
       setError(null);
       const data = await executionService.getExecutions(params);
       setExecutions(data.items);
@@ -25,7 +28,9 @@ export function useExecutions(params?: {
     } catch (err: any) {
       setError(err.message || 'Failed to fetch executions');
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   }, [
     params?.repository_id,
@@ -37,7 +42,25 @@ export function useExecutions(params?: {
 
   useEffect(() => {
     fetchExecutions();
+    isFirstLoad.current = false;
   }, [fetchExecutions]);
+
+  // Real-Time Polling for Active In-Flight Executions
+  useEffect(() => {
+    const hasActiveExecution = executions.some((e) =>
+      ['PENDING', 'ANALYZING', 'PLANNING', 'GENERATING', 'COMMITTING'].includes(e.status)
+    );
+
+    if (!hasActiveExecution && params?.autoRefresh !== true) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      fetchExecutions(true);
+    }, 2500);
+
+    return () => clearInterval(intervalId);
+  }, [executions, fetchExecutions, params?.autoRefresh]);
 
   return {
     executions,
@@ -45,6 +68,6 @@ export function useExecutions(params?: {
     total,
     loading,
     error,
-    refetch: fetchExecutions,
+    refetch: () => fetchExecutions(false),
   };
 }
