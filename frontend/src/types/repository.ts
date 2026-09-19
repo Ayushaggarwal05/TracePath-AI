@@ -17,9 +17,10 @@ export interface RepositoryAutomation {
 
 export interface Repository {
   id: string;
-  user_id: string;
+  user_id?: string;
   github_repo_id: string;
   name: string;
+
   full_name: string;
   default_branch: string;
   is_private: boolean;

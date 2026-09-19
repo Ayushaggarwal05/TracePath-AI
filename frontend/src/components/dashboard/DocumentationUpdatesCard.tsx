@@ -1,30 +1,38 @@
 import React from 'react';
 import { Execution } from '../../types/execution';
+import { Repository } from '../../types/repository';
 import { Card } from '../common/Card';
 import { formatShortSha, formatTimeAgo } from '../../utils/formatters';
-import { FileText, Sparkles } from 'lucide-react';
+import { FileText, Sparkles, FolderGit2 } from 'lucide-react';
 
 interface DocumentationUpdatesCardProps {
   executions: Execution[];
+  repositories?: Repository[];
   onOpenDiff: (diff: string, title: string) => void;
 }
 
 export const DocumentationUpdatesCard: React.FC<DocumentationUpdatesCardProps> = ({
   executions,
+  repositories = [],
   onOpenDiff,
 }) => {
   // Collect all updated documents from completed executions
   const recentDocUpdates: Array<{
     exec: Execution;
+    repoName: string;
     docPath: string;
     summary: string;
     diff: string;
   }> = [];
 
   executions.forEach((exec) => {
+    const repo = repositories.find((r) => r.id === exec.repository_id);
+    const repoDisplayName = repo?.name || exec.repository_name || 'Repository';
+
     exec.updated_documents?.forEach((doc) => {
       recentDocUpdates.push({
         exec,
+        repoName: repoDisplayName,
         docPath: doc.doc_path,
         summary: doc.summary_of_changes,
         diff: doc.diff || exec.generated_diff || '',
@@ -53,13 +61,19 @@ export const DocumentationUpdatesCard: React.FC<DocumentationUpdatesCardProps> =
           recentDocUpdates.slice(0, 4).map((item, i) => (
             <div
               key={i}
-              onClick={() => onOpenDiff(item.diff, `Diff: ${item.docPath} (Commit ${formatShortSha(item.exec.commit_sha)})`)}
+              onClick={() => onOpenDiff(item.diff, `Diff: ${item.docPath} (${item.repoName} @ ${formatShortSha(item.exec.commit_sha)})`)}
               className="p-4 hover:bg-dark-hover/70 transition-colors cursor-pointer group"
             >
-              <div className="flex items-center justify-between gap-2 mb-1">
-                <div className="flex items-center gap-2 font-mono text-xs font-semibold text-brand-400">
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>{item.docPath}</span>
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-slate-800 text-brand-300 border border-slate-700/60">
+                    <FolderGit2 className="w-3 h-3 text-brand-400" />
+                    {item.repoName}
+                  </span>
+                  <div className="flex items-center gap-1.5 font-mono text-xs font-semibold text-emerald-400">
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>{item.docPath}</span>
+                  </div>
                 </div>
                 <span className="text-[11px] font-mono text-slate-500">
                   {formatTimeAgo(item.exec.created_at)}
@@ -81,3 +95,4 @@ export const DocumentationUpdatesCard: React.FC<DocumentationUpdatesCardProps> =
     </Card>
   );
 };
+

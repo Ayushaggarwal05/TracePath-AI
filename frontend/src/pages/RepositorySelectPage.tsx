@@ -194,69 +194,71 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
           </Button>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div className="bg-slate-900/60 border border-dark-border rounded-xl divide-y divide-dark-border/60 overflow-hidden shadow-sm">
           {filteredRepos.map((repo) => {
             const isSelected = selectedIds.includes(repo.id);
 
             return (
-              <Card
+              <div
                 key={repo.id}
                 onClick={() => toggleSelect(repo.id)}
-                className={`p-4 cursor-pointer transition-all ${
+                className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:px-5 gap-3 cursor-pointer transition-all ${
                   isSelected
-                    ? 'border-brand-500/60 bg-brand-500/5 ring-1 ring-brand-500/30'
-                    : 'hover:border-slate-700 bg-dark-card/60'
+                    ? 'bg-brand-500/10 border-l-4 border-l-brand-500'
+                    : 'hover:bg-slate-800/40'
                 }`}
               >
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => {}}
-                      className="w-4 h-4 rounded bg-slate-900 border-slate-700 text-brand-500 focus:ring-brand-500/40"
-                    />
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-sm text-slate-100 truncate">
-                          {repo.name}
-                        </span>
-                        {repo.is_private ? (
-                          <Lock className="w-3 h-3 text-slate-500 shrink-0" />
-                        ) : (
-                          <Globe className="w-3 h-3 text-slate-500 shrink-0" />
-                        )}
-                      </div>
-                      <p className="text-[11px] font-mono text-slate-400 truncate">
-                        {repo.full_name}
-                      </p>
-                    </div>
+                <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => {}}
+                    className="w-4 h-4 mt-1 sm:mt-0 rounded bg-slate-900 border-slate-700 text-brand-500 focus:ring-brand-500/40 shrink-0 pointer-events-none"
+                  />
+                  <div className="p-2 rounded-lg border shrink-0 bg-slate-800/80 border-slate-700/60 text-slate-400">
+                    <FolderGit2 className="w-4 h-4" />
                   </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-semibold text-sm text-slate-100 truncate">
+                        {repo.name}
+                      </span>
+                      {repo.is_private ? (
+                        <span title="Private"><Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" /></span>
+                      ) : (
+                        <span title="Public"><Globe className="w-3.5 h-3.5 text-slate-500 shrink-0" /></span>
+                      )}
+                      <span className="text-xs font-mono text-slate-500 truncate hidden sm:inline">
+                        {repo.full_name}
+                      </span>
+                    </div>
+                    {repo.description && (
+                      <p className="text-xs text-slate-400 line-clamp-1 mt-0.5 leading-relaxed">
+                        {repo.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
+                <div className="flex items-center gap-3 shrink-0 text-xs text-slate-400">
+                  <span className="inline-flex items-center gap-1 font-mono bg-slate-800/60 px-2 py-0.5 rounded border border-slate-700/40">
+                    <GitBranch className="w-3.5 h-3.5 text-slate-500" />
+                    {repo.default_branch || 'main'}
+                  </span>
+                  {repo.language && (
+                    <Badge variant="slate" className="text-[11px] py-0 font-mono">
+                      {repo.language}
+                    </Badge>
+                  )}
                   {repo.stars !== undefined && repo.stars > 0 && (
-                    <span className="flex items-center gap-1 text-xs font-mono text-slate-400 shrink-0">
-                      <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                    <span className="flex items-center gap-1 text-xs font-mono text-amber-400">
+                      <Star className="w-3.5 h-3.5 fill-amber-400" />
                       {repo.stars}
                     </span>
                   )}
                 </div>
-
-                <p className="text-xs text-slate-300 line-clamp-2 mb-3 leading-relaxed">
-                  {repo.description || 'No description provided.'}
-                </p>
-
-                <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-                  <span className="flex items-center gap-1">
-                    <GitBranch className="w-3 h-3 text-slate-500" />
-                    {repo.default_branch}
-                  </span>
-                  {repo.language && (
-                    <Badge variant="slate" className="text-[10px] py-0">
-                      {repo.language}
-                    </Badge>
-                  )}
-                </div>
-              </Card>
+              </div>
             );
           })}
         </div>
@@ -264,3 +266,4 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
     </div>
   );
 };
+

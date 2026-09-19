@@ -80,6 +80,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         <div className="lg:col-span-2">
           <RecentExecutionsTable
             executions={executions}
+            repositories={repositories}
             onSelectExecution={setSelectedExecution}
             onViewAll={() => onNavigate('activity')}
           />
@@ -88,10 +89,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         <div>
           <DocumentationUpdatesCard
             executions={executions}
+            repositories={repositories}
             onOpenDiff={(diff, title) => setDiffModalData({ isOpen: true, diff, title })}
           />
         </div>
       </div>
+
 
       {/* Trigger Sync Modal */}
       <QuickSyncTriggerModal

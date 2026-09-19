@@ -57,14 +57,16 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
   };
 
   const executeToggle = (repo: Repository, currentStatus: AutomationStatus) => {
-    toggleAutomation(repo.id, currentStatus, (newStatus) => {
+    toggleAutomation(repo, currentStatus, (newStatus, newRepoId) => {
       setRepositories((prev) =>
         prev.map((r) =>
           r.id === repo.id
             ? {
                 ...r,
+                id: newRepoId || r.id,
                 automation: {
                   ...r.automation!,
+                  repository_id: newRepoId || r.id,
                   status: newStatus,
                 },
               }
@@ -79,6 +81,7 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
     executeToggle(deactivatingRepo, 'ACTIVE');
     setDeactivatingRepo(null);
   };
+
 
   const handleSelect = (id: string) => {
     setSelectedIds((prev) =>
@@ -154,7 +157,7 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
           }
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-slate-900/60 border border-dark-border rounded-xl divide-y divide-dark-border/60 overflow-hidden shadow-sm">
           {filteredRepos.map((repo) => (
             <RepositoryCard
               key={repo.id}
@@ -169,6 +172,7 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
           ))}
         </div>
       )}
+
 
       {/* Confirmation Modal for Disabling Automation */}
       <ConfirmationModal
