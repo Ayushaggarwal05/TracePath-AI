@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useExecutions } from '../hooks/useExecutions';
+import { useRepositories } from '../hooks/useRepositories';
 import { activityService } from '../services/activityService';
 import { Execution, ExecutionStatus } from '../types/execution';
 import { ActivityEvent, ActivityEventType } from '../types/activity';
@@ -11,10 +12,12 @@ import { ExecutionDetailDrawer } from '../components/activity/ExecutionDetailDra
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { EmptyState } from '../components/common/EmptyState';
 import { Button } from '../components/common/Button';
-import { Activity, RefreshCw, Layers, Clock } from 'lucide-react';
+import { Activity, RefreshCw, Layers, Clock, FolderGit2, ChevronDown } from 'lucide-react';
+
 
 export const ActivityPage: React.FC = () => {
   const { executions, loading: executionsLoading, refetch } = useExecutions();
+  const { repositories } = useRepositories();
   const [activities, setActivities] = useState<ActivityEvent[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
 
@@ -22,6 +25,7 @@ export const ActivityPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'events' | 'traces'>('events');
 
   const [search, setSearch] = useState<string>('');
+  const [repoFilter, setRepoFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | ExecutionStatus>('ALL');
   const [eventTypeFilter, setEventTypeFilter] = useState<'ALL' | ActivityEventType>('ALL');
   const [selectedExecution, setSelectedExecution] = useState<Execution | null>(null);
@@ -55,7 +59,12 @@ export const ActivityPage: React.FC = () => {
       (exec.repository_name || '').toLowerCase().includes(search.toLowerCase());
 
     const matchesStatus = statusFilter === 'ALL' || exec.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesRepo =
+      repoFilter === 'ALL' ||
+      exec.repository_id === repoFilter ||
+      (exec.repository_name || '').toLowerCase().includes(repoFilter.toLowerCase());
+
+    return matchesSearch && matchesStatus && matchesRepo;
   });
 
   // Filtered Activities
@@ -67,7 +76,12 @@ export const ActivityPage: React.FC = () => {
       (evt.commit_sha || '').toLowerCase().includes(search.toLowerCase());
 
     const matchesType = eventTypeFilter === 'ALL' || evt.type === eventTypeFilter;
-    return matchesSearch && matchesType;
+    const matchesRepo =
+      repoFilter === 'ALL' ||
+      evt.repository_id === repoFilter ||
+      evt.repository_name.toLowerCase().includes(repoFilter.toLowerCase());
+
+    return matchesSearch && matchesType && matchesRepo;
   });
 
   const handleOpenExecution = (executionId: string) => {
@@ -75,7 +89,6 @@ export const ActivityPage: React.FC = () => {
     if (found) {
       setSelectedExecution(found);
     } else {
-      // Create fallback execution object if not yet in array
       setSelectedExecution({
         id: executionId,
         repository_id: 'repo-1',
@@ -150,18 +163,52 @@ export const ActivityPage: React.FC = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="w-full sm:w-80">
-          <SearchInput
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onClear={() => setSearch('')}
-            placeholder="Search commits, repos, or summaries..."
-          />
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 max-w-2xl">
+          <div className="flex-1">
+            <SearchInput
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onClear={() => setSearch('')}
+              placeholder="Search commits, repos, or summaries..."
+            />
+          </div>
+
+          {/* Repository Selector Dropdown (Active Automation Only) */}
+          <div className="relative min-w-[210px] shrink-0">
+            <select
+              value={repoFilter}
+              onChange={(e) => setRepoFilter(e.target.value)}
+              className="w-full appearance-none pl-8 pr-8 py-2 bg-dark-card border border-dark-border rounded-lg text-xs text-slate-200 font-medium focus:outline-none focus:border-brand-500/60 cursor-pointer hover:border-slate-700 transition-colors"
+            >
+              <option value="ALL">
+                All Active Repos ({repositories.filter((r) => r.automation?.status === 'ACTIVE').length})
+              </option>
+              {repositories
+                .filter((r) => r.automation?.status === 'ACTIVE')
+                .map((repo) => (
+                  <option key={repo.id} value={repo.id}>
+                    {repo.name}
+                  </option>
+                ))}
+            </select>
+            <FolderGit2 className="w-3.5 h-3.5 text-emerald-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+
+          {repoFilter !== 'ALL' && (
+            <button
+              onClick={() => setRepoFilter('ALL')}
+              className="text-xs text-brand-400 hover:underline shrink-0 whitespace-nowrap self-center"
+            >
+              Reset Repo
+            </button>
+          )}
         </div>
 
         {viewMode === 'events' ? (
-          <div className="flex items-center gap-1.5 p-1 bg-dark-card border border-dark-border rounded-lg overflow-x-auto self-start sm:self-auto text-xs">
+          <div className="flex items-center gap-1.5 p-1 bg-dark-card border border-dark-border rounded-lg overflow-x-auto self-start lg:self-auto text-xs">
             {(
               [
                 { id: 'ALL', label: 'All Events' },
@@ -186,7 +233,7 @@ export const ActivityPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 p-1 bg-dark-card border border-dark-border rounded-lg overflow-x-auto self-start sm:self-auto text-xs">
+          <div className="flex items-center gap-1.5 p-1 bg-dark-card border border-dark-border rounded-lg overflow-x-auto self-start lg:self-auto text-xs">
             {(['ALL', 'COMPLETED', 'SKIPPED', 'FAILED'] as const).map((st) => (
               <button
                 key={st}
@@ -203,6 +250,7 @@ export const ActivityPage: React.FC = () => {
           </div>
         )}
       </div>
+
 
       {/* Main Content Area */}
       <Card className="p-0 overflow-hidden">

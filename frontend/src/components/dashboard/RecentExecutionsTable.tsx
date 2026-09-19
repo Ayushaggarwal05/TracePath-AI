@@ -72,8 +72,9 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
                       </span>
                     </div>
                     <p className="text-xs text-slate-300 truncate mt-1 group-hover:text-brand-300 transition-colors">
-                      {exec.analysis_result?.summary || 'Processing commit...'}
+                      {exec.analysis_result?.summary || exec.documentation_decision?.decision_rationale || (exec.status === 'COMPLETED' ? 'Code commit synchronized' : 'Processing commit...')}
                     </p>
+
                   </div>
                 </div>
 

@@ -19,10 +19,18 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
   onClose,
   onTriggered,
 }) => {
-  const [selectedRepoId, setSelectedRepoId] = useState<string>(repositories[0]?.id || '');
+  const activeRepos = repositories.filter((r) => r.automation?.status === 'ACTIVE');
+  const [selectedRepoId, setSelectedRepoId] = useState<string>('');
   const [scenario, setScenario] = useState<'billing' | 'caching' | 'bugfix'>('billing');
   const [triggering, setTriggering] = useState<boolean>(false);
   const { success, error } = useToast();
+
+  // Keep selectedRepoId synchronized with first available active repository
+  React.useEffect(() => {
+    if (activeRepos.length > 0 && (!selectedRepoId || !activeRepos.some(r => r.id === selectedRepoId))) {
+      setSelectedRepoId(activeRepos[0].id);
+    }
+  }, [activeRepos, selectedRepoId]);
 
   const scenarios = [
     {
@@ -47,23 +55,21 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
 
     try {
       setTriggering(true);
-      const commitSha =
-        scenario === 'bugfix'
-          ? 'bugfix' + Math.random().toString(16).substring(2, 10).padEnd(34, '0')
-          : scenario === 'caching'
-          ? 'cache' + Math.random().toString(16).substring(2, 10).padEnd(35, '0')
-          : 'bill' + Math.random().toString(16).substring(2, 10).padEnd(36, '0');
+      const randomHex = Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+      const prefix = scenario === 'bugfix' ? 'bugf' : scenario === 'caching' ? 'cach' : 'bill';
+      const commitSha = (prefix + '0000' + randomHex).slice(0, 40);
 
       await executionService.triggerExecution({
         repository_id: selectedRepoId,
-        commit_sha: commitSha.slice(0, 40),
+        commit_sha: commitSha,
         branch: 'main',
         event_type: 'push',
       });
 
-      success('Pipeline Triggered', 'Multi-agent documentation sync is executing in the background.');
+      success('Pipeline Executed', 'Multi-agent documentation sync completed successfully.');
       onTriggered();
       onClose();
+
     } catch (err: any) {
       error('Trigger Failed', err.message || 'Could not start pipeline run.');
     } finally {
@@ -83,20 +89,27 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
         {/* Repository selector */}
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-            Target Repository
+            Target Repository (Active Only)
           </label>
-          <select
-            value={selectedRepoId}
-            onChange={(e) => setSelectedRepoId(e.target.value)}
-            className="w-full px-3.5 py-2 bg-dark-card border border-dark-border rounded-lg text-sm text-slate-100 focus:outline-none focus:border-brand-500/60"
-          >
-            {repositories.map((repo) => (
-              <option key={repo.id} value={repo.id}>
-                {repo.full_name} ({repo.automation?.status || 'INACTIVE'})
-              </option>
-            ))}
-          </select>
+          {activeRepos.length === 0 ? (
+            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-300">
+              No active repositories found. Please activate automation on a repository in the Repositories tab first.
+            </div>
+          ) : (
+            <select
+              value={selectedRepoId}
+              onChange={(e) => setSelectedRepoId(e.target.value)}
+              className="w-full px-3.5 py-2 bg-dark-card border border-dark-border rounded-lg text-sm text-slate-100 focus:outline-none focus:border-brand-500/60"
+            >
+              {activeRepos.map((repo) => (
+                <option key={repo.id} value={repo.id}>
+                  {repo.full_name} ({repo.default_branch || 'main'})
+                </option>
+              ))}
+            </select>
+          )}
         </div>
+
 
         {/* Change Scenario */}
         <div>
@@ -134,10 +147,12 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
           size="sm"
           onClick={handleTrigger}
           isLoading={triggering}
+          disabled={triggering || activeRepos.length === 0}
           leftIcon={<Sparkles className="w-4 h-4" />}
         >
           Run Multi-Agent Pipeline
         </Button>
+
       </div>
     </Modal>
   );

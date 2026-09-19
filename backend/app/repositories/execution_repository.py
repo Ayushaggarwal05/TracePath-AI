@@ -2,6 +2,7 @@ from typing import Optional, Sequence, Tuple
 from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from app.models.execution import Execution, ExecutionStatus
 from app.schemas.execution import ExecutionCreate, ExecutionUpdate
 from app.repositories.base import BaseRepository
@@ -19,7 +20,7 @@ class ExecutionRepository(BaseRepository[Execution, ExecutionCreate, ExecutionUp
         skip: int = 0,
         limit: int = 50,
     ) -> Sequence[Execution]:
-        stmt = select(Execution).where(Execution.repository_id == repository_id)
+        stmt = select(Execution).where(Execution.repository_id == repository_id).options(selectinload(Execution.repository))
         if status:
             stmt = stmt.where(Execution.status == status)
         stmt = stmt.order_by(Execution.created_at.desc()).offset(skip).limit(limit)
@@ -47,7 +48,7 @@ class ExecutionRepository(BaseRepository[Execution, ExecutionCreate, ExecutionUp
         skip: int = 0,
         limit: int = 20,
     ) -> Tuple[Sequence[Execution], int]:
-        stmt = select(Execution)
+        stmt = select(Execution).options(selectinload(Execution.repository))
         count_stmt = select(func.count()).select_from(Execution)
 
         if repository_id:
@@ -71,3 +72,4 @@ class ExecutionRepository(BaseRepository[Execution, ExecutionCreate, ExecutionUp
 
 
 execution_repo = ExecutionRepository()
+
