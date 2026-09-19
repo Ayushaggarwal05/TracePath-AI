@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useRepositories } from '../hooks/useRepositories';
 import { useExecutions } from '../hooks/useExecutions';
 import { MetricCards } from '../components/dashboard/MetricCards';
+import { ActiveRepositoriesBar } from '../components/dashboard/ActiveRepositoriesBar';
 import { RecentExecutionsTable } from '../components/dashboard/RecentExecutionsTable';
 import { DocumentationUpdatesCard } from '../components/dashboard/DocumentationUpdatesCard';
+import { AgentHealthAndCoverageCard } from '../components/dashboard/AgentHealthAndCoverageCard';
 import { QuickSyncTriggerModal } from '../components/dashboard/QuickSyncTriggerModal';
 import { ExecutionDetailDrawer } from '../components/activity/ExecutionDetailDrawer';
 import { DiffViewerModal } from '../components/activity/DiffViewerModal';
@@ -75,6 +77,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         successRate={successRate}
       />
 
+      {/* Active Repositories Live Status Bar */}
+      <ActiveRepositoriesBar
+        repositories={repositories}
+        onTriggerSync={() => setIsTriggerModalOpen(true)}
+        onNavigateToRepos={() => onNavigate('repositories')}
+      />
+
       {/* Main Grid: Stream & Recent Docs */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
@@ -94,6 +103,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           />
         </div>
       </div>
+
+      {/* Multi-Agent Engine Health & Protected Docs Coverage */}
+      <AgentHealthAndCoverageCard activeReposCount={activeAutomations} />
+
 
 
       {/* Trigger Sync Modal */}
