@@ -37,12 +37,18 @@ class RepositoryService:
         if existing:
             raise EntityAlreadyExistsException("Repository", "github_repo_id", repo_data.github_repo_id)
 
-        # Create repository
-        repo = await repository_repo.create(db, obj_in=repo_data)
+        # Create repository with user_id
+        repo_dict = repo_data.model_dump()
+        if not repo_dict.get("user_id"):
+            repo_dict["user_id"] = user_id
+
+        repo = await repository_repo.create(db, obj_in=repo_dict)
         
         # Ensure default automation configuration exists
         automation = await automation_repo.get_or_create_default(db, repo.id)
         repo.automation = automation
+        await db.commit()
+        await db.refresh(repo)
         return repo
 
     async def update_repository(
@@ -52,7 +58,11 @@ class RepositoryService:
         update_data: RepositoryUpdate,
     ) -> Repository:
         repo = await self.get_repository(db, repo_id)
-        return await repository_repo.update(db, db_obj=repo, obj_in=update_data)
+        updated = await repository_repo.update(db, db_obj=repo, obj_in=update_data)
+        await db.commit()
+        await db.refresh(updated)
+        return updated
+
 
 
 repository_service = RepositoryService()

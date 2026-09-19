@@ -8,18 +8,16 @@ import {
   Brain,
   Sparkles,
   FileCode,
-  ArrowRight,
   GitCommit,
   GitPullRequest,
 } from 'lucide-react';
 
 interface LandingPageProps {
-  onGetStarted: () => void;
   onConnectGitHub: () => void;
+  onGetStarted?: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
-  onGetStarted,
   onConnectGitHub,
 }) => {
   const steps = [
@@ -81,17 +79,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           evaluate documentation impact, and commit minimal updates without manual overhead.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+        <div className="flex items-center justify-center pt-4">
           <Button
             size="lg"
             variant="primary"
             onClick={onConnectGitHub}
-            leftIcon={<Github className="w-5 h-5" />}
+            leftIcon={<Github className="w-5 h-5 text-white" />}
+            className="px-8 py-3.5 text-base font-semibold shadow-xl"
           >
             Connect GitHub
-          </Button>
-          <Button size="lg" variant="secondary" onClick={onGetStarted} rightIcon={<ArrowRight className="w-4 h-4" />}>
-            Explore Dashboard
           </Button>
         </div>
       </section>

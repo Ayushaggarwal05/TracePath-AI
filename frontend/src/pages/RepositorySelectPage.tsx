@@ -7,7 +7,7 @@ import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { githubService, GitHubAvailableRepo } from '../services/githubService';
 import { repositoryService } from '../services/repositoryService';
 import { useToast } from '../hooks/useToast';
-import { GitBranch, Lock, Globe, Star, CheckSquare, Square, ArrowRight } from 'lucide-react';
+import { GitBranch, Lock, Globe, Star, CheckSquare, Square, ArrowRight, RefreshCw, FolderGit2 } from 'lucide-react';
 
 interface RepositorySelectPageProps {
   onComplete: () => void;
@@ -23,22 +23,26 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
   const [importing, setImporting] = useState<boolean>(false);
   const { success, error } = useToast();
 
-  useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        const repos = await githubService.getAvailableRepositories();
-        setAvailableRepos(repos);
-        // Default select first two
-        setSelectedIds(repos.slice(0, 2).map((r) => r.id));
-      } catch (err: any) {
-        error('Failed to load GitHub repositories', err.message);
-      } finally {
-        setLoading(false);
+  const loadRepos = async () => {
+    try {
+      setLoading(true);
+      const savedUser = localStorage.getItem('tracepath_github_user') || 'Ayushaggarwal05';
+      const repos = await githubService.getAvailableRepositories(savedUser);
+      setAvailableRepos(repos);
+      if (repos && repos.length > 0) {
+        setSelectedIds([repos[0].id]);
       }
+    } catch (err: any) {
+      error('Failed to load GitHub repositories', err.message);
+    } finally {
+      setLoading(false);
     }
-    load();
-  }, [error]);
+  };
+
+  useEffect(() => {
+    loadRepos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
@@ -65,27 +69,55 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
     try {
       setImporting(true);
       const selected = availableRepos.filter((r) => selectedIds.includes(r.id));
+      let successCount = 0;
 
       for (const repo of selected) {
-        await repositoryService.registerRepository({
-          github_repo_id: repo.id,
-          name: repo.name,
-          full_name: repo.full_name,
-          default_branch: repo.default_branch,
-          is_private: repo.is_private,
-          html_url: repo.html_url,
-          description: repo.description,
-        });
+        let repoId: string | null = null;
+        try {
+          const registered = await repositoryService.registerRepository({
+            github_repo_id: String(repo.id),
+            name: repo.name,
+            full_name: repo.full_name,
+            default_branch: repo.default_branch || 'main',
+            is_private: Boolean(repo.is_private),
+            html_url: repo.html_url || `https://github.com/${repo.full_name}`,
+            description: repo.description || undefined,
+          });
+          if (registered && registered.id) {
+            repoId = registered.id;
+          }
+          successCount++;
+        } catch (regErr: any) {
+          // If already registered (409 Conflict), consider it connected
+          if (regErr?.status === 409 || regErr?.message?.includes('already exists')) {
+            successCount++;
+          } else {
+            console.warn(`Failed to register repo ${repo.full_name}:`, regErr);
+          }
+        }
+
+        if (repoId) {
+          try {
+            await repositoryService.activateAutomation(repoId);
+          } catch {
+            // Automation already active or default
+          }
+        }
       }
 
-      success('Repositories Imported', `Activated ${selected.length} repositories for documentation sync.`);
-      onComplete();
+      if (successCount > 0) {
+        success('Repositories Imported', `Successfully connected ${successCount} repos with autonomous sync enabled.`);
+        onComplete();
+      } else {
+        error('Import Failed', 'Unable to import the selected repositories. Please try again.');
+      }
     } catch (err: any) {
       error('Import Failed', err.message || 'Could not import repositories.');
     } finally {
       setImporting(false);
     }
   };
+
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-6">
@@ -97,15 +129,26 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          onClick={handleImport}
-          isLoading={importing}
-          disabled={selectedIds.length === 0}
-          rightIcon={<ArrowRight className="w-4 h-4" />}
-        >
-          Import & Activate ({selectedIds.length})
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="md"
+            onClick={loadRepos}
+            disabled={loading}
+            leftIcon={<RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />}
+          >
+            Refresh
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleImport}
+            isLoading={importing}
+            disabled={selectedIds.length === 0}
+            rightIcon={<ArrowRight className="w-4 h-4" />}
+          >
+            Import & Activate ({selectedIds.length})
+          </Button>
+        </div>
       </div>
 
       <div className="flex items-center justify-between gap-4 mb-4">
@@ -118,21 +161,38 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
           />
         </div>
 
-        <button
-          onClick={toggleSelectAll}
-          className="flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-slate-200"
-        >
-          {selectedIds.length === filteredRepos.length ? (
-            <CheckSquare className="w-4 h-4 text-brand-400" />
-          ) : (
-            <Square className="w-4 h-4" />
-          )}
-          <span>Select All ({filteredRepos.length})</span>
-        </button>
+        {filteredRepos.length > 0 && (
+          <button
+            onClick={toggleSelectAll}
+            className="flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-slate-200"
+          >
+            {selectedIds.length === filteredRepos.length ? (
+              <CheckSquare className="w-4 h-4 text-brand-400" />
+            ) : (
+              <Square className="w-4 h-4" />
+            )}
+            <span>Select All ({filteredRepos.length})</span>
+          </button>
+        )}
       </div>
 
       {loading ? (
         <LoadingSpinner label="Fetching accessible repositories from GitHub..." />
+      ) : filteredRepos.length === 0 ? (
+        <Card className="p-12 text-center space-y-4 border-dashed border-dark-border">
+          <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-dark-border flex items-center justify-center mx-auto text-slate-400">
+            <FolderGit2 className="w-6 h-6" />
+          </div>
+          <div>
+            <h4 className="text-base font-semibold text-slate-200">No Repositories Found</h4>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
+              Could not find repositories for this account. Ensure your username is correct or connect a GitHub Token on the connect page.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={loadRepos}>
+            Retry Fetch
+          </Button>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredRepos.map((repo) => {
@@ -182,7 +242,7 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
                 </div>
 
                 <p className="text-xs text-slate-300 line-clamp-2 mb-3 leading-relaxed">
-                  {repo.description}
+                  {repo.description || 'No description provided.'}
                 </p>
 
                 <div className="flex items-center gap-2 text-xs font-mono text-slate-400">

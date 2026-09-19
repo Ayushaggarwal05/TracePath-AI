@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from './hooks/useUser';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { PublicLayout } from './layouts/PublicLayout';
@@ -21,23 +21,79 @@ export type AppRoute =
   | 'activity'
   | 'settings';
 
+const VALID_ROUTES: AppRoute[] = [
+  'landing',
+  'connect',
+  'select-repos',
+  'dashboard',
+  'repositories',
+  'repository-detail',
+  'activity',
+  'settings',
+];
+
+const getInitialRoute = (): AppRoute => {
+  // 1. Check URL Hash first (e.g. #/dashboard)
+  const hash = window.location.hash.replace('#/', '').replace('#', '') as AppRoute;
+  if (hash && VALID_ROUTES.includes(hash)) {
+    return hash;
+  }
+  // 2. Check localStorage persistence
+  const saved = localStorage.getItem('tracepath_current_route') as AppRoute;
+  if (saved && VALID_ROUTES.includes(saved)) {
+    return saved;
+  }
+  // 3. Default to landing page on initial visit
+  return 'landing';
+};
+
 export const App: React.FC = () => {
-  const [currentRoute, setCurrentRoute] = useState<AppRoute>('dashboard');
-  const [selectedRepoId, setSelectedRepoId] = useState<string | null>('repo-1');
+  const [currentRoute, setCurrentRoute] = useState<AppRoute>(getInitialRoute);
+  const [selectedRepoId, setSelectedRepoId] = useState<string | null>(() => {
+    return localStorage.getItem('tracepath_selected_repo_id') || 'repo-1';
+  });
   const { user } = useUser();
+
+  const navigateTo = (route: AppRoute) => {
+    setCurrentRoute(route);
+    localStorage.setItem('tracepath_current_route', route);
+    window.location.hash = `#/${route}`;
+  };
+
+  // Sync route on hashchange (browser Back/Forward navigation)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#/', '').replace('#', '') as AppRoute;
+      if (hash && VALID_ROUTES.includes(hash)) {
+        setCurrentRoute(hash);
+        localStorage.setItem('tracepath_current_route', hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const handleOpenRepoDetail = (repoId: string) => {
     setSelectedRepoId(repoId);
-    setCurrentRoute('repository-detail');
+    localStorage.setItem('tracepath_selected_repo_id', repoId);
+    navigateTo('repository-detail');
+  };
+
+  const handleCompleteRepoSelect = () => {
+    localStorage.setItem('tracepath_github_connected', 'true');
+    navigateTo('dashboard');
   };
 
   // Route Rendering
   if (currentRoute === 'landing') {
     return (
-      <PublicLayout onNavigateToApp={() => setCurrentRoute('dashboard')}>
+      <PublicLayout
+        onNavigateToApp={() => navigateTo('dashboard')}
+        onConnectGitHub={() => navigateTo('connect')}
+      >
         <LandingPage
-          onGetStarted={() => setCurrentRoute('dashboard')}
-          onConnectGitHub={() => setCurrentRoute('connect')}
+          onGetStarted={() => navigateTo('connect')}
+          onConnectGitHub={() => navigateTo('connect')}
         />
       </PublicLayout>
     );
@@ -45,10 +101,13 @@ export const App: React.FC = () => {
 
   if (currentRoute === 'connect') {
     return (
-      <PublicLayout onNavigateToApp={() => setCurrentRoute('dashboard')}>
+      <PublicLayout
+        onNavigateToApp={() => navigateTo('dashboard')}
+        onConnectGitHub={() => navigateTo('connect')}
+      >
         <ConnectGitHubPage
-          onConnected={() => setCurrentRoute('select-repos')}
-          onCancel={() => setCurrentRoute('dashboard')}
+          onConnected={() => navigateTo('select-repos')}
+          onCancel={() => navigateTo('landing')}
         />
       </PublicLayout>
     );
@@ -56,8 +115,11 @@ export const App: React.FC = () => {
 
   if (currentRoute === 'select-repos') {
     return (
-      <PublicLayout onNavigateToApp={() => setCurrentRoute('dashboard')}>
-        <RepositorySelectPage onComplete={() => setCurrentRoute('dashboard')} />
+      <PublicLayout
+        onNavigateToApp={() => navigateTo('dashboard')}
+        onConnectGitHub={() => navigateTo('connect')}
+      >
+        <RepositorySelectPage onComplete={handleCompleteRepoSelect} />
       </PublicLayout>
     );
   }
@@ -69,21 +131,21 @@ export const App: React.FC = () => {
     <DashboardLayout
       user={user}
       activeRoute={activeSidebarRoute}
-      onRouteChange={(route) => setCurrentRoute(route as AppRoute)}
+      onRouteChange={(route) => navigateTo(route as AppRoute)}
     >
       {currentRoute === 'dashboard' && (
-        <DashboardPage onNavigate={(route) => setCurrentRoute(route as AppRoute)} />
+        <DashboardPage onNavigate={(route) => navigateTo(route as AppRoute)} />
       )}
       {currentRoute === 'repositories' && (
         <RepositoriesPage
-          onImportClick={() => setCurrentRoute('connect')}
+          onImportClick={() => navigateTo('connect')}
           onSelectRepo={handleOpenRepoDetail}
         />
       )}
       {currentRoute === 'repository-detail' && (
         <RepositoryDetailPage
           repositoryId={selectedRepoId || 'repo-1'}
-          onBack={() => setCurrentRoute('repositories')}
+          onBack={() => navigateTo('repositories')}
         />
       )}
       {currentRoute === 'activity' && <ActivityPage />}

@@ -16,7 +16,7 @@ class RepositoryBase(BaseModel):
 
 
 class RepositoryCreate(RepositoryBase):
-    user_id: UUID
+    user_id: Optional[UUID] = None
 
 
 class RepositoryUpdate(BaseModel):

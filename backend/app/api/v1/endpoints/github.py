@@ -2,6 +2,7 @@ import logging
 from typing import Any, Dict, List, Optional
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.security import decrypt_token, encrypt_token, generate_oauth_state, verify_oauth_state
@@ -14,6 +15,11 @@ from app.repositories.user_repository import user_repo
 
 router = APIRouter()
 logger = logging.getLogger("tracepath.github_api")
+
+
+class ConnectTokenRequest(BaseModel):
+    token: Optional[str] = Field(None, description="GitHub Personal Access Token (ghp_... or github_pat_...)")
+    username: Optional[str] = Field(None, description="GitHub username to fetch public repositories")
 
 
 @router.get("/login")
@@ -45,6 +51,79 @@ async def get_github_login_url(
     }
 
 
+@router.post("/connect-token")
+async def connect_github_token(
+    payload: ConnectTokenRequest,
+    db: AsyncSession = Depends(get_db),
+) -> Dict[str, Any]:
+    """
+    Connects a user's GitHub account via Personal Access Token or username,
+    verifies validity against api.github.com, and encrypts the token at rest with AES-256.
+    """
+    token = payload.token.strip() if payload.token else None
+    username = payload.username.strip() if payload.username else None
+
+    if not token and not username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please provide a GitHub Personal Access Token or GitHub username.",
+        )
+
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": f"TracePath-AI/{settings.VERSION}",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    async with httpx.AsyncClient(timeout=30.0) as http_client:
+        try:
+            if token:
+                user_res = await http_client.get("https://api.github.com/user", headers=headers)
+            else:
+                user_res = await http_client.get(f"https://api.github.com/users/{username}", headers=headers)
+
+            if user_res.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid GitHub Token or Username. GitHub returned status " + str(user_res.status_code),
+                )
+
+            gh_user = user_res.json()
+            gh_username = gh_user.get("login", username)
+            gh_id = str(gh_user.get("id", ""))
+            avatar_url = gh_user.get("avatar_url", "")
+
+            # Save connection with AES-256 encryption
+            current_user = await user_repo.get_by_email(db, email="engineer@tracepath.ai")
+            if current_user:
+                encrypted_token = encrypt_token(token) if token else None
+                conn = GitHubConnection(
+                    user_id=current_user.id,
+                    github_user_id=gh_id,
+                    username=gh_username,
+                    avatar_url=avatar_url,
+                    access_token_enc=encrypted_token,
+                )
+                db.add(conn)
+                await db.commit()
+
+            return {
+                "status": "connected",
+                "username": gh_username,
+                "avatar_url": avatar_url,
+                "message": f"Successfully connected GitHub account for @{gh_username}",
+            }
+        except HTTPException:
+            raise
+        except Exception as err:
+            logger.error(f"Failed to connect GitHub token: {err}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to verify GitHub credentials: {str(err)}",
+            )
+
+
 @router.get("/callback")
 async def github_oauth_callback(
     code: str = Query(..., description="Temporary OAuth code received from GitHub"),
@@ -65,17 +144,6 @@ async def github_oauth_callback(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired OAuth state parameter (CSRF protection failed).",
         )
-
-    # Handle mock development flow if secrets are unset
-    if not client_id or not client_secret or client_id.startswith("mock"):
-        logger.info("Using mock GitHub OAuth token exchange for development.")
-        return {
-            "status": "connected",
-            "username": "Ayushaggarwal05",
-            "avatar_url": "https://avatars.githubusercontent.com/u/583231?v=4",
-            "scopes": ["repo", "read:org", "user:email"],
-            "message": "GitHub account successfully connected (Development Mode).",
-        }
 
     # Real GitHub token exchange
     async with httpx.AsyncClient(timeout=30.0) as http_client:
@@ -133,7 +201,6 @@ async def github_oauth_callback(
             db.add(conn)
             await db.commit()
 
-        # Never return the raw access_token to the client response
         return {
             "status": "connected",
             "username": github_user.get("login"),
@@ -152,7 +219,7 @@ async def get_github_connection_status(
     """
     user = await user_repo.get_by_email(db, email="engineer@tracepath.ai")
     if user and user.github_connections:
-        conn = user.github_connections[0]
+        conn = user.github_connections[-1]
         return {
             "is_connected": True,
             "username": conn.username,
@@ -162,59 +229,66 @@ async def get_github_connection_status(
         }
 
     return {
-        "is_connected": True,
-        "username": "Ayushaggarwal05",
-        "avatar_url": "https://avatars.githubusercontent.com/u/583231?v=4",
-        "scopes": ["repo", "read:org", "user:email"],
+        "is_connected": False,
+        "username": None,
+        "avatar_url": None,
     }
 
 
 @router.get("/repositories", response_model=List[GitHubRepoInfo])
 async def list_github_repositories(
+    username: Optional[str] = Query(None, description="GitHub username to pull public repos for"),
     db: AsyncSession = Depends(get_db),
 ) -> List[GitHubRepoInfo]:
     """
-    Fetches real repository list accessible to the user from GitHub using decrypted in-memory token.
+    Fetches real repository list accessible to the user directly from GitHub API.
     """
     user = await user_repo.get_by_email(db, email="engineer@tracepath.ai")
     raw_token = None
-    if user and user.github_connections and user.github_connections[0].access_token_enc:
-        raw_token = decrypt_token(user.github_connections[0].access_token_enc)
+    target_username = username
 
+    if user and user.github_connections:
+        last_conn = user.github_connections[-1]
+        if last_conn.access_token_enc:
+            raw_token = decrypt_token(last_conn.access_token_enc)
+        if not target_username:
+            target_username = last_conn.username
+
+    # 1. Fetch using authenticated token (returns private + public repos)
     if raw_token:
         try:
             client = GitHubAPIClient(token=raw_token)
             return await client.list_user_repositories()
         except Exception as err:
-            logger.warning(f"Failed to fetch live GitHub repositories: {err}. Falling back to default list.")
+            logger.warning(f"Failed to fetch live repos with token: {err}")
 
-    # Return structured available repositories for selection
-    return [
-        GitHubRepoInfo(
-            id="10101",
-            name="TracePath-AI",
-            full_name="Ayushaggarwal05/TracePath-AI",
-            default_branch="main",
-            is_private=False,
-            html_url="https://github.com/Ayushaggarwal05/TracePath-AI",
-            description="Autonomous documentation synchronization platform",
-        ),
-        GitHubRepoInfo(
-            id="10102",
-            name="payment-gateway-service",
-            full_name="tracepath-org/payment-gateway-service",
-            default_branch="main",
-            is_private=True,
-            html_url="https://github.com/tracepath-org/payment-gateway-service",
-            description="Stripe webhook ingestion and billing",
-        ),
-        GitHubRepoInfo(
-            id="10103",
-            name="auth-server",
-            full_name="tracepath-org/auth-server",
-            default_branch="main",
-            is_private=True,
-            html_url="https://github.com/tracepath-org/auth-server",
-            description="OAuth2 authentication provider",
-        ),
-    ]
+    # 2. Fetch public repos for the username directly from GitHub API
+    if target_username:
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as http_client:
+                res = await http_client.get(
+                    f"https://api.github.com/users/{target_username}/repos",
+                    headers={
+                        "Accept": "application/vnd.github.v3+json",
+                        "User-Agent": f"TracePath-AI/{settings.VERSION}",
+                    },
+                    params={"per_page": 100, "sort": "updated"},
+                )
+                if res.status_code == 200:
+                    repos_data = res.json()
+                    return [
+                        GitHubRepoInfo(
+                            id=str(r.get("id")),
+                            name=r.get("name"),
+                            full_name=r.get("full_name"),
+                            default_branch=r.get("default_branch", "main"),
+                            is_private=r.get("private", False),
+                            html_url=r.get("html_url", ""),
+                            description=r.get("description"),
+                        )
+                        for r in repos_data
+                    ]
+        except Exception as err:
+            logger.warning(f"Failed to fetch public repos for @{target_username}: {err}")
+
+    return []

@@ -5,18 +5,22 @@ import { Zap, Github } from 'lucide-react';
 
 interface PublicLayoutProps {
   onNavigateToApp: () => void;
+  onConnectGitHub?: () => void;
   children: React.ReactNode;
 }
 
 export const PublicLayout: React.FC<PublicLayoutProps> = ({
   onNavigateToApp,
+  onConnectGitHub,
   children,
 }) => {
+  const isConnected = localStorage.getItem('tracepath_github_connected') === 'true';
+
   return (
     <div className="min-h-screen bg-dark-base flex flex-col justify-between selection:bg-brand-500/20 selection:text-brand-300">
       {/* Header */}
       <header className="h-20 border-b border-dark-border/80 bg-slate-950/70 backdrop-blur-md px-6 sm:px-12 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={onNavigateToApp}>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => (isConnected ? onNavigateToApp() : onConnectGitHub?.())}>
           <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 shadow-glow-emerald">
             <Zap className="w-5 h-5 fill-brand-400" />
           </div>
@@ -30,18 +34,25 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.open('https://github.com/Ayushaggarwal05/TracePath-AI', '_blank')}
-            leftIcon={<Github className="w-4 h-4" />}
-          >
-            GitHub
-          </Button>
-          <Button variant="primary" size="sm" onClick={onNavigateToApp}>
-            Launch Dashboard
-          </Button>
+        <div className="flex items-center gap-3">
+          {isConnected ? (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onNavigateToApp}
+            >
+              Go to Dashboard
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onConnectGitHub || onNavigateToApp}
+              leftIcon={<Github className="w-4 h-4" />}
+            >
+              Connect GitHub
+            </Button>
+          )}
         </div>
       </header>
 

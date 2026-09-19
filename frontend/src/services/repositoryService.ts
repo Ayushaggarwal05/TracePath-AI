@@ -32,4 +32,13 @@ export const repositoryService = {
   async updateRepository(id: string, payload: RepositoryUpdatePayload): Promise<Repository> {
     return await apiClient.patch<Repository>(`/repositories/${id}`, payload);
   },
+
+  async activateAutomation(repoId: string) {
+    return await apiClient.post(`/repositories/${repoId}/automation/activate`);
+  },
+
+  async deactivateAutomation(repoId: string) {
+    return await apiClient.post(`/repositories/${repoId}/automation/deactivate`);
+  },
 };
+
