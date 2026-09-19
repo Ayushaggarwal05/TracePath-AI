@@ -106,7 +106,7 @@ export const App: React.FC = () => {
         onConnectGitHub={() => navigateTo('connect')}
       >
         <ConnectGitHubPage
-          onConnected={() => navigateTo('select-repos')}
+          onConnected={() => navigateTo('dashboard')}
           onCancel={() => navigateTo('landing')}
         />
       </PublicLayout>

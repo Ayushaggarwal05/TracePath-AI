@@ -18,16 +18,30 @@ export const githubService = {
       const liveRepos = await apiClient.get<GitHubAvailableRepo[]>('/github/repositories', {
         params: username ? { username } : undefined,
       });
-      if (liveRepos && Array.isArray(liveRepos)) {
+      if (liveRepos && Array.isArray(liveRepos) && liveRepos.length > 0) {
+        try {
+          localStorage.setItem('tracepath_cached_gh_repos', JSON.stringify(liveRepos));
+        } catch {}
         return liveRepos;
       }
     } catch (err) {
       console.warn('Could not fetch live GitHub repositories:', err);
     }
+
+    try {
+      const cached = localStorage.getItem('tracepath_cached_gh_repos');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {}
+
     return [];
   },
 
-  async connectToken(token?: string, username?: string): Promise<{ username: string; avatar_url: string }> {
+  async connectToken(token?: string, username?: string): Promise<{ username: string; name?: string; avatar_url: string }> {
     return await apiClient.post('/github/connect-token', {
       token: token || undefined,
       username: username || undefined,

@@ -3,7 +3,6 @@ import { Button } from '../components/common/Button';
 import { Card } from '../components/common/Card';
 import { Badge } from '../components/common/Badge';
 import {
-  Zap,
   Github,
   Brain,
   Sparkles,
@@ -63,7 +62,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Hero Section */}
       <section className="text-center space-y-6 pt-10">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-semibold tracking-wide shadow-glow-emerald">
-          <Zap className="w-3.5 h-3.5 fill-brand-400" />
+          <img src="/logo-icon.png" alt="TracePath AI" className="w-4 h-4 object-contain" />
           <span>Production Multi-Agent Platform</span>
         </div>
 

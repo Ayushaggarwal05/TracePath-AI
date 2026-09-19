@@ -1,0 +1,317 @@
+[
+  {
+    "id": "1001",
+    "name": "TracePath-AI",
+    "full_name": "Ayushaggarwal05/TracePath-AI",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/TracePath-AI",
+    "description": "Repository for TracePath-AI"
+  },
+  {
+    "id": "1002",
+    "name": "Automation_testing",
+    "full_name": "Ayushaggarwal05/Automation_testing",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/Automation_testing",
+    "description": "Repository for Automation_testing"
+  },
+  {
+    "id": "1003",
+    "name": "Kisan-Saathi",
+    "full_name": "Ayushaggarwal05/Kisan-Saathi",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/Kisan-Saathi",
+    "description": "Repository for Kisan-Saathi"
+  },
+  {
+    "id": "1004",
+    "name": "E-commerce-platform",
+    "full_name": "Ayushaggarwal05/E-commerce-platform",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/E-commerce-platform",
+    "description": "Repository for E-commerce-platform"
+  },
+  {
+    "id": "1005",
+    "name": "DevSync-CLI",
+    "full_name": "Ayushaggarwal05/DevSync-CLI",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/DevSync-CLI",
+    "description": "Repository for DevSync-CLI"
+  },
+  {
+    "id": "1006",
+    "name": "portfolio-v2",
+    "full_name": "Ayushaggarwal05/portfolio-v2",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/portfolio-v2",
+    "description": "Repository for portfolio-v2"
+  },
+  {
+    "id": "1007",
+    "name": "react-markdown-editor",
+    "full_name": "Ayushaggarwal05/react-markdown-editor",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/react-markdown-editor",
+    "description": "Repository for react-markdown-editor"
+  },
+  {
+    "id": "1008",
+    "name": "microservices-auth-service",
+    "full_name": "Ayushaggarwal05/microservices-auth-service",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/microservices-auth-service",
+    "description": "Repository for microservices-auth-service"
+  },
+  {
+    "id": "1009",
+    "name": "doc-generator-ai",
+    "full_name": "Ayushaggarwal05/doc-generator-ai",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/doc-generator-ai",
+    "description": "Repository for doc-generator-ai"
+  },
+  {
+    "id": "1010",
+    "name": "fullstack-billing-api",
+    "full_name": "Ayushaggarwal05/fullstack-billing-api",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/fullstack-billing-api",
+    "description": "Repository for fullstack-billing-api"
+  },
+  {
+    "id": "1011",
+    "name": "fastapi-ai-pipeline",
+    "full_name": "Ayushaggarwal05/fastapi-ai-pipeline",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/fastapi-ai-pipeline",
+    "description": "Repository for fastapi-ai-pipeline"
+  },
+  {
+    "id": "1012",
+    "name": "github-webhook-orchestrator",
+    "full_name": "Ayushaggarwal05/github-webhook-orchestrator",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/github-webhook-orchestrator",
+    "description": "Repository for github-webhook-orchestrator"
+  },
+  {
+    "id": "1013",
+    "name": "cloud-infra-terraform",
+    "full_name": "Ayushaggarwal05/cloud-infra-terraform",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/cloud-infra-terraform",
+    "description": "Repository for cloud-infra-terraform"
+  },
+  {
+    "id": "1014",
+    "name": "realtime-collaborative-whiteboard",
+    "full_name": "Ayushaggarwal05/realtime-collaborative-whiteboard",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/realtime-collaborative-whiteboard",
+    "description": "Repository for realtime-collaborative-whiteboard"
+  },
+  {
+    "id": "1015",
+    "name": "ai-rag-knowledge-base",
+    "full_name": "Ayushaggarwal05/ai-rag-knowledge-base",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/ai-rag-knowledge-base",
+    "description": "Repository for ai-rag-knowledge-base"
+  },
+  {
+    "id": "1016",
+    "name": "nextjs-saas-starter",
+    "full_name": "Ayushaggarwal05/nextjs-saas-starter",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/nextjs-saas-starter",
+    "description": "Repository for nextjs-saas-starter"
+  },
+  {
+    "id": "1017",
+    "name": "distributed-task-queue",
+    "full_name": "Ayushaggarwal05/distributed-task-queue",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/distributed-task-queue",
+    "description": "Repository for distributed-task-queue"
+  },
+  {
+    "id": "1018",
+    "name": "docker-k8s-manifests",
+    "full_name": "Ayushaggarwal05/docker-k8s-manifests",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/docker-k8s-manifests",
+    "description": "Repository for docker-k8s-manifests"
+  },
+  {
+    "id": "1019",
+    "name": "graphql-gateway",
+    "full_name": "Ayushaggarwal05/graphql-gateway",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/graphql-gateway",
+    "description": "Repository for graphql-gateway"
+  },
+  {
+    "id": "1020",
+    "name": "redis-caching-proxy",
+    "full_name": "Ayushaggarwal05/redis-caching-proxy",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/redis-caching-proxy",
+    "description": "Repository for redis-caching-proxy"
+  },
+  {
+    "id": "1021",
+    "name": "websocket-chat-server",
+    "full_name": "Ayushaggarwal05/websocket-chat-server",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/websocket-chat-server",
+    "description": "Repository for websocket-chat-server"
+  },
+  {
+    "id": "1022",
+    "name": "semantic-code-search",
+    "full_name": "Ayushaggarwal05/semantic-code-search",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/semantic-code-search",
+    "description": "Repository for semantic-code-search"
+  },
+  {
+    "id": "1023",
+    "name": "typescript-ast-analyzer",
+    "full_name": "Ayushaggarwal05/typescript-ast-analyzer",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/typescript-ast-analyzer",
+    "description": "Repository for typescript-ast-analyzer"
+  },
+  {
+    "id": "1024",
+    "name": "prisma-postgres-starter",
+    "full_name": "Ayushaggarwal05/prisma-postgres-starter",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/prisma-postgres-starter",
+    "description": "Repository for prisma-postgres-starter"
+  },
+  {
+    "id": "1025",
+    "name": "serverless-lambda-functions",
+    "full_name": "Ayushaggarwal05/serverless-lambda-functions",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/serverless-lambda-functions",
+    "description": "Repository for serverless-lambda-functions"
+  },
+  {
+    "id": "1026",
+    "name": "vite-react-tailwind-template",
+    "full_name": "Ayushaggarwal05/vite-react-tailwind-template",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/vite-react-tailwind-template",
+    "description": "Repository for vite-react-tailwind-template"
+  },
+  {
+    "id": "1027",
+    "name": "jwt-oauth2-authenticator",
+    "full_name": "Ayushaggarwal05/jwt-oauth2-authenticator",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/jwt-oauth2-authenticator",
+    "description": "Repository for jwt-oauth2-authenticator"
+  },
+  {
+    "id": "1028",
+    "name": "stripe-payment-integration",
+    "full_name": "Ayushaggarwal05/stripe-payment-integration",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/stripe-payment-integration",
+    "description": "Repository for stripe-payment-integration"
+  },
+  {
+    "id": "1029",
+    "name": "elasticsearch-log-aggregator",
+    "full_name": "Ayushaggarwal05/elasticsearch-log-aggregator",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/elasticsearch-log-aggregator",
+    "description": "Repository for elasticsearch-log-aggregator"
+  },
+  {
+    "id": "1030",
+    "name": "grpc-microservices-mesh",
+    "full_name": "Ayushaggarwal05/grpc-microservices-mesh",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/grpc-microservices-mesh",
+    "description": "Repository for grpc-microservices-mesh"
+  },
+  {
+    "id": "1031",
+    "name": "kafka-event-streaming",
+    "full_name": "Ayushaggarwal05/kafka-event-streaming",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/kafka-event-streaming",
+    "description": "Repository for kafka-event-streaming"
+  },
+  {
+    "id": "1032",
+    "name": "ai-agent-decision-tree",
+    "full_name": "Ayushaggarwal05/ai-agent-decision-tree",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/ai-agent-decision-tree",
+    "description": "Repository for ai-agent-decision-tree"
+  },
+  {
+    "id": "1033",
+    "name": "prompt-injection-firewall",
+    "full_name": "Ayushaggarwal05/prompt-injection-firewall",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/prompt-injection-firewall",
+    "description": "Repository for prompt-injection-firewall"
+  },
+  {
+    "id": "1034",
+    "name": "unified-diff-engine",
+    "full_name": "Ayushaggarwal05/unified-diff-engine",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/unified-diff-engine",
+    "description": "Repository for unified-diff-engine"
+  },
+  {
+    "id": "1035",
+    "name": "auto-changelog-generator",
+    "full_name": "Ayushaggarwal05/auto-changelog-generator",
+    "default_branch": "main",
+    "is_private": false,
+    "html_url": "https://github.com/Ayushaggarwal05/auto-changelog-generator",
+    "description": "Repository for auto-changelog-generator"
+  }
+]

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ToastContainer } from '../components/common/ToastContainer';
 import { Button } from '../components/common/Button';
-import { Zap, Github } from 'lucide-react';
+import { Github } from 'lucide-react';
 
 interface PublicLayoutProps {
   onNavigateToApp: () => void;
@@ -20,17 +20,22 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
     <div className="min-h-screen bg-dark-base flex flex-col justify-between selection:bg-brand-500/20 selection:text-brand-300">
       {/* Header */}
       <header className="h-20 border-b border-dark-border/80 bg-slate-950/70 backdrop-blur-md px-6 sm:px-12 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => (isConnected ? onNavigateToApp() : onConnectGitHub?.())}>
-          <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 shadow-glow-emerald">
-            <Zap className="w-5 h-5 fill-brand-400" />
+        <div className="flex items-center gap-3.5 cursor-pointer group" onClick={() => (isConnected ? onNavigateToApp() : onConnectGitHub?.())}>
+          <div className="relative flex items-center justify-center">
+            <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full group-hover:bg-indigo-500/35 transition-all" />
+            <img
+              src="/logo-icon.png"
+              alt="TracePath AI Logo"
+              className="relative w-9 h-9 object-contain drop-shadow-[0_0_15px_rgba(129,140,248,0.7)] group-hover:scale-105 transition-transform"
+            />
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-lg tracking-tight text-slate-100">TracePath</span>
-              <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-400 font-mono">
-                AI
-              </span>
-            </div>
+          <div className="flex items-center gap-1.5 font-brand">
+            <span className="font-extrabold text-xl tracking-[-0.03em] text-white group-hover:text-slate-100 transition-colors drop-shadow-[0_2px_12px_rgba(255,255,255,0.12)]">
+              TracePath
+            </span>
+            <span className="text-xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_16px_rgba(168,85,247,0.6)]">
+              AI
+            </span>
           </div>
         </div>
 
