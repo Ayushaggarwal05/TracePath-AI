@@ -222,3 +222,34 @@ class GitHubAPIClient(IGitHubClient):
             response.raise_for_status()
             data = response.json()
             return data.get("html_url", f"https://github.com/{full_name}/pull/{data.get('number', '')}")
+
+    async def get_latest_commit_sha(self, full_name: str, branch: str = "main") -> Optional[str]:
+        """Fetch the latest commit SHA for a branch in the repository."""
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(
+                f"{self.base_url}/repos/{full_name}/commits/{branch}",
+                headers=self._get_headers(),
+            )
+            if response.status_code == 404:
+                return None
+            response.raise_for_status()
+            data = response.json()
+            return data.get("sha")
+
+    async def create_branch(self, full_name: str, new_branch: str, base_sha: str) -> bool:
+        """Create a new git ref (branch) from a base commit SHA."""
+        payload = {
+            "ref": f"refs/heads/{new_branch}",
+            "sha": base_sha,
+        }
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                f"{self.base_url}/repos/{full_name}/git/refs",
+                headers=self._get_headers(),
+                json=payload,
+            )
+            if response.status_code in (201, 422):
+                # 201 Created or 422 Reference already exists
+                return True
+            response.raise_for_status()
+            return True

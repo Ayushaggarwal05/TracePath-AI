@@ -34,7 +34,7 @@ class UpdatedDocumentItem(BaseModel):
 class ExecutionBase(BaseModel):
     repository_id: UUID
     event_type: str = Field(default="push", max_length=50)
-    commit_sha: str = Field(..., min_length=7, max_length=40)
+    commit_sha: str = Field(default="latest", min_length=1, max_length=100)
     branch: str = Field(default="main", max_length=100)
 
 
@@ -45,6 +45,7 @@ class ExecutionCreate(ExecutionBase):
 
 class ExecutionUpdate(BaseModel):
     status: Optional[ExecutionStatusEnum] = None
+    commit_sha: Optional[str] = None
     start_time: Optional[datetime] = None
     completion_time: Optional[datetime] = None
     changed_files: Optional[List[Dict[str, Any]]] = None

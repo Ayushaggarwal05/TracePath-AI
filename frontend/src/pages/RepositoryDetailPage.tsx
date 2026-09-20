@@ -57,6 +57,7 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
 
   // Modals & Drawers
   const [selectedExecution, setSelectedExecution] = useState<Execution | null>(null);
+  const [selectedExecutionTab, setSelectedExecutionTab] = useState<'pipeline' | 'agents' | 'files' | 'diff'>('pipeline');
   const [historyDoc, setHistoryDoc] = useState<TrackedDocument | null>(null);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
@@ -440,9 +441,16 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
         <Card className="p-0 overflow-hidden">
           <ActivityFeedList
             events={activities}
-            onSelectExecution={(id) => {
+            onSelectExecution={async (id, tab = 'pipeline') => {
+              setSelectedExecutionTab(tab);
               const target = executions.find((e) => e.id === id);
               if (target) setSelectedExecution(target);
+              try {
+                const full = await executionService.getExecution(id);
+                if (full) setSelectedExecution(full);
+              } catch (err) {
+                console.error(err);
+              }
             }}
           />
         </Card>
@@ -453,6 +461,7 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
         execution={selectedExecution}
         isOpen={!!selectedExecution}
         onClose={() => setSelectedExecution(null)}
+        initialTab={selectedExecutionTab}
       />
 
       {/* Doc History Modal */}

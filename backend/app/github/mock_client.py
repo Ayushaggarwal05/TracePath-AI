@@ -104,5 +104,11 @@ class MockGitHubClient(IGitHubClient):
     ) -> str:
         return f"https://github.com/{full_name}/pull/42"
 
+    async def get_latest_commit_sha(self, full_name: str, branch: str = "main") -> Optional[str]:
+        return "mock-latest-sha-001"
+
+    async def create_branch(self, full_name: str, new_branch: str, base_sha: str) -> bool:
+        return True
+
 
 mock_github_client = MockGitHubClient()

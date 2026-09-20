@@ -56,7 +56,6 @@ async def test_execution_lifecycle_and_pipeline(async_client: AsyncClient):
     piped_data = pipeline_res.json()
     assert piped_data["status"] == "COMPLETED"
     assert piped_data["final_commit_sha"] is not None
-    assert piped_data["pull_request_url"] is not None
     assert piped_data["analysis_result"] is not None
     assert piped_data["documentation_decision"] is not None
     assert piped_data["updated_documents"] is not None

@@ -51,6 +51,16 @@ class IGitHubClient(ABC):
         pass
 
     @abstractmethod
+    async def get_latest_commit_sha(self, full_name: str, branch: str = "main") -> str:
+        """Fetch latest commit SHA for a branch."""
+        pass
+
+    @abstractmethod
+    async def create_branch(self, full_name: str, new_branch: str, base_branch: str = "main") -> bool:
+        """Create a new branch from base_branch reference."""
+        pass
+
+    @abstractmethod
     async def create_or_update_file(
         self,
         full_name: str,

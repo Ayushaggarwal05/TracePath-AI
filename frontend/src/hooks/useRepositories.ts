@@ -25,21 +25,37 @@ export function useRepositories() {
 
       const dbMap = new Map<string, Repository>();
       (dbRes.items || []).forEach((r) => {
-        dbMap.set(String(r.github_repo_id), r);
-        dbMap.set(r.full_name.toLowerCase(), r);
+        if (r.github_repo_id) dbMap.set(String(r.github_repo_id), r);
+        if (r.full_name) dbMap.set(r.full_name.toLowerCase(), r);
+        if (r.name) dbMap.set(r.name.toLowerCase(), r);
       });
 
       const merged: Repository[] = [];
-      const seenIds = new Set<string>();
+      const seenNames = new Set<string>();
 
-      // 1. Process GitHub repos
+      // 1. Process live GitHub repos
       if (ghRepos && ghRepos.length > 0) {
         ghRepos.forEach((gh) => {
-          const existing = dbMap.get(String(gh.id)) || dbMap.get(gh.full_name.toLowerCase());
+          const nameKey = (gh.name || '').toLowerCase();
+          const fullNameKey = (gh.full_name || '').toLowerCase();
+          const existing =
+            dbMap.get(String(gh.id)) ||
+            dbMap.get(fullNameKey) ||
+            dbMap.get(nameKey);
+
+          if (fullNameKey) seenNames.add(fullNameKey);
+          if (nameKey) seenNames.add(nameKey);
+
           if (existing) {
-            merged.push(existing);
-            seenIds.add(existing.id);
-            if (existing.github_repo_id) seenIds.add(String(existing.github_repo_id));
+            merged.push({
+              ...existing,
+              name: gh.name || existing.name,
+              full_name: gh.full_name || existing.full_name,
+              is_private: gh.is_private ?? existing.is_private,
+              default_branch: gh.default_branch || existing.default_branch,
+              html_url: gh.html_url || existing.html_url,
+              description: gh.description || existing.description,
+            });
           } else {
             merged.push({
               id: `gh_${gh.id}`,
@@ -70,9 +86,12 @@ export function useRepositories() {
         });
       }
 
-      // 2. Add any DB repos not present in GitHub list
+      // 2. Add any custom DB repos ONLY if they don't match any live GitHub repo name
       (dbRes.items || []).forEach((r) => {
-        if (!seenIds.has(r.id) && !seenIds.has(String(r.github_repo_id))) {
+        const rName = (r.name || '').toLowerCase();
+        const rFullName = (r.full_name || '').toLowerCase();
+        if (!seenNames.has(rFullName) && !seenNames.has(rName)) {
+          seenNames.add(rFullName);
           merged.unshift(r);
         }
       });

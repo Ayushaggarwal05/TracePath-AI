@@ -1,13 +1,16 @@
 import logging
 from typing import Any, Dict, List, Optional
 from uuid import UUID
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.agents.change_analyzer import change_analyzer_agent
 from app.agents.doc_generator import doc_generator_agent
 from app.agents.impact_planner import impact_planner_agent
+from app.core.security import decrypt_token
 from app.github.interface import IGitHubClient
 from app.github import get_github_client
 from app.models.execution import Execution, ExecutionStatus
+from app.models.github_connection import GitHubConnection
 from app.pipeline.context_builder import context_builder
 from app.services.execution_service import execution_service
 
@@ -41,10 +44,38 @@ class PipelineOrchestrator:
         branch: str = "main",
         doc_paths: Optional[List[str]] = None,
         github_client: Optional[IGitHubClient] = None,
-        auto_commit: bool = False,
-        create_pull_request: bool = True,
+        auto_commit: bool = True,
+        create_pull_request: bool = False,
     ) -> Execution:
-        client = github_client or get_github_client()
+        # Step -1: Resolve authenticated GitHub client if not explicitly passed
+        client = github_client
+        if not client:
+            token = None
+            try:
+                stmt = select(GitHubConnection).order_by(GitHubConnection.created_at.desc())
+                res = await db.execute(stmt)
+                conn = res.scalars().first()
+                if conn and conn.access_token_enc:
+                    token = decrypt_token(conn.access_token_enc)
+            except Exception as e:
+                logger.warning(f"Could not retrieve GitHub token from DB: {e}")
+            client = get_github_client(token=token)
+
+        # Step -0.5: Resolve real commit SHA if generic or requested latest
+        if hasattr(client, "get_latest_commit_sha"):
+            if not commit_sha or commit_sha in ("latest", "HEAD", "latest-commit") or commit_sha.startswith("bill"):
+                try:
+                    latest_sha = await client.get_latest_commit_sha(repository_full_name, branch)
+                    if latest_sha:
+                        commit_sha = latest_sha
+                        await execution_service.update_execution_progress(
+                            db,
+                            execution_id,
+                            update_in={"commit_sha": latest_sha},
+                        )
+                except Exception as e:
+                    logger.warning(f"Could not resolve latest commit SHA from GitHub: {e}")
+
         logger.info(f"Starting pipeline execution {execution_id} for {repository_full_name} @ {commit_sha[:8]}")
 
         # Step 0: Build Bounded Context from GitHub API
@@ -222,6 +253,12 @@ class PipelineOrchestrator:
             else:
                 # Open a Pull Request on a sync branch
                 target_pr_branch = f"tracepath/sync-{commit_sha[:7]}"
+                if hasattr(client, "create_branch"):
+                    try:
+                        await client.create_branch(repository_full_name, target_pr_branch, commit_sha)
+                    except Exception as branch_err:
+                        logger.warning(f"Branch creation note: {branch_err}")
+
                 for update_item in updated_docs:
                     final_commit_sha = await client.create_or_update_file(
                         full_name=repository_full_name,

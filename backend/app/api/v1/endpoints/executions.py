@@ -82,7 +82,9 @@ async def create_execution(
             execution_id=execution.id,
             repository_full_name=repo.full_name,
             commit_sha=execution.commit_sha,
+            branch=execution.branch or "main",
             doc_paths=doc_paths,
+            auto_commit=True,
         )
 
     return ExecutionDetailResponse.model_validate(execution)

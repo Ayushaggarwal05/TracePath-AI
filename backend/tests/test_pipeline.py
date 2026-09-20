@@ -50,7 +50,6 @@ async def test_full_pipeline_feature_flow(db_session: AsyncSession):
     assert len(result.updated_documents) > 0
     assert result.generated_diff != ""
     assert result.final_commit_sha is not None
-    assert result.pull_request_url is not None
 
 
 @pytest.mark.asyncio

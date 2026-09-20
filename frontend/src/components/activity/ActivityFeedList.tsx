@@ -14,11 +14,14 @@ import {
   PowerOff,
   ExternalLink,
   ChevronRight,
+  Code2,
+  FileText,
+  GitPullRequest,
 } from 'lucide-react';
 
 interface ActivityFeedListProps {
   events: ActivityEvent[];
-  onSelectExecution?: (executionId: string) => void;
+  onSelectExecution?: (executionId: string, initialTab?: 'pipeline' | 'agents' | 'files' | 'diff') => void;
 }
 
 export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
@@ -69,6 +72,62 @@ export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
     }
   };
 
+  const renderContextualButton = (evt: ActivityEvent) => {
+    if (!evt.execution_id || !onSelectExecution) return null;
+
+    if (evt.type === 'CODE_CHANGE_DETECTED') {
+      return (
+        <button
+          onClick={() => onSelectExecution(evt.execution_id!, 'files')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-xs font-mono text-indigo-300 hover:text-indigo-200 transition-colors border border-indigo-500/30"
+          title="Inspect code changes and AI reasoning"
+        >
+          <Code2 className="w-3.5 h-3.5 text-indigo-400" />
+          <span>View Code Changes</span>
+          <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+        </button>
+      );
+    }
+
+    if (evt.type === 'DOCUMENTATION_UPDATED' || evt.type === 'COMMIT_CREATED') {
+      return (
+        <button
+          onClick={() => onSelectExecution(evt.execution_id!, 'diff')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-mono text-emerald-300 hover:text-emerald-200 transition-colors border border-emerald-500/30"
+          title="Inspect documentation diff and PR"
+        >
+          <FileText className="w-3.5 h-3.5 text-emerald-400" />
+          <span>View Doc Updates</span>
+          <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+        </button>
+      );
+    }
+
+    if (evt.type === 'AI_ANALYSIS_COMPLETED') {
+      return (
+        <button
+          onClick={() => onSelectExecution(evt.execution_id!, 'agents')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-xs font-mono text-amber-300 hover:text-amber-200 transition-colors border border-amber-500/30"
+          title="View 3-Agent deep trace"
+        >
+          <Brain className="w-3.5 h-3.5 text-amber-400" />
+          <span>View AI Trace</span>
+          <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+        </button>
+      );
+    }
+
+    return (
+      <button
+        onClick={() => onSelectExecution(evt.execution_id!, 'pipeline')}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs font-mono text-slate-300 hover:text-slate-100 transition-colors border border-dark-border"
+      >
+        <span>View Trace</span>
+        <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+      </button>
+    );
+  };
+
   return (
     <div className="divide-y divide-dark-border">
       {events.map((evt) => (
@@ -110,26 +169,20 @@ export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
             </div>
           </div>
 
-          {/* Quick Action Link */}
+          {/* Contextual Action Links */}
           <div className="flex items-center gap-2 shrink-0 self-center">
-            {evt.execution_id && onSelectExecution && (
-              <button
-                onClick={() => onSelectExecution(evt.execution_id!)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs font-mono text-slate-300 hover:text-slate-100 transition-colors border border-dark-border"
-              >
-                <span>View Trace</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            )}
+            {renderContextualButton(evt)}
             {evt.metadata?.pull_request_url && (
               <a
                 href={evt.metadata.pull_request_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-                title="Open Pull Request"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 text-brand-300 hover:text-brand-200 border border-brand-500/30 text-xs font-mono transition-colors"
+                title="Open Pull Request on GitHub"
               >
-                <ExternalLink className="w-4 h-4" />
+                <GitPullRequest className="w-3.5 h-3.5 text-brand-400" />
+                <span className="hidden sm:inline">PR</span>
+                <ExternalLink className="w-3 h-3 opacity-70" />
               </a>
             )}
           </div>

@@ -399,7 +399,7 @@ export const ConnectGitHubPage: React.FC<ConnectGitHubPageProps> = ({
                 </div>
                 <div className="text-xs space-y-2 flex-1">
                   <h4 className="font-semibold text-slate-200">
-                    Set Repository Permissions (3 Required)
+                    Set Repository Permissions (Recommended)
                   </h4>
                   <div className="space-y-1.5 pt-1">
                     <div className="flex items-center justify-between p-2 rounded-lg bg-slate-950/70 border border-dark-border">
@@ -416,6 +416,16 @@ export const ConnectGitHubPage: React.FC<ConnectGitHubPageProps> = ({
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                         <span className="font-mono text-slate-200 text-[11px]">Pull requests</span>
+                      </div>
+                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                        Read and write
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-slate-950/70 border border-dark-border">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span className="font-mono text-slate-200 text-[11px]">Webhooks</span>
                       </div>
                       <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                         Read and write

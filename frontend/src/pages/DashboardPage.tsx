@@ -10,6 +10,7 @@ import { QuickSyncTriggerModal } from '../components/dashboard/QuickSyncTriggerM
 import { ExecutionDetailDrawer } from '../components/activity/ExecutionDetailDrawer';
 import { DiffViewerModal } from '../components/activity/DiffViewerModal';
 import { Button } from '../components/common/Button';
+import { executionService } from '../services/executionService';
 import { Execution } from '../types/execution';
 import { Sparkles, RefreshCw } from 'lucide-react';
 
@@ -90,7 +91,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           <RecentExecutionsTable
             executions={executions}
             repositories={repositories}
-            onSelectExecution={setSelectedExecution}
+            onSelectExecution={async (exec) => {
+              setSelectedExecution(exec);
+              try {
+                const full = await executionService.getExecution(exec.id);
+                if (full) setSelectedExecution(full);
+              } catch (err) {
+                console.error(err);
+              }
+            }}
             onViewAll={() => onNavigate('activity')}
           />
         </div>

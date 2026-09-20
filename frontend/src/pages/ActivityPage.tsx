@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useExecutions } from '../hooks/useExecutions';
 import { useRepositories } from '../hooks/useRepositories';
 import { activityService } from '../services/activityService';
+import { executionService } from '../services/executionService';
 import { Execution, ExecutionStatus } from '../types/execution';
 import { ActivityEvent, ActivityEventType } from '../types/activity';
 import { Card } from '../components/common/Card';
@@ -29,6 +30,7 @@ export const ActivityPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'ALL' | ExecutionStatus>('ALL');
   const [eventTypeFilter, setEventTypeFilter] = useState<'ALL' | ActivityEventType>('ALL');
   const [selectedExecution, setSelectedExecution] = useState<Execution | null>(null);
+  const [selectedExecutionTab, setSelectedExecutionTab] = useState<'pipeline' | 'agents' | 'files' | 'diff'>('pipeline');
 
   const loadActivities = async () => {
     setActivityLoading(true);
@@ -84,32 +86,21 @@ export const ActivityPage: React.FC = () => {
     return matchesSearch && matchesType && matchesRepo;
   });
 
-  const handleOpenExecution = (executionId: string) => {
+  const handleOpenExecution = async (executionId: string, tab: 'pipeline' | 'agents' | 'files' | 'diff' = 'pipeline') => {
+    setSelectedExecutionTab(tab);
+    // Instant optimistic render from list if available
     const found = executions.find((e) => e.id === executionId);
     if (found) {
       setSelectedExecution(found);
-    } else {
-      setSelectedExecution({
-        id: executionId,
-        repository_id: 'repo-1',
-        repository_name: 'tracepath-org/tracepath-backend',
-        event_type: 'push',
-        commit_sha: 'a8f4c219',
-        branch: 'main',
-        status: 'COMPLETED',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        analysis_result: {
-          summary: 'Synchronized documentation with recent code modifications.',
-          purpose: 'Maintain architectural specification accuracy.',
-          key_changes: ['Updated core components'],
-          affected_components: ['API Engine'],
-          behavior_changes: [],
-          dependencies: [],
-          evidence: [],
-          uncertainties: [],
-        },
-      });
+    }
+    // Fetch full, complete execution record with all agent details from API
+    try {
+      const fullExec = await executionService.getExecution(executionId);
+      if (fullExec) {
+        setSelectedExecution(fullExec);
+      }
+    } catch (err) {
+      console.error('Failed to fetch full execution details', err);
     }
   };
 
@@ -300,6 +291,7 @@ export const ActivityPage: React.FC = () => {
         execution={selectedExecution}
         isOpen={!!selectedExecution}
         onClose={() => setSelectedExecution(null)}
+        initialTab={selectedExecutionTab}
       />
     </div>
   );
