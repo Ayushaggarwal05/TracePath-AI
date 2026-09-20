@@ -103,81 +103,10 @@ Branch: {branch}
 
 Please provide your factual, structured JSON analysis strictly following the schema."""
 
-        def mock_generator() -> Dict[str, Any]:
-            # Deterministic simulation based on context
-            file_names = [f.get("filename", str(f)) if isinstance(f, dict) else str(f) for f in changed_files]
-            is_bugfix = any(w in commit_message.lower() for w in ["fix", "bug", "typo", "patch", "correct"])
-            is_billing = any(w in commit_message.lower() or any("billing" in f or "subscription" in f for f in file_names) for w in ["billing", "stripe", "subscription", "pricing"])
-            is_caching = any(w in commit_message.lower() or any("cache" in f or "redis" in f for f in file_names) for w in ["cache", "redis", "memcached"])
-
-            if is_billing:
-                return {
-                    "summary": "Implemented subscription billing and plan management system.",
-                    "purpose": "Introduce recurring billing tiers and webhook handling for payment gateways.",
-                    "key_changes": [
-                        "Added SubscriptionTier enum and BillingAccount data model",
-                        "Created /api/v1/billing/checkout and /api/v1/billing/webhook endpoints",
-                        "Implemented usage-based metering checks",
-                    ],
-                    "affected_components": ["Billing Service", "API Routes", "User Subscription Model"],
-                    "behavior_changes": [
-                        "Users can subscribe to Pro and Enterprise tiers",
-                        "Payment gateway webhooks activate user subscriptions upon checkout",
-                    ],
-                    "dependencies": ["stripe>=7.0.0"],
-                    "evidence": [f"Files modified: {', '.join(file_names)}", "Added SubscriptionTier enum definition"],
-                    "uncertainties": ["Grace period duration on failed webhook was not specified in the diff"],
-                }
-            elif is_caching:
-                return {
-                    "summary": "Integrated Redis caching layer for hot repository queries.",
-                    "purpose": "Improve read latency on high-frequency API endpoints via cached data.",
-                    "key_changes": [
-                        "Added Redis connection pool in core cache service",
-                        "Wrapped repository listing query with 60-second TTL cache decorator",
-                        "Added cache invalidation hooks on repository update/delete",
-                    ],
-                    "affected_components": ["Cache Layer", "Repository Service", "Core Infrastructure"],
-                    "behavior_changes": [
-                        "Repeated reads are served from Redis cache instead of PostgreSQL",
-                        "Cache invalidation occurs on repository modification",
-                    ],
-                    "dependencies": ["redis>=5.0.0"],
-                    "evidence": [f"Files modified: {', '.join(file_names)}", "Redis client initialization with TTL=60"],
-                    "uncertainties": ["Cache cluster failover strategy is not defined in this commit"],
-                }
-            elif is_bugfix:
-                return {
-                    "summary": f"Bug fix: {commit_message or 'Resolved minor logic issue'}",
-                    "purpose": "Correct unexpected edge-case handling without changing system contracts.",
-                    "key_changes": [
-                        f"Fixed conditional check in {file_names[0] if file_names else 'source code'}",
-                    ],
-                    "affected_components": [file_names[0] if file_names else "Internal Handler"],
-                    "behavior_changes": [
-                        "Fixed error on null payload values; core behavior and public API unchanged.",
-                    ],
-                    "dependencies": [],
-                    "evidence": [f"Diff in {file_names[:2]}"],
-                    "uncertainties": [],
-                }
-            else:
-                return {
-                    "summary": f"Code modification across {len(file_names)} files: {commit_message or 'Feature update'}",
-                    "purpose": commit_message or "Enhance application capability and components.",
-                    "key_changes": [f"Updated logic in {f}" for f in file_names[:3]],
-                    "affected_components": file_names[:3],
-                    "behavior_changes": ["Updated internal functions and routines."],
-                    "dependencies": [],
-                    "evidence": [f"Modified {f}" for f in file_names[:3]],
-                    "uncertainties": [],
-                }
-
         try:
             raw_response = await self.llm.call_llm(
                 system_prompt=SYSTEM_PROMPT,
                 user_prompt=user_prompt,
-                mock_response_generator=mock_generator,
             )
             # Schema validation
             validated = AnalysisOutput.model_validate(raw_response)

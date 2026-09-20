@@ -126,29 +126,9 @@ Target Document: {doc_path}
 
 Please generate the updated documentation strictly following the minimal delta rules and output schema."""
 
-        def mock_single_generator() -> Dict[str, Any]:
-            required_changes = decision_data.get("required_changes", ["Update relevant sections"])
-            reason = decision_data.get("reason", "Code synchronization")
-            
-            # Formulate minimal update to existing content
-            doc_addition = f"\n\n## Automated Update: {reason}\n"
-            for change in required_changes:
-                doc_addition += f"- {change}\n"
-
-            updated_content = original_content.rstrip() + doc_addition
-
-            return {
-                "doc_path": doc_path,
-                "action": "update" if original_content else "create",
-                "updated_content": updated_content,
-                "summary_of_changes": f"Updated {doc_path}: {'; '.join(required_changes)}",
-                "validation_notes": "Document structure preserved with minimal delta addition.",
-            }
-
         raw_res = await self.llm.call_llm(
             system_prompt=SYSTEM_PROMPT,
             user_prompt=user_prompt,
-            mock_response_generator=mock_single_generator,
         )
 
         updated_text = raw_res.get("updated_content", original_content)

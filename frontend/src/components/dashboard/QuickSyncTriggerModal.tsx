@@ -110,7 +110,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Trigger Autonomous Sync Execution"
-      subtitle="Analyze live GitHub commits with the 3-Agent AI Pipeline (Gemini 3.6 Flash)."
+      subtitle="Analyze live GitHub commits with the 3-Agent AI Pipeline (Gemini Flash Engine)."
       maxWidth="lg"
     >
       <div className="space-y-5">

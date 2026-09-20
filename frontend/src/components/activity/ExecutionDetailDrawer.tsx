@@ -11,7 +11,6 @@ import {
   X,
   GitPullRequest,
   GitCommit,
-  FileCode,
   Brain,
   Sparkles,
   AlertCircle,
@@ -357,7 +356,7 @@ export const ExecutionDetailDrawer: React.FC<ExecutionDetailDrawerProps> = ({
                 <div className="flex items-center justify-between pb-3 border-b border-dark-border">
                   <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-indigo-400">
                     <Brain className="w-4 h-4" />
-                    <span>Agent 1 — Code Understanding Agent (Gemini 3.6 Flash)</span>
+                    <span>Agent 1 — Code Understanding Agent (Gemini Flash)</span>
                   </div>
                   <Badge variant="indigo">Analysis Complete</Badge>
                 </div>
@@ -414,32 +413,52 @@ export const ExecutionDetailDrawer: React.FC<ExecutionDetailDrawerProps> = ({
                         </div>
                       </div>
                     )}
+
+                    {execution.analysis_result.behavior_changes?.length > 0 && (
+                      <div>
+                        <span className="font-semibold text-slate-300 block mb-1.5">Behavioral Changes:</span>
+                        <ul className="list-disc list-inside text-slate-300 space-y-1 pl-2 text-[11px]">
+                          {execution.analysis_result.behavior_changes.map((b, i) => (
+                            <li key={i}>{b}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-500 italic">Analysis stage trace not available.</p>
+                  <p className="text-xs text-slate-400 italic">No analysis data available for this execution stage.</p>
                 )}
               </div>
 
-              {/* Agent 2 Decision */}
+              {/* Agent 2 Impact Decision */}
               <div className="p-5 rounded-xl bg-slate-900/60 border border-dark-border space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-dark-border">
                   <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-amber-400">
                     <Sparkles className="w-4 h-4" />
-                    <span>Agent 2 — Documentation Impact & Decision Agent (Gemini 3.6 Flash)</span>
+                    <span>Agent 2 — Documentation Impact & Decision Agent (Gemini Flash)</span>
                   </div>
-                  <Badge
-                    variant={
-                      execution.documentation_decision?.overall_decision === 'UPDATE_REQUIRED'
-                        ? 'emerald'
-                        : 'slate'
-                    }
-                  >
-                    {execution.documentation_decision?.overall_decision || 'EVALUATED'}
+                  <Badge variant="amber">
+                    {execution.documentation_decision?.overall_decision || 'Evaluation Complete'}
                   </Badge>
                 </div>
 
                 {execution.documentation_decision ? (
                   <div className="space-y-4 text-xs">
+                    <div>
+                      <span className="font-semibold text-slate-300 block mb-1">Impact Decision:</span>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={
+                            execution.documentation_decision.overall_decision === 'UPDATE_REQUIRED'
+                              ? 'rose'
+                              : 'emerald'
+                          }
+                        >
+                          {execution.documentation_decision.overall_decision}
+                        </Badge>
+                      </div>
+                    </div>
+
                     <div>
                       <span className="font-semibold text-slate-300 block mb-1">Decision Rationale:</span>
                       <p className="text-slate-300 leading-relaxed bg-dark-card p-3 rounded-lg border border-dark-border">
@@ -447,38 +466,42 @@ export const ExecutionDetailDrawer: React.FC<ExecutionDetailDrawerProps> = ({
                       </p>
                     </div>
 
-                    <div className="space-y-2">
-                      <span className="font-semibold text-slate-300 block">Evaluated Documentation Files:</span>
-                      {execution.documentation_decision.document_decisions?.map((doc, i) => (
-                        <div key={i} className="p-3.5 rounded-lg bg-dark-card border border-dark-border space-y-1.5">
-                          <div className="flex items-center justify-between font-mono font-semibold">
-                            <span className="text-brand-300 text-xs">{doc.doc_path}</span>
-                            <Badge variant={doc.is_affected ? 'emerald' : 'slate'}>
-                              {doc.is_affected ? 'Update Required' : 'No Change Needed'}
-                            </Badge>
-                          </div>
-                          <p className="text-slate-300 text-xs">{doc.reason}</p>
-                          {doc.required_changes?.length > 0 && (
-                            <div className="pt-1.5 text-[11px] font-mono text-slate-400 border-t border-slate-800/80 mt-1">
-                              <span className="text-amber-400 font-semibold">Planned Updates: </span>
-                              {doc.required_changes.join(' • ')}
+                    {execution.documentation_decision.document_decisions?.length > 0 && (
+                      <div>
+                        <span className="font-semibold text-slate-300 block mb-2">Evaluated Target Documents:</span>
+                        <div className="space-y-2">
+                          {execution.documentation_decision.document_decisions.map((d, i) => (
+                            <div
+                              key={i}
+                              className="p-3 rounded-lg bg-dark-card border border-dark-border flex items-start justify-between gap-3 text-xs"
+                            >
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2 font-mono font-medium text-slate-200">
+                                  <FileText className="w-3.5 h-3.5 text-amber-400" />
+                                  <span>{d.doc_path}</span>
+                                </div>
+                                <p className="text-slate-400 text-[11px]">{d.reason}</p>
+                              </div>
+                              <Badge variant={d.is_affected ? 'rose' : 'slate'} className="shrink-0">
+                                {d.is_affected ? 'AFFECTED' : 'NO CHANGE'}
+                              </Badge>
                             </div>
-                          )}
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-500 italic">Decision stage trace not available.</p>
+                  <p className="text-xs text-slate-400 italic">No decision data available for this execution stage.</p>
                 )}
               </div>
 
-              {/* Agent 3 Generation */}
+              {/* Agent 3 Generated Docs */}
               <div className="p-5 rounded-xl bg-slate-900/60 border border-dark-border space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-dark-border">
                   <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-emerald-400">
-                    <FileCode className="w-4 h-4" />
-                    <span>Agent 3 — Documentation Generator Agent (Gemini 3.6 Flash)</span>
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Agent 3 — Documentation Generator Agent (Gemini Flash)</span>
                   </div>
                   <Badge variant="emerald">Generation Complete</Badge>
                 </div>

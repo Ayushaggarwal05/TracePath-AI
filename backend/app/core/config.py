@@ -66,23 +66,32 @@ class Settings(BaseSettings):
     # =========================================================================
     
     # AGENT 1: Analysis Agent
-    AGENT_1_MODEL: str = "gpt-4o-mini"
+    AGENT_1_MODEL: Optional[str] = None
+    AGENT_CHANGE_ANALYZER_MODEL: Optional[str] = None
     AGENT_1_API_KEY: Optional[str] = None
+    AGENT_CHANGE_ANALYZER_API_KEY: Optional[str] = None
     AGENT_1_BASE_URL: Optional[str] = None
+    AGENT_CHANGE_ANALYZER_BASE_URL: Optional[str] = None
     AGENT_1_TEMPERATURE: float = 0.1
     AGENT_1_TIMEOUT: float = 60.0
 
     # AGENT 2: Differential / Decision Agent
-    AGENT_2_MODEL: str = "gpt-4o"
+    AGENT_2_MODEL: Optional[str] = None
+    AGENT_IMPACT_PLANNER_MODEL: Optional[str] = None
     AGENT_2_API_KEY: Optional[str] = None
+    AGENT_IMPACT_PLANNER_API_KEY: Optional[str] = None
     AGENT_2_BASE_URL: Optional[str] = None
+    AGENT_IMPACT_PLANNER_BASE_URL: Optional[str] = None
     AGENT_2_TEMPERATURE: float = 0.1
     AGENT_2_TIMEOUT: float = 60.0
 
     # AGENT 3: Documentation Generator
-    AGENT_3_MODEL: str = "gpt-4o"
+    AGENT_3_MODEL: Optional[str] = None
+    AGENT_DOC_GENERATOR_MODEL: Optional[str] = None
     AGENT_3_API_KEY: Optional[str] = None
+    AGENT_DOC_GENERATOR_API_KEY: Optional[str] = None
     AGENT_3_BASE_URL: Optional[str] = None
+    AGENT_DOC_GENERATOR_BASE_URL: Optional[str] = None
     AGENT_3_TEMPERATURE: float = 0.2
     AGENT_3_TIMEOUT: float = 90.0
 
@@ -101,38 +110,47 @@ class Settings(BaseSettings):
 
     @property
     def agent_1_config(self) -> AgentConfig:
+        key = self.AGENT_1_API_KEY or self.AGENT_CHANGE_ANALYZER_API_KEY
+        model = self.AGENT_1_MODEL or self.AGENT_CHANGE_ANALYZER_MODEL or "gemini-3.6-flash"
+        base_url = self.AGENT_1_BASE_URL or self.AGENT_CHANGE_ANALYZER_BASE_URL or "https://generativelanguage.googleapis.com/v1beta/openai"
         return AgentConfig(
             name="AnalysisAgent",
-            model=self.AGENT_1_MODEL,
-            api_key=self.AGENT_1_API_KEY,
-            base_url=self.AGENT_1_BASE_URL,
+            model=model,
+            api_key=key,
+            base_url=base_url,
             temperature=self.AGENT_1_TEMPERATURE,
             timeout_seconds=self.AGENT_1_TIMEOUT,
-            mock_mode=not bool(self.AGENT_1_API_KEY),
+            mock_mode=not bool(key),
         )
 
     @property
     def agent_2_config(self) -> AgentConfig:
+        key = self.AGENT_2_API_KEY or self.AGENT_IMPACT_PLANNER_API_KEY
+        model = self.AGENT_2_MODEL or self.AGENT_IMPACT_PLANNER_MODEL or "gemini-3.6-flash"
+        base_url = self.AGENT_2_BASE_URL or self.AGENT_IMPACT_PLANNER_BASE_URL or "https://generativelanguage.googleapis.com/v1beta/openai"
         return AgentConfig(
             name="DecisionAgent",
-            model=self.AGENT_2_MODEL,
-            api_key=self.AGENT_2_API_KEY,
-            base_url=self.AGENT_2_BASE_URL,
+            model=model,
+            api_key=key,
+            base_url=base_url,
             temperature=self.AGENT_2_TEMPERATURE,
             timeout_seconds=self.AGENT_2_TIMEOUT,
-            mock_mode=not bool(self.AGENT_2_API_KEY),
+            mock_mode=not bool(key),
         )
 
     @property
     def agent_3_config(self) -> AgentConfig:
+        key = self.AGENT_3_API_KEY or self.AGENT_DOC_GENERATOR_API_KEY
+        model = self.AGENT_3_MODEL or self.AGENT_DOC_GENERATOR_MODEL or "gemini-3.6-flash"
+        base_url = self.AGENT_3_BASE_URL or self.AGENT_DOC_GENERATOR_BASE_URL or "https://generativelanguage.googleapis.com/v1beta/openai"
         return AgentConfig(
             name="DocGeneratorAgent",
-            model=self.AGENT_3_MODEL,
-            api_key=self.AGENT_3_API_KEY,
-            base_url=self.AGENT_3_BASE_URL,
+            model=model,
+            api_key=key,
+            base_url=base_url,
             temperature=self.AGENT_3_TEMPERATURE,
             timeout_seconds=self.AGENT_3_TIMEOUT,
-            mock_mode=not bool(self.AGENT_3_API_KEY),
+            mock_mode=not bool(key),
         )
 
 
