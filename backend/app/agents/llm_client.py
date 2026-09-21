@@ -107,10 +107,10 @@ class LLMClient:
                 "response_format": {"type": "json_object"},
             }
 
-            max_retries = 4
+            max_retries = 5
             for attempt in range(max_retries):
                 try:
-                    async with httpx.AsyncClient(timeout=self.config.timeout_seconds) as client:
+                    async with httpx.AsyncClient(timeout=max(self.config.timeout_seconds, 60.0)) as client:
                         response = await client.post(
                             self.endpoint,
                             headers=headers,
@@ -126,10 +126,10 @@ class LLMClient:
                             return extract_json_from_response(content)
 
                         last_error_text = f"Status {response.status_code}: {response.text[:200]}"
-                        if response.status_code in (429, 503) and attempt < max_retries - 1:
-                            backoff = (attempt + 1) * 3.0
+                        if response.status_code in (429, 503, 500) and attempt < max_retries - 1:
+                            backoff = [3.0, 6.0, 12.0, 20.0, 30.0][attempt]
                             logger.warning(
-                                f"[{self.config.name}] Model {model_name} temporary {response.status_code} spike. Retrying in {backoff}s (attempt {attempt + 1}/{max_retries})..."
+                                f"[{self.config.name}] Model {model_name} temporary {response.status_code} spike ({'Server High Demand' if response.status_code == 503 else 'Rate Limit'}). Retrying in {backoff}s (attempt {attempt + 1}/{max_retries})..."
                             )
                             await asyncio.sleep(backoff)
                             continue
@@ -141,7 +141,8 @@ class LLMClient:
                     last_error_text = f"Network error: {str(net_err)}"
                     logger.warning(f"[{self.config.name}] Network error with {model_name}: {net_err}")
                     if attempt < max_retries - 1:
-                        await asyncio.sleep(1.5)
+                        backoff = (attempt + 1) * 3.0
+                        await asyncio.sleep(backoff)
                         continue
                     break
 

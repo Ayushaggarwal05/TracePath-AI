@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import math
 from typing import Any, Dict, List, Optional
 from uuid import UUID
@@ -23,6 +24,17 @@ from app.schemas.repository_automation import (
 )
 from app.services.automation_service import automation_service
 from app.services.execution_service import execution_service
+from app.services.repository_service import repository_service
+
+router = APIRouter()
+
+
+def _to_iso_utc(dt) -> str:
+    if not dt:
+        return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    if hasattr(dt, "tzinfo") and dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.isoformat().replace("+00:00", "Z")
 from app.services.repository_service import repository_service
 
 router = APIRouter()
@@ -252,14 +264,14 @@ async def list_repository_documents(
         else:
             category = "general"
             title = f"Document: {path}"
-
-        # Find latest execution that updated this document
+        # Find the latest execution that updated this specific document
         matching_updates = []
         for exec_item in executions:
             if exec_item.updated_documents:
                 for doc_update in exec_item.updated_documents:
                     if doc_update.get("doc_path") == path:
                         matching_updates.append((exec_item, doc_update))
+                        break
 
         if matching_updates:
             latest_exec, latest_doc = matching_updates[0]
@@ -269,7 +281,7 @@ async def list_repository_documents(
                 "doc_path": path,
                 "title": title,
                 "category": category,
-                "last_updated_at": latest_exec.created_at.isoformat(),
+                "last_updated_at": _to_iso_utc(latest_exec.created_at),
                 "last_commit_sha": latest_exec.commit_sha,
                 "last_execution_id": str(latest_exec.id),
                 "total_updates_count": len(matching_updates),
@@ -284,7 +296,7 @@ async def list_repository_documents(
                 "doc_path": path,
                 "title": title,
                 "category": category,
-                "last_updated_at": repo.created_at.isoformat(),
+                "last_updated_at": _to_iso_utc(repo.created_at),
                 "last_commit_sha": "initial",
                 "last_execution_id": "initial",
                 "total_updates_count": 0,
@@ -327,7 +339,7 @@ async def get_document_history(
                         "summary_of_changes": doc_update.get("summary_of_changes", "Documentation update"),
                         "diff": doc_update.get("diff", ""),
                         "updated_content": doc_update.get("updated_content", ""),
-                        "created_at": exec_item.created_at.isoformat(),
+                        "created_at": _to_iso_utc(exec_item.created_at),
                         "validation_passed": True,
                     })
 
