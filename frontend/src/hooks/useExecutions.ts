@@ -57,7 +57,7 @@ export function useExecutions(params?: {
 
     const intervalId = setInterval(() => {
       fetchExecutions(true);
-    }, 2500);
+    }, 1500);
 
     return () => clearInterval(intervalId);
   }, [executions, fetchExecutions, params?.autoRefresh]);

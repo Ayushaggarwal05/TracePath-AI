@@ -46,6 +46,40 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
             const repo = repositories.find((r) => r.id === exec.repository_id);
             const repoDisplayName = repo?.name || exec.repository_name || 'Repository';
 
+            const getSummaryText = () => {
+              if (exec.status === 'FAILED') {
+                if (exec.error_information?.error) {
+                  return `Failed at ${exec.error_information.stage || 'Pipeline'}: ${exec.error_information.error}`;
+                }
+                return 'Pipeline execution failed';
+              }
+              if (exec.status === 'SKIPPED') {
+                return exec.documentation_decision?.decision_rationale || 'Zero documentation impact detected (No doc updates needed)';
+              }
+              if (exec.analysis_result?.summary) {
+                return exec.analysis_result.summary;
+              }
+              if (exec.documentation_decision?.decision_rationale) {
+                return exec.documentation_decision.decision_rationale;
+              }
+              if (exec.status === 'COMPLETED') {
+                return 'Code commit synchronized directly to main branch';
+              }
+              if (exec.status === 'COMMITTING') {
+                return 'Pushing documentation commit to GitHub...';
+              }
+              if (exec.status === 'GENERATING') {
+                return 'Agent 3: Generating documentation updates...';
+              }
+              if (exec.status === 'PLANNING') {
+                return 'Agent 2: Evaluating documentation impact...';
+              }
+              if (exec.status === 'ANALYZING') {
+                return 'Agent 1: Analyzing code changes with Gemini...';
+              }
+              return 'Queued for pipeline execution...';
+            };
+
             return (
               <div
                 key={exec.id}
@@ -67,14 +101,13 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
                         {formatShortSha(exec.commit_sha)}
                       </span>
                       <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.2 rounded-full border ${style.bg} ${style.text} ${style.border}`}>
-                        <span className={`w-1 h-1 rounded-full ${style.dot}`} />
+                        <span className={`w-1 h-1 rounded-full ${style.dot} ${['ANALYZING', 'PLANNING', 'GENERATING', 'COMMITTING'].includes(exec.status) ? 'animate-ping' : ''}`} />
                         {style.label}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 truncate mt-1 group-hover:text-brand-300 transition-colors">
-                      {exec.analysis_result?.summary || exec.documentation_decision?.decision_rationale || (exec.status === 'COMPLETED' ? 'Code commit synchronized' : 'Processing commit...')}
+                    <p className={`text-xs truncate mt-1 group-hover:text-brand-300 transition-colors ${exec.status === 'FAILED' ? 'text-rose-400 font-mono text-[11px]' : 'text-slate-300'}`}>
+                      {getSummaryText()}
                     </p>
-
                   </div>
                 </div>
 

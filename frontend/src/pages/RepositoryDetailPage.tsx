@@ -395,11 +395,17 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
                           <span className="font-mono text-xs font-bold text-slate-200">
                             {formatShortSha(exec.commit_sha)}
                           </span>
-                          <Badge variant={exec.status === 'COMPLETED' ? 'emerald' : exec.status === 'FAILED' ? 'rose' : 'slate'}>
+                          <Badge variant={exec.status === 'COMPLETED' ? 'emerald' : exec.status === 'FAILED' ? 'rose' : exec.status === 'SKIPPED' ? 'slate' : 'amber'}>
                             {style.label}
                           </Badge>
-                          <span className="text-xs text-slate-300 font-medium">
-                            {exec.analysis_result?.summary || 'Execution run'}
+                          <span className={`text-xs font-medium ${exec.status === 'FAILED' ? 'text-rose-400 font-mono text-[11px]' : 'text-slate-300'}`}>
+                            {exec.status === 'FAILED'
+                              ? exec.error_information?.error
+                                ? `Failed at ${exec.error_information.stage || 'Pipeline'}: ${exec.error_information.error}`
+                                : 'Pipeline execution failed'
+                              : exec.status === 'SKIPPED'
+                              ? exec.documentation_decision?.decision_rationale || 'Zero documentation impact (Skipped)'
+                              : exec.analysis_result?.summary || 'Execution run'}
                           </span>
                         </div>
                         <div className="flex items-center gap-3 text-[11px] font-mono text-slate-500">
@@ -483,8 +489,10 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
       <QuickSyncTriggerModal
         repositories={repository ? [repository] : []}
         isOpen={showSyncModal}
+        initialRepoId={repository?.id}
         onClose={() => setShowSyncModal(false)}
         onTriggered={() => loadData()}
+        onViewDetails={(exec) => setSelectedExecution(exec)}
       />
 
       {/* Deactivation Confirmation Modal */}

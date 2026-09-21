@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Any, Dict, List, Optional
 from uuid import UUID
@@ -130,6 +131,7 @@ class PipelineOrchestrator:
         )
 
         # Step 4: Run Agent 2 (Differential / Decision Agent)
+        await asyncio.sleep(1.0)
         agent2_res = await impact_planner_agent.run(
             {
                 "analysis_result": analysis_data,
@@ -175,6 +177,7 @@ class PipelineOrchestrator:
         )
 
         # Step 6: Run Agent 3 (Documentation Generator)
+        await asyncio.sleep(1.0)
         agent3_res = await doc_generator_agent.run(
             {
                 "analysis_result": analysis_data,

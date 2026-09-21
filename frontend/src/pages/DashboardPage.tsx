@@ -124,6 +124,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         isOpen={isTriggerModalOpen}
         onClose={() => setIsTriggerModalOpen(false)}
         onTriggered={handleRefresh}
+        onViewDetails={(exec) => setSelectedExecution(exec)}
       />
 
       {/* Execution Details Drawer */}

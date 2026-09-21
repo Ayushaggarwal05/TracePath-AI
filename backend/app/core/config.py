@@ -149,6 +149,7 @@ class Settings(BaseSettings):
             api_key=key,
             base_url=base_url,
             temperature=self.AGENT_3_TEMPERATURE,
+            max_tokens=8192,
             timeout_seconds=self.AGENT_3_TIMEOUT,
             mock_mode=not bool(key),
         )

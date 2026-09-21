@@ -13,7 +13,7 @@ logger = logging.getLogger("tracepath.llm")
 def extract_json_from_response(text: str) -> Dict[str, Any]:
     """
     Extracts and parses JSON object from an LLM response string.
-    Handles raw JSON, markdown-fenced ```json ... ```, and surrounding commentary.
+    Handles raw JSON, markdown-fenced ```json ... ```, unescaped string literals, and malformed quotes.
     """
     if not text or not text.strip():
         raise ValueError("Received empty response from LLM.")
@@ -25,21 +25,30 @@ def extract_json_from_response(text: str) -> Dict[str, Any]:
     if match:
         cleaned = match.group(1).strip()
 
-    # 2. Try parsing directly
+    # 2. Try standard json.loads with strict=False
     try:
-        return json.loads(cleaned)
+        return json.loads(cleaned, strict=False)
     except json.JSONDecodeError:
         pass
 
-    # 3. Find first '{' and last '}'
+    # 3. Find outer '{' and '}' bounds
     start_idx = cleaned.find("{")
     end_idx = cleaned.rfind("}")
     if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
         json_str = cleaned[start_idx : end_idx + 1]
         try:
-            return json.loads(json_str)
-        except json.JSONDecodeError as err:
-            raise ValueError(f"Failed to parse extracted JSON substring: {err}")
+            return json.loads(json_str, strict=False)
+        except json.JSONDecodeError:
+            pass
+
+    # 4. Fallback to json_repair for auto-healing unescaped quotes or cutoffs
+    try:
+        import json_repair
+        repaired = json_repair.loads(cleaned)
+        if isinstance(repaired, dict) and repaired:
+            return repaired
+    except Exception as e:
+        logger.debug(f"json_repair parsing attempt: {e}")
 
     raise ValueError(f"Could not find valid JSON in LLM response: {text[:200]}...")
 
@@ -75,12 +84,11 @@ class LLMClient:
             "Content-Type": "application/json",
         }
 
-        # Model candidates to try in order of preference
+        # Active model candidates in order of preference
         models_to_try = [
-            self.config.model or "gemini-2.5-flash",
-            "gemini-2.5-flash",
-            "gemini-3.5-flash",
+            self.config.model or "gemini-3.6-flash",
             "gemini-3.6-flash",
+            "gemini-3.5-flash",
         ]
         # Deduplicate while preserving order
         seen = set()
@@ -99,7 +107,8 @@ class LLMClient:
                 "response_format": {"type": "json_object"},
             }
 
-            for attempt in range(2):
+            max_retries = 4
+            for attempt in range(max_retries):
                 try:
                     async with httpx.AsyncClient(timeout=self.config.timeout_seconds) as client:
                         response = await client.post(
@@ -117,8 +126,12 @@ class LLMClient:
                             return extract_json_from_response(content)
 
                         last_error_text = f"Status {response.status_code}: {response.text[:200]}"
-                        if response.status_code in (429, 503) and attempt == 0:
-                            await asyncio.sleep(1.5)
+                        if response.status_code in (429, 503) and attempt < max_retries - 1:
+                            backoff = (attempt + 1) * 3.0
+                            logger.warning(
+                                f"[{self.config.name}] Model {model_name} temporary {response.status_code} spike. Retrying in {backoff}s (attempt {attempt + 1}/{max_retries})..."
+                            )
+                            await asyncio.sleep(backoff)
                             continue
                         
                         logger.warning(f"[{self.config.name}] Model {model_name} returned {last_error_text}, trying fallback model...")
@@ -127,8 +140,8 @@ class LLMClient:
                 except (httpx.TimeoutException, httpx.RequestError) as net_err:
                     last_error_text = f"Network error: {str(net_err)}"
                     logger.warning(f"[{self.config.name}] Network error with {model_name}: {net_err}")
-                    if attempt == 0:
-                        await asyncio.sleep(1.0)
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(1.5)
                         continue
                     break
 
