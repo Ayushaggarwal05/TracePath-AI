@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Execution, ExecutionStatus } from '../../types/execution';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
+import { LivePipelineSegments } from '../common/LivePipelineSegments';
 import { formatShortSha } from '../../utils/formatters';
 import {
   GitCommit,
@@ -339,46 +340,58 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Header Summary Card */}
-      <div className="p-4 rounded-xl bg-slate-900/80 border border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-slate-400">Target Repository:</span>
-            <span className="text-xs font-bold text-slate-100">{repoFullName}</span>
-          </div>
-          <div className="flex items-center gap-3 text-xs text-slate-400 font-mono">
-            {execution?.commit_sha && (
+      <div className="p-4 rounded-xl bg-slate-900/80 border border-dark-border space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-slate-400">Target Repository:</span>
+              <span className="text-xs font-bold text-slate-100">{repoFullName}</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-slate-400 font-mono">
+              {execution?.commit_sha && (
+                <span className="flex items-center gap-1">
+                  <GitCommit className="w-3.5 h-3.5 text-brand-400" />
+                  {formatShortSha(execution.commit_sha)}
+                </span>
+              )}
               <span className="flex items-center gap-1">
-                <GitCommit className="w-3.5 h-3.5 text-brand-400" />
-                {formatShortSha(execution.commit_sha)}
+                <Clock className="w-3.5 h-3.5 text-amber-400" />
+                Elapsed: {elapsedSeconds}s
               </span>
-            )}
-            <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-amber-400" />
-              Elapsed: {elapsedSeconds}s
-            </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Badge
+              variant={
+                execStatus === 'COMPLETED'
+                  ? 'emerald'
+                  : execStatus === 'FAILED'
+                  ? 'rose'
+                  : execStatus === 'SKIPPED'
+                  ? 'slate'
+                  : 'amber'
+              }
+            >
+              {execStatus === 'COMPLETED'
+                ? 'SYNCHRONIZED'
+                : execStatus === 'FAILED'
+                ? 'FAILED'
+                : execStatus === 'SKIPPED'
+                ? 'NO UPDATE NEEDED'
+                : 'AI ENGINE RUNNING'}
+            </Badge>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Badge
-            variant={
-              execStatus === 'COMPLETED'
-                ? 'emerald'
-                : execStatus === 'FAILED'
-                ? 'rose'
-                : execStatus === 'SKIPPED'
-                ? 'slate'
-                : 'amber'
-            }
-          >
-            {execStatus === 'COMPLETED'
-              ? 'SYNCHRONIZED'
-              : execStatus === 'FAILED'
-              ? 'FAILED'
-              : execStatus === 'SKIPPED'
-              ? 'NO UPDATE NEEDED'
-              : 'AI ENGINE RUNNING'}
-          </Badge>
+        {/* 5-Segment Progress Bar */}
+        <div className="pt-2 border-t border-dark-border/80">
+          <LivePipelineSegments
+            status={execStatus}
+            errorStage={execution?.error_information?.stage}
+            showLabels={true}
+            size="md"
+          />
         </div>
       </div>
 

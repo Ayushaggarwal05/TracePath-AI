@@ -65,35 +65,26 @@ class Settings(BaseSettings):
     # THREE INDEPENDENT AI AGENT CONFIGURATIONS
     # =========================================================================
     
-    # AGENT 1: Analysis Agent
-    AGENT_1_MODEL: Optional[str] = None
-    AGENT_CHANGE_ANALYZER_MODEL: Optional[str] = None
-    AGENT_1_API_KEY: Optional[str] = None
+    # AGENT 1: Change Analyzer Agent
+    AGENT_CHANGE_ANALYZER_MODEL: str = "gemini-3.6-flash"
     AGENT_CHANGE_ANALYZER_API_KEY: Optional[str] = None
-    AGENT_1_BASE_URL: Optional[str] = None
-    AGENT_CHANGE_ANALYZER_BASE_URL: Optional[str] = None
-    AGENT_1_TEMPERATURE: float = 0.1
-    AGENT_1_TIMEOUT: float = 60.0
+    AGENT_CHANGE_ANALYZER_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai"
+    AGENT_CHANGE_ANALYZER_TEMPERATURE: float = 0.1
+    AGENT_CHANGE_ANALYZER_TIMEOUT: float = 60.0
 
-    # AGENT 2: Differential / Decision Agent
-    AGENT_2_MODEL: Optional[str] = None
-    AGENT_IMPACT_PLANNER_MODEL: Optional[str] = None
-    AGENT_2_API_KEY: Optional[str] = None
+    # AGENT 2: Impact Planner / Decision Agent
+    AGENT_IMPACT_PLANNER_MODEL: str = "gemini-3.6-flash"
     AGENT_IMPACT_PLANNER_API_KEY: Optional[str] = None
-    AGENT_2_BASE_URL: Optional[str] = None
-    AGENT_IMPACT_PLANNER_BASE_URL: Optional[str] = None
-    AGENT_2_TEMPERATURE: float = 0.1
-    AGENT_2_TIMEOUT: float = 60.0
+    AGENT_IMPACT_PLANNER_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai"
+    AGENT_IMPACT_PLANNER_TEMPERATURE: float = 0.1
+    AGENT_IMPACT_PLANNER_TIMEOUT: float = 60.0
 
-    # AGENT 3: Documentation Generator
-    AGENT_3_MODEL: Optional[str] = None
-    AGENT_DOC_GENERATOR_MODEL: Optional[str] = None
-    AGENT_3_API_KEY: Optional[str] = None
+    # AGENT 3: Documentation Generator Agent
+    AGENT_DOC_GENERATOR_MODEL: str = "gemini-3.6-flash"
     AGENT_DOC_GENERATOR_API_KEY: Optional[str] = None
-    AGENT_3_BASE_URL: Optional[str] = None
-    AGENT_DOC_GENERATOR_BASE_URL: Optional[str] = None
-    AGENT_3_TEMPERATURE: float = 0.2
-    AGENT_3_TIMEOUT: float = 90.0
+    AGENT_DOC_GENERATOR_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai"
+    AGENT_DOC_GENERATOR_TEMPERATURE: float = 0.2
+    AGENT_DOC_GENERATOR_TIMEOUT: float = 90.0
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
@@ -109,50 +100,57 @@ class Settings(BaseSettings):
         return self.ENVIRONMENT == EnvironmentType.PRODUCTION
 
     @property
-    def agent_1_config(self) -> AgentConfig:
-        key = self.AGENT_1_API_KEY or self.AGENT_CHANGE_ANALYZER_API_KEY
-        model = self.AGENT_1_MODEL or self.AGENT_CHANGE_ANALYZER_MODEL or "gemini-3.6-flash"
-        base_url = self.AGENT_1_BASE_URL or self.AGENT_CHANGE_ANALYZER_BASE_URL or "https://generativelanguage.googleapis.com/v1beta/openai"
+    def change_analyzer_config(self) -> AgentConfig:
+        key = self.AGENT_CHANGE_ANALYZER_API_KEY
         return AgentConfig(
             name="AnalysisAgent",
-            model=model,
+            model=self.AGENT_CHANGE_ANALYZER_MODEL,
             api_key=key,
-            base_url=base_url,
-            temperature=self.AGENT_1_TEMPERATURE,
-            timeout_seconds=self.AGENT_1_TIMEOUT,
+            base_url=self.AGENT_CHANGE_ANALYZER_BASE_URL,
+            temperature=self.AGENT_CHANGE_ANALYZER_TEMPERATURE,
+            timeout_seconds=self.AGENT_CHANGE_ANALYZER_TIMEOUT,
             mock_mode=not bool(key),
         )
+
+    @property
+    def impact_planner_config(self) -> AgentConfig:
+        key = self.AGENT_IMPACT_PLANNER_API_KEY
+        return AgentConfig(
+            name="DecisionAgent",
+            model=self.AGENT_IMPACT_PLANNER_MODEL,
+            api_key=key,
+            base_url=self.AGENT_IMPACT_PLANNER_BASE_URL,
+            temperature=self.AGENT_IMPACT_PLANNER_TEMPERATURE,
+            timeout_seconds=self.AGENT_IMPACT_PLANNER_TIMEOUT,
+            mock_mode=not bool(key),
+        )
+
+    @property
+    def doc_generator_config(self) -> AgentConfig:
+        key = self.AGENT_DOC_GENERATOR_API_KEY
+        return AgentConfig(
+            name="DocGeneratorAgent",
+            model=self.AGENT_DOC_GENERATOR_MODEL,
+            api_key=key,
+            base_url=self.AGENT_DOC_GENERATOR_BASE_URL,
+            temperature=self.AGENT_DOC_GENERATOR_TEMPERATURE,
+            max_tokens=8192,
+            timeout_seconds=self.AGENT_DOC_GENERATOR_TIMEOUT,
+            mock_mode=not bool(key),
+        )
+
+    # Backward-compatible property aliases
+    @property
+    def agent_1_config(self) -> AgentConfig:
+        return self.change_analyzer_config
 
     @property
     def agent_2_config(self) -> AgentConfig:
-        key = self.AGENT_2_API_KEY or self.AGENT_IMPACT_PLANNER_API_KEY
-        model = self.AGENT_2_MODEL or self.AGENT_IMPACT_PLANNER_MODEL or "gemini-3.6-flash"
-        base_url = self.AGENT_2_BASE_URL or self.AGENT_IMPACT_PLANNER_BASE_URL or "https://generativelanguage.googleapis.com/v1beta/openai"
-        return AgentConfig(
-            name="DecisionAgent",
-            model=model,
-            api_key=key,
-            base_url=base_url,
-            temperature=self.AGENT_2_TEMPERATURE,
-            timeout_seconds=self.AGENT_2_TIMEOUT,
-            mock_mode=not bool(key),
-        )
+        return self.impact_planner_config
 
     @property
     def agent_3_config(self) -> AgentConfig:
-        key = self.AGENT_3_API_KEY or self.AGENT_DOC_GENERATOR_API_KEY
-        model = self.AGENT_3_MODEL or self.AGENT_DOC_GENERATOR_MODEL or "gemini-3.6-flash"
-        base_url = self.AGENT_3_BASE_URL or self.AGENT_DOC_GENERATOR_BASE_URL or "https://generativelanguage.googleapis.com/v1beta/openai"
-        return AgentConfig(
-            name="DocGeneratorAgent",
-            model=model,
-            api_key=key,
-            base_url=base_url,
-            temperature=self.AGENT_3_TEMPERATURE,
-            max_tokens=8192,
-            timeout_seconds=self.AGENT_3_TIMEOUT,
-            mock_mode=not bool(key),
-        )
+        return self.doc_generator_config
 
 
 settings = Settings()

@@ -10,8 +10,10 @@ import { QuickSyncTriggerModal } from '../components/dashboard/QuickSyncTriggerM
 import { ExecutionDetailDrawer } from '../components/activity/ExecutionDetailDrawer';
 import { DiffViewerModal } from '../components/activity/DiffViewerModal';
 import { Button } from '../components/common/Button';
+import { LivePipelineSegments } from '../components/common/LivePipelineSegments';
 import { executionService } from '../services/executionService';
 import { Execution } from '../types/execution';
+import { formatShortSha } from '../utils/formatters';
 import { Sparkles, RefreshCw } from 'lucide-react';
 
 interface DashboardPageProps {
@@ -77,6 +79,58 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         totalDocUpdates={totalDocUpdates}
         successRate={successRate}
       />
+
+      {/* Active Pipeline Live Stream Banner */}
+      {(() => {
+        const activeExec = executions.find((e) =>
+          ['PENDING', 'ANALYZING', 'PLANNING', 'GENERATING', 'COMMITTING'].includes(e.status)
+        );
+        if (!activeExec) return null;
+
+        const activeRepo = repositories.find((r) => r.id === activeExec.repository_id);
+        const repoName = activeRepo?.name || activeExec.repository_name || 'Repository';
+
+        return (
+          <div className="p-4 rounded-xl bg-gradient-to-r from-amber-950/30 via-dark-card to-slate-900 border border-amber-500/40 shadow-lg shadow-amber-500/5 space-y-3 animate-in fade-in duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30 animate-pulse">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-amber-300 uppercase tracking-wider font-mono">
+                      Autonomous Pipeline In Progress
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                  </div>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Analyzing commit <code className="text-brand-300 bg-slate-800/80 px-1 py-0.5 rounded font-mono text-[11px]">{formatShortSha(activeExec.commit_sha)}</code> on <strong className="text-slate-100">{repoName}</strong>
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-amber-500/40 text-amber-300 hover:bg-amber-500/10 self-start sm:self-auto text-xs"
+                onClick={() => setSelectedExecution(activeExec)}
+              >
+                View Live Trace
+              </Button>
+            </div>
+
+            <div className="pt-1">
+              <LivePipelineSegments
+                status={activeExec.status}
+                errorStage={activeExec.error_information?.stage}
+                showLabels={true}
+                size="md"
+              />
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Active Repositories Live Status Bar */}
       <ActiveRepositoriesBar

@@ -91,7 +91,7 @@ class DocGeneratorAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="DocGeneratorAgent",
-            config=settings.agent_3_config,
+            config=settings.doc_generator_config,
         )
         self.llm = LLMClient(self.config)
 

@@ -87,7 +87,7 @@ class DecisionAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="DecisionAgent",
-            config=settings.agent_2_config,
+            config=settings.impact_planner_config,
         )
         self.llm = LLMClient(self.config)
 

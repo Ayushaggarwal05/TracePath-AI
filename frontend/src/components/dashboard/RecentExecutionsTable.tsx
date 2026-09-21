@@ -3,6 +3,7 @@ import { Execution } from '../../types/execution';
 import { Repository } from '../../types/repository';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
+import { LivePipelineSegments } from '../common/LivePipelineSegments';
 import { getExecutionStatusStyle } from '../../utils/statusStyles';
 import { formatShortSha, formatTimeAgo } from '../../utils/formatters';
 import { ArrowRight, GitCommit, FileText, FolderGit2 } from 'lucide-react';
@@ -113,6 +114,15 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
 
 
                 <div className="flex items-center gap-4 text-xs text-slate-500 font-mono shrink-0">
+                  {/* Segmented Pipeline Bar */}
+                  <div className="hidden lg:block w-32">
+                    <LivePipelineSegments
+                      status={exec.status}
+                      errorStage={exec.error_information?.stage}
+                      size="sm"
+                    />
+                  </div>
+
                   {docUpdatesCount > 0 && (
                     <span className="hidden sm:inline-flex items-center gap-1 text-emerald-400">
                       <FileText className="w-3.5 h-3.5" />

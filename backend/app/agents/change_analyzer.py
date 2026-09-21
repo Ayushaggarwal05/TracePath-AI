@@ -73,7 +73,7 @@ class AnalysisAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="AnalysisAgent",
-            config=settings.agent_1_config,
+            config=settings.change_analyzer_config,
         )
         self.llm = LLMClient(self.config)
 
