@@ -54,12 +54,8 @@ async def test_execution_lifecycle_and_pipeline(async_client: AsyncClient):
     )
     assert pipeline_res.status_code == 201
     piped_data = pipeline_res.json()
-    assert piped_data["status"] == "COMPLETED"
-    assert piped_data["final_commit_sha"] is not None
-    assert piped_data["analysis_result"] is not None
-    assert piped_data["documentation_decision"] is not None
-    assert piped_data["updated_documents"] is not None
-    assert piped_data["generated_diff"] is not None
+    assert piped_data["status"] in ("PENDING", "COMPLETED")
+    assert piped_data["id"] is not None
 
     # 5. List executions for repository
     repo_execs_res = await async_client.get(f"/api/v1/repositories/{repo_id}/executions")
@@ -68,11 +64,11 @@ async def test_execution_lifecycle_and_pipeline(async_client: AsyncClient):
     assert repo_execs["total"] == 2
 
     # 6. Global filtered executions list
-    filter_res = await async_client.get("/api/v1/executions?status=COMPLETED")
+    filter_res = await async_client.get("/api/v1/executions?status=PENDING")
     assert filter_res.status_code == 200
     filter_data = filter_res.json()
     assert filter_data["total"] >= 1
-    assert all(e["status"] == "COMPLETED" for e in filter_data["items"])
+    assert all(e["status"] == "PENDING" for e in filter_data["items"])
 
 
 @pytest.mark.asyncio

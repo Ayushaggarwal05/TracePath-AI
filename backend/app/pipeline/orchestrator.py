@@ -371,28 +371,53 @@ class PipelineOrchestrator:
             commit_tag = f"[tracepath-sync:{commit_sha[:7]}]"
             commit_message = f"docs(tracepath): synchronize engineering documentation {commit_tag}"
 
+            files_to_commit = [
+                {"path": u.get("doc_path", ""), "content": u.get("updated_content", "")}
+                for u in updated_docs
+                if u.get("doc_path") and u.get("updated_content")
+            ]
+
             if auto_commit:
                 _record_event(
                     telemetry_logs,
                     stage="GitHub Sync",
                     level="INFO",
-                    message=f"Directly committing {len(updated_docs)} documentation file(s) to branch {branch}...",
+                    message=f"Directly committing {len(files_to_commit)} documentation file(s) in 1 atomic commit to branch {branch}...",
                 )
-                for update_item in updated_docs:
-                    final_commit_sha = await client.create_or_update_file(
-                        full_name=repository_full_name,
-                        path=update_item.get("doc_path", ""),
-                        content=update_item.get("updated_content", ""),
-                        message=commit_message,
-                        branch=branch,
-                    )
+                if hasattr(client, "create_or_update_files_batch") and len(files_to_commit) > 0:
+                    try:
+                        final_commit_sha = await client.create_or_update_files_batch(
+                            full_name=repository_full_name,
+                            files=files_to_commit,
+                            message=commit_message,
+                            branch=branch,
+                        )
+                    except Exception as batch_err:
+                        logger.warning(f"Batch commit via Git Trees API encountered error, using single-file fallback: {batch_err}")
+                        for update_item in updated_docs:
+                            final_commit_sha = await client.create_or_update_file(
+                                full_name=repository_full_name,
+                                path=update_item.get("doc_path", ""),
+                                content=update_item.get("updated_content", ""),
+                                message=commit_message,
+                                branch=branch,
+                            )
+                else:
+                    for update_item in updated_docs:
+                        final_commit_sha = await client.create_or_update_file(
+                            full_name=repository_full_name,
+                            path=update_item.get("doc_path", ""),
+                            content=update_item.get("updated_content", ""),
+                            message=commit_message,
+                            branch=branch,
+                        )
             else:
                 target_pr_branch = f"tracepath/sync-{commit_sha[:7]}"
                 _record_event(
                     telemetry_logs,
                     stage="GitHub Sync",
                     level="INFO",
-                    message=f"Opening Pull Request on branch {target_pr_branch}...",
+                    message=f"Opening Pull Request on branch {target_pr_branch} with {len(files_to_commit)} updated file(s)...",
                 )
                 if hasattr(client, "create_branch"):
                     try:
@@ -400,14 +425,33 @@ class PipelineOrchestrator:
                     except Exception as branch_err:
                         logger.warning(f"Branch creation note: {branch_err}")
 
-                for update_item in updated_docs:
-                    final_commit_sha = await client.create_or_update_file(
-                        full_name=repository_full_name,
-                        path=update_item.get("doc_path", ""),
-                        content=update_item.get("updated_content", ""),
-                        message=commit_message,
-                        branch=target_pr_branch,
-                    )
+                if hasattr(client, "create_or_update_files_batch") and len(files_to_commit) > 0:
+                    try:
+                        final_commit_sha = await client.create_or_update_files_batch(
+                            full_name=repository_full_name,
+                            files=files_to_commit,
+                            message=commit_message,
+                            branch=target_pr_branch,
+                        )
+                    except Exception as batch_err:
+                        logger.warning(f"Batch PR commit via Git Trees API encountered error, using single-file fallback: {batch_err}")
+                        for update_item in updated_docs:
+                            final_commit_sha = await client.create_or_update_file(
+                                full_name=repository_full_name,
+                                path=update_item.get("doc_path", ""),
+                                content=update_item.get("updated_content", ""),
+                                message=commit_message,
+                                branch=target_pr_branch,
+                            )
+                else:
+                    for update_item in updated_docs:
+                        final_commit_sha = await client.create_or_update_file(
+                            full_name=repository_full_name,
+                            path=update_item.get("doc_path", ""),
+                            content=update_item.get("updated_content", ""),
+                            message=commit_message,
+                            branch=target_pr_branch,
+                        )
 
                 pr_url = await client.create_pull_request(
                     full_name=repository_full_name,

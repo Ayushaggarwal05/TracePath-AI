@@ -94,6 +94,15 @@ class MockGitHubClient(IGitHubClient):
     ) -> str:
         return f"mock-commit-sha-{abs(hash(message)) % 1000000:06d}"
 
+    async def create_or_update_files_batch(
+        self,
+        full_name: str,
+        files: List[Dict[str, str]],
+        message: str,
+        branch: str,
+    ) -> str:
+        return f"mock-batch-sha-{abs(hash(message)) % 1000000:06d}"
+
     async def create_pull_request(
         self,
         full_name: str,

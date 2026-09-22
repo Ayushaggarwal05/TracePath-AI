@@ -197,6 +197,98 @@ class GitHubAPIClient(IGitHubClient):
             commit_info = data.get("commit", {})
             return commit_info.get("sha", "committed")
 
+    async def create_or_update_files_batch(
+        self,
+        full_name: str,
+        files: List[Dict[str, str]],
+        message: str,
+        branch: str,
+    ) -> str:
+        """
+        Atomically commits multiple updated/created files into a single commit on the specified branch
+        using GitHub's Git Data Trees API.
+        """
+        if not files:
+            raise ValueError("No files provided for batch commit.")
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # 1. Fetch latest commit SHA and base tree on the target branch
+            ref_resp = await client.get(
+                f"{self.base_url}/repos/{full_name}/commits/{branch}",
+                headers=self._get_headers(),
+            )
+            ref_resp.raise_for_status()
+            ref_data = ref_resp.json()
+            base_commit_sha = ref_data.get("sha")
+            base_tree_sha = ref_data.get("commit", {}).get("tree", {}).get("sha")
+
+            if not base_commit_sha or not base_tree_sha:
+                raise ValueError(f"Could not resolve base tree for branch {branch} in {full_name}")
+
+            # 2. Build tree payload with all updated files
+            tree_items = [
+                {
+                    "path": f["path"].replace("\\", "/").lstrip("/"),
+                    "mode": "100644",
+                    "type": "blob",
+                    "content": f["content"],
+                }
+                for f in files
+            ]
+
+            tree_payload = {
+                "base_tree": base_tree_sha,
+                "tree": tree_items,
+            }
+
+            tree_resp = await client.post(
+                f"{self.base_url}/repos/{full_name}/git/trees",
+                headers=self._get_headers(),
+                json=tree_payload,
+            )
+            tree_resp.raise_for_status()
+            new_tree_sha = tree_resp.json().get("sha")
+
+            # 3. Create single atomic commit pointing to new tree
+            commit_payload = {
+                "message": message,
+                "tree": new_tree_sha,
+                "parents": [base_commit_sha],
+                "committer": {
+                    "name": "TracePath AI",
+                    "email": "bot@tracepath.dev",
+                },
+                "author": {
+                    "name": "TracePath AI",
+                    "email": "bot@tracepath.dev",
+                },
+            }
+
+            commit_resp = await client.post(
+                f"{self.base_url}/repos/{full_name}/git/commits",
+                headers=self._get_headers(),
+                json=commit_payload,
+            )
+            commit_resp.raise_for_status()
+            new_commit_sha = commit_resp.json().get("sha")
+
+            # 4. Update the branch reference to point to the new commit
+            ref_update_payload = {
+                "sha": new_commit_sha,
+                "force": False,
+            }
+            ref_update_resp = await client.patch(
+                f"{self.base_url}/repos/{full_name}/git/refs/heads/{branch}",
+                headers=self._get_headers(),
+                json=ref_update_payload,
+            )
+            ref_update_resp.raise_for_status()
+
+            logger.info(
+                f"Successfully committed {len(files)} files in single atomic commit {new_commit_sha[:8]} to {branch} ({full_name})"
+            )
+            return new_commit_sha
+
     async def create_pull_request(
         self,
         full_name: str,

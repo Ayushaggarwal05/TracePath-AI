@@ -12,7 +12,7 @@ from app.github.mock_client import MockGitHubClient, mock_github_client
 def get_github_client(token: Optional[str] = None) -> IGitHubClient:
     """Returns real GitHub API client if token is provided or configured in settings, else mock client for testing."""
     from app.core.config import settings
-    resolved_token = token or settings.GITHUB_PERSONAL_ACCESS_TOKEN
+    resolved_token = token or getattr(settings, "GITHUB_PERSONAL_ACCESS_TOKEN", None) or getattr(settings, "GITHUB_ACCESS_TOKEN", None)
     if resolved_token:
         return GitHubAPIClient(token=resolved_token)
     return mock_github_client
