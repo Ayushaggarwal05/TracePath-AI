@@ -81,7 +81,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
         } catch (err) {
           console.debug('Polling note:', err);
         }
-      }, 1500);
+      }, 900);
     }
     return () => {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);

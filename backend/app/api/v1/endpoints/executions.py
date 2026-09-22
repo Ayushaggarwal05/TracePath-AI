@@ -1,9 +1,12 @@
+import asyncio
+import logging
 import math
 from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.dependencies import get_database_session
+from app.database.session import AsyncSessionLocal
 from app.models.execution import ExecutionStatus
 from app.schemas.common import PaginatedResponse
 from app.schemas.execution import (
@@ -16,6 +19,26 @@ from app.pipeline.orchestrator import pipeline_orchestrator
 from app.services.repository_service import repository_service
 
 router = APIRouter()
+logger = logging.getLogger("tracepath.executions")
+
+
+async def _run_pipeline_background(execution_id: UUID, repo_id: UUID, commit_sha: str, branch: str):
+    """Executes the 3-agent documentation synchronization pipeline in the background."""
+    async with AsyncSessionLocal() as session:
+        try:
+            repo = await repository_service.get_repository(session, repo_id)
+            doc_paths = repo.automation.doc_paths if repo.automation else None
+            await pipeline_orchestrator.execute_sync_pipeline(
+                db=session,
+                execution_id=execution_id,
+                repository_full_name=repo.full_name,
+                commit_sha=commit_sha,
+                branch=branch or "main",
+                doc_paths=doc_paths,
+                auto_commit=True,
+            )
+        except Exception as e:
+            logger.error(f"Background pipeline execution failed for {execution_id}: {e}", exc_info=True)
 
 
 @router.get(
@@ -63,28 +86,24 @@ async def list_executions(
 )
 async def create_execution(
     execution_in: ExecutionCreate,
-    run_pipeline: bool = Query(default=False, description="Run sync pipeline immediately (Phase 1 demo)"),
+    run_pipeline: bool = Query(default=False, description="Run sync pipeline immediately"),
     db: AsyncSession = Depends(get_database_session),
 ) -> ExecutionDetailResponse:
-
-
     """
     Create a new documentation synchronization execution job.
-    Optionally triggers the multi-agent pipeline simulation.
+    Launches the multi-agent pipeline in the background and returns immediately
+    to support real-time frontend streaming and step-by-step progress tracking.
     """
     execution = await execution_service.create_execution(db, execution_in)
 
     if run_pipeline:
-        repo = await repository_service.get_repository(db, execution.repository_id)
-        doc_paths = repo.automation.doc_paths if repo.automation else None
-        execution = await pipeline_orchestrator.execute_sync_pipeline(
-            db=db,
-            execution_id=execution.id,
-            repository_full_name=repo.full_name,
-            commit_sha=execution.commit_sha,
-            branch=execution.branch or "main",
-            doc_paths=doc_paths,
-            auto_commit=True,
+        asyncio.create_task(
+            _run_pipeline_background(
+                execution_id=execution.id,
+                repo_id=execution.repository_id,
+                commit_sha=execution.commit_sha,
+                branch=execution.branch or "main",
+            )
         )
 
     return ExecutionDetailResponse.model_validate(execution)

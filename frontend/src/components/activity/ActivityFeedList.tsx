@@ -117,6 +117,20 @@ export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
       );
     }
 
+    if (evt.type === 'EXECUTION_FAILED') {
+      return (
+        <button
+          onClick={() => onSelectExecution(evt.execution_id!, 'pipeline')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-xs font-mono text-rose-300 hover:text-rose-200 transition-colors border border-rose-500/30"
+          title="Inspect failure diagnostics and stage error"
+        >
+          <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
+          <span>View Error Trace</span>
+          <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+        </button>
+      );
+    }
+
     return (
       <button
         onClick={() => onSelectExecution(evt.execution_id!, 'pipeline')}

@@ -13,22 +13,24 @@ logger = logging.getLogger("tracepath.llm")
 def extract_json_from_response(text: str) -> Dict[str, Any]:
     """
     Extracts and parses JSON object from an LLM response string.
-    Handles raw JSON, markdown-fenced ```json ... ```, unescaped string literals, and malformed quotes.
+    Safely handles nested markdown codeblocks (e.g. ```bash, ```json), raw JSON, unescaped newlines, and auto-repair.
     """
     if not text or not text.strip():
         raise ValueError("Received empty response from LLM.")
 
     cleaned = text.strip()
 
-    # 1. Check for markdown code blocks (```json ... ``` or ``` ...)
-    match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", cleaned, re.IGNORECASE)
-    if match:
-        cleaned = match.group(1).strip()
+    # 1. Safely strip outermost markdown wrapper (```json ... ``` or ``` ... ```) without chopping nested codeblocks
+    if cleaned.startswith("```"):
+        first_newline = cleaned.find("\n")
+        last_fence = cleaned.rfind("```")
+        if first_newline != -1 and last_fence > first_newline:
+            cleaned = cleaned[first_newline + 1:last_fence].strip()
 
     # 2. Try standard json.loads with strict=False
     try:
         return json.loads(cleaned, strict=False)
-    except json.JSONDecodeError:
+    except Exception:
         pass
 
     # 3. Find outer '{' and '}' bounds
@@ -38,10 +40,17 @@ def extract_json_from_response(text: str) -> Dict[str, Any]:
         json_str = cleaned[start_idx : end_idx + 1]
         try:
             return json.loads(json_str, strict=False)
-        except json.JSONDecodeError:
+        except Exception:
+            pass
+        try:
+            import json_repair
+            repaired = json_repair.loads(json_str)
+            if isinstance(repaired, dict) and repaired:
+                return repaired
+        except Exception:
             pass
 
-    # 4. Fallback to json_repair for auto-healing unescaped quotes or cutoffs
+    # 4. Fallback to json_repair on full text
     try:
         import json_repair
         repaired = json_repair.loads(cleaned)

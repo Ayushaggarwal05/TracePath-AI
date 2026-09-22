@@ -4,10 +4,18 @@ import { CheckCircle2, Clock, AlertCircle, Sparkles, Brain, FileCode, Check } fr
 
 interface AgentPipelineVisualizerProps {
   status: ExecutionStatus;
+  errorStage?: string;
+  hasAnalysis?: boolean;
+  hasDecision?: boolean;
+  hasDocs?: boolean;
 }
 
 export const AgentPipelineVisualizer: React.FC<AgentPipelineVisualizerProps> = ({
   status,
+  errorStage,
+  hasAnalysis,
+  hasDecision,
+  hasDocs,
 }) => {
   const steps = [
     {
@@ -36,15 +44,37 @@ export const AgentPipelineVisualizer: React.FC<AgentPipelineVisualizerProps> = (
     },
   ];
 
-  const getStepState = (stepIndex: number) => {
-    if (status === 'FAILED') {
-      return 'failed';
-    }
+  const getStepState = (stepIndex: number): 'completed' | 'active' | 'skipped' | 'failed' | 'pending' => {
     if (status === 'COMPLETED') {
       return 'completed';
     }
+
     if (status === 'SKIPPED') {
       return stepIndex <= 1 ? 'completed' : 'skipped';
+    }
+
+    if (status === 'FAILED') {
+      const errLower = (errorStage || '').toLowerCase();
+      let failedStepIdx = 0;
+      if (errLower.includes('committing') || errLower.includes('github') || errLower.includes('sync')) {
+        failedStepIdx = 3;
+      } else if (errLower.includes('agent3') || errLower.includes('generator') || errLower.includes('doc')) {
+        failedStepIdx = 2;
+      } else if (errLower.includes('agent2') || errLower.includes('decision') || errLower.includes('impact') || errLower.includes('planner')) {
+        failedStepIdx = 1;
+      } else if (errLower.includes('agent1') || errLower.includes('analysis') || errLower.includes('change')) {
+        failedStepIdx = 0;
+      } else {
+        // Infer from data
+        if (hasDocs) failedStepIdx = 3;
+        else if (hasDecision) failedStepIdx = 2;
+        else if (hasAnalysis) failedStepIdx = 1;
+        else failedStepIdx = 0;
+      }
+
+      if (stepIndex < failedStepIdx) return 'completed';
+      if (stepIndex === failedStepIdx) return 'failed';
+      return 'pending';
     }
 
     const statusOrder: ExecutionStatus[] = [

@@ -72,12 +72,17 @@ export const ActivityPage: React.FC = () => {
   // Filtered Activities
   const filteredActivities = activities.filter((evt) => {
     const matchesSearch =
+      !search ||
       evt.title.toLowerCase().includes(search.toLowerCase()) ||
       evt.description.toLowerCase().includes(search.toLowerCase()) ||
       evt.repository_name.toLowerCase().includes(search.toLowerCase()) ||
       (evt.commit_sha || '').toLowerCase().includes(search.toLowerCase());
 
-    const matchesType = eventTypeFilter === 'ALL' || evt.type === eventTypeFilter;
+    const matchesType =
+      eventTypeFilter === 'ALL' ||
+      evt.type === eventTypeFilter ||
+      (eventTypeFilter === 'AUTOMATION_ACTIVATED' && evt.type === 'REPOSITORY_CONNECTED');
+
     const matchesRepo =
       repoFilter === 'ALL' ||
       evt.repository_id === repoFilter ||
@@ -207,6 +212,7 @@ export const ActivityPage: React.FC = () => {
                 { id: 'DOCUMENTATION_UPDATED', label: 'Doc Updates' },
                 { id: 'AI_ANALYSIS_COMPLETED', label: 'AI Analyses' },
                 { id: 'CODE_CHANGE_DETECTED', label: 'Code Pushes' },
+                { id: 'EXECUTION_FAILED', label: 'Failed' },
                 { id: 'AUTOMATION_ACTIVATED', label: 'Activated' },
               ] as const
             ).map((filter) => (

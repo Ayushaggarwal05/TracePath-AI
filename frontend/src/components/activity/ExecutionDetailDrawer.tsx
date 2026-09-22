@@ -151,7 +151,13 @@ export const ExecutionDetailDrawer: React.FC<ExecutionDetailDrawerProps> = ({
               Duration: <strong className="text-slate-200">{formatDuration(execution.start_time, execution.completion_time)}</strong>
             </span>
           </div>
-          <AgentPipelineVisualizer status={execution.status} />
+          <AgentPipelineVisualizer
+            status={execution.status}
+            errorStage={execution.error_information?.stage}
+            hasAnalysis={!!execution.analysis_result}
+            hasDecision={!!execution.documentation_decision}
+            hasDocs={Boolean(execution.updated_documents && execution.updated_documents.length > 0)}
+          />
         </div>
 
         {/* Navigation Tabs */}
