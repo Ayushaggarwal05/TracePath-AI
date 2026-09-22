@@ -31,7 +31,7 @@ interface ExecutionDetailDrawerProps {
   execution: Execution | null;
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: 'pipeline' | 'agents' | 'files' | 'diff';
+  initialTab?: 'pipeline' | 'agents' | 'files' | 'diff' | 'telemetry';
 }
 
 export const ExecutionDetailDrawer: React.FC<ExecutionDetailDrawerProps> = ({
@@ -40,7 +40,7 @@ export const ExecutionDetailDrawer: React.FC<ExecutionDetailDrawerProps> = ({
   onClose,
   initialTab = 'pipeline',
 }) => {
-  const [activeTab, setActiveTab] = useState<'pipeline' | 'agents' | 'files' | 'diff'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'pipeline' | 'agents' | 'files' | 'diff' | 'telemetry'>(initialTab);
   const [selectedDocDiff, setSelectedDocDiff] = useState<{ path: string; diff: string; content?: string } | null>(null);
   const [copiedSha, setCopiedSha] = useState(false);
 
@@ -167,6 +167,7 @@ export const ExecutionDetailDrawer: React.FC<ExecutionDetailDrawerProps> = ({
             { id: 'agents', label: '3-Agent Deep Trace', icon: <Brain className="w-4 h-4" /> },
             { id: 'files', label: `Code Changes (${execution.changed_files?.length || 0})`, icon: <Code2 className="w-4 h-4" /> },
             { id: 'diff', label: `Docs Diff (${execution.updated_documents?.length || 0})`, icon: <FileText className="w-4 h-4" /> },
+            { id: 'telemetry', label: `Engine Telemetry (${execution.telemetry_logs?.length || 0})`, icon: <Activity className="w-4 h-4" /> },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -589,6 +590,111 @@ export const ExecutionDetailDrawer: React.FC<ExecutionDetailDrawerProps> = ({
               ) : (
                 <div className="p-8 text-center text-slate-500 text-xs italic bg-slate-900/40 rounded-xl border border-dark-border">
                   No documentation diff was produced for this execution run.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 5: ENGINE TELEMETRY & LOGS */}
+          {activeTab === 'telemetry' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-brand-400" />
+                    <span>Real-Time Engine Telemetry & Agent Model Logs</span>
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Deterministic error classifier, model cascade failover, and latency telemetry
+                  </p>
+                </div>
+                <Badge variant="indigo">
+                  {execution.telemetry_logs?.length || 0} Events Logged
+                </Badge>
+              </div>
+
+              {execution.telemetry_logs && execution.telemetry_logs.length > 0 ? (
+                <div className="rounded-xl border border-dark-border bg-slate-950/80 p-4 font-mono text-xs space-y-3 overflow-x-auto shadow-inner">
+                  {execution.telemetry_logs.map((log, index) => {
+                    const isError = log.level === 'ERROR' || log.status === 'FAILED';
+                    const isWarn = log.level === 'WARN' || log.status === 'FAILOVER' || log.status === 'RETRY';
+                    const isSuccess = log.status === 'SUCCESS';
+
+                    return (
+                      <div
+                        key={index}
+                        className={`p-3 rounded-lg border flex flex-col sm:flex-row sm:items-start justify-between gap-2.5 transition-all ${
+                          isError
+                            ? 'bg-rose-950/30 border-rose-500/40 text-rose-200'
+                            : isWarn
+                            ? 'bg-amber-950/30 border-amber-500/40 text-amber-200'
+                            : isSuccess
+                            ? 'bg-emerald-950/20 border-emerald-500/30 text-slate-200'
+                            : 'bg-slate-900/60 border-slate-800 text-slate-300'
+                        }`}
+                      >
+                        <div className="space-y-1 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                isError
+                                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                                  : isWarn
+                                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                  : isSuccess
+                                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                  : 'bg-slate-800 text-slate-400 border border-slate-700'
+                              }`}
+                            >
+                              {log.stage}
+                            </span>
+
+                            {log.model && (
+                              <span className="px-1.5 py-0.5 rounded bg-brand-500/10 text-brand-300 border border-brand-500/20 text-[10px]">
+                                {log.model}
+                              </span>
+                            )}
+
+                            {log.latency_ms !== undefined && (
+                              <span className="text-[10px] text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/50">
+                                ⏱️ {log.latency_ms}ms
+                              </span>
+                            )}
+
+                            {log.status && (
+                              <span
+                                className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                                  isSuccess
+                                    ? 'text-emerald-400 bg-emerald-500/10'
+                                    : isWarn
+                                    ? 'text-amber-400 bg-amber-500/10'
+                                    : 'text-rose-400 bg-rose-500/10'
+                                }`}
+                              >
+                                {log.status}
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="text-xs font-sans text-slate-200 leading-relaxed pl-0.5">
+                            {log.message}
+                          </p>
+                        </div>
+
+                        <span className="text-[11px] text-slate-500 whitespace-nowrap self-start font-mono">
+                          {log.timestamp ? log.timestamp.split('T')[1]?.replace('Z', '') : ''}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="p-8 text-center text-slate-500 text-xs italic bg-slate-900/40 rounded-xl border border-dark-border space-y-2">
+                  <Activity className="w-6 h-6 text-slate-600 mx-auto" />
+                  <p>No telemetry events recorded for this historical execution run.</p>
+                  <p className="text-[11px] text-slate-600">
+                    New synchronizations will stream live model selection, failovers, and latency data here.
+                  </p>
                 </div>
               )}
             </div>

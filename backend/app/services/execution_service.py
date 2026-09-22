@@ -24,6 +24,8 @@ class ExecutionService:
             db,
             obj_in=execution_in,
         )
+        await db.commit()
+        await db.refresh(execution)
         return execution
 
     async def get_execution(self, db: AsyncSession, execution_id: UUID) -> Execution:
@@ -103,7 +105,10 @@ class ExecutionService:
             if not start_time_val:
                 update_dict["start_time"] = datetime.now(timezone.utc)
 
-        return await execution_repo.update(db, db_obj=execution, obj_in=update_dict)
+        updated_exec = await execution_repo.update(db, db_obj=execution, obj_in=update_dict)
+        await db.commit()
+        await db.refresh(updated_exec)
+        return updated_exec
 
 
 execution_service = ExecutionService()

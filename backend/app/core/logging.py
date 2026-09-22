@@ -34,6 +34,10 @@ def setup_logging() -> None:
             "uvicorn": {"level": "INFO"},
             "uvicorn.error": {"level": "INFO"},
             "uvicorn.access": {"level": "INFO"},
+            "aiosqlite": {"level": "WARNING"},
+            "httpcore": {"level": "WARNING"},
+            "httpx": {"level": "WARNING"},
+            "asyncio": {"level": "WARNING"},
             "sqlalchemy.engine": {
                 "level": "INFO" if settings.DB_ECHO else "WARNING",
                 "handlers": ["console"],

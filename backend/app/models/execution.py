@@ -74,6 +74,10 @@ class Execution(BaseModel):
     # 7. Error information in case of failure
     error_information: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
 
+    # 8. Real-time engine telemetry and agent execution logs
+    # Format: [{"timestamp": "...", "stage": "Agent 1", "level": "INFO", "message": "...", "model": "gemini-2.5-flash", "latency_ms": 1420}]
+    telemetry_logs: Mapped[Optional[List[Dict[str, Any]]]] = mapped_column(JSON, nullable=True, default=list)
+
     # Relationships
     repository: Mapped["Repository"] = relationship("Repository", back_populates="executions")
 

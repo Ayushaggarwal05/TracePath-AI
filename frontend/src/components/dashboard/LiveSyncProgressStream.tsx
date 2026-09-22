@@ -225,9 +225,11 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
           type: 'info',
         });
       } else if (execution.status === 'FAILED') {
+        const errorStage = execution.error_information?.stage ? ` at ${execution.error_information.stage}` : '';
+        const errorText = execution.error_information?.error || 'Execution encountered an unexpected error.';
         newLogs.push({
           time: now,
-          text: `[Error] Pipeline failed at ${execution.error_information?.stage}: ${execution.error_information?.error}`,
+          text: `[Error] Pipeline failed${errorStage}: ${errorText}`,
           type: 'error',
         });
       }

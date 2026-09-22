@@ -39,6 +39,17 @@ async def _run_pipeline_background(execution_id: UUID, repo_id: UUID, commit_sha
             )
         except Exception as e:
             logger.error(f"Background pipeline execution failed for {execution_id}: {e}", exc_info=True)
+            try:
+                await execution_service.update_execution_progress(
+                    session,
+                    execution_id,
+                    update_in={
+                        "status": ExecutionStatus.FAILED,
+                        "error_information": {"stage": "BackgroundDispatcher", "error": str(e)},
+                    },
+                )
+            except Exception:
+                pass
 
 
 @router.get(
@@ -86,7 +97,7 @@ async def list_executions(
 )
 async def create_execution(
     execution_in: ExecutionCreate,
-    run_pipeline: bool = Query(default=False, description="Run sync pipeline immediately"),
+    run_pipeline: bool = Query(default=True, description="Run sync pipeline immediately"),
     db: AsyncSession = Depends(get_database_session),
 ) -> ExecutionDetailResponse:
     """

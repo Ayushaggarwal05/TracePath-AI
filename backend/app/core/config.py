@@ -66,21 +66,21 @@ class Settings(BaseSettings):
     # =========================================================================
     
     # AGENT 1: Change Analyzer Agent
-    AGENT_CHANGE_ANALYZER_MODEL: str = "gemini-3.6-flash"
+    AGENT_CHANGE_ANALYZER_MODEL: str = "gemini-3.5-flash-lite"
     AGENT_CHANGE_ANALYZER_API_KEY: Optional[str] = None
     AGENT_CHANGE_ANALYZER_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai"
     AGENT_CHANGE_ANALYZER_TEMPERATURE: float = 0.1
     AGENT_CHANGE_ANALYZER_TIMEOUT: float = 60.0
 
     # AGENT 2: Impact Planner / Decision Agent
-    AGENT_IMPACT_PLANNER_MODEL: str = "gemini-3.6-flash"
+    AGENT_IMPACT_PLANNER_MODEL: str = "gemini-3.5-flash-lite"
     AGENT_IMPACT_PLANNER_API_KEY: Optional[str] = None
     AGENT_IMPACT_PLANNER_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai"
     AGENT_IMPACT_PLANNER_TEMPERATURE: float = 0.1
     AGENT_IMPACT_PLANNER_TIMEOUT: float = 60.0
 
     # AGENT 3: Documentation Generator Agent
-    AGENT_DOC_GENERATOR_MODEL: str = "gemini-3.6-flash"
+    AGENT_DOC_GENERATOR_MODEL: str = "gemini-3.5-flash-lite"
     AGENT_DOC_GENERATOR_API_KEY: Optional[str] = None
     AGENT_DOC_GENERATOR_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai"
     AGENT_DOC_GENERATOR_TEMPERATURE: float = 0.2

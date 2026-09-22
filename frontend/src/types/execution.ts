@@ -58,6 +58,16 @@ export interface ErrorInformation {
   error: string;
 }
 
+export interface TelemetryLogItem {
+  timestamp: string;
+  stage: string;
+  level: 'INFO' | 'WARN' | 'ERROR';
+  message: string;
+  model?: string;
+  latency_ms?: number;
+  status?: string;
+}
+
 export interface Execution {
   id: string;
   repository_id: string;
@@ -76,6 +86,7 @@ export interface Execution {
   final_commit_sha?: string;
   pull_request_url?: string;
   error_information?: ErrorInformation;
+  telemetry_logs?: TelemetryLogItem[];
   created_at: string;
   updated_at: string;
 }

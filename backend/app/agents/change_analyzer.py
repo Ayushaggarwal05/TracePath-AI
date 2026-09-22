@@ -10,19 +10,49 @@ from app.core.exceptions import AgentExecutionException
 logger = logging.getLogger("tracepath.agent1")
 
 
+from pydantic import BaseModel, Field, ValidationError, model_validator
+
+
 class AnalysisOutput(BaseModel):
     """
     Structured output of Agent 1 (Analysis Agent).
     Captures factual, semantic understanding of code changes.
     """
-    summary: str = Field(..., description="High-level concise summary of what changed")
-    purpose: str = Field(..., description="The underlying intent/goal of this code change")
+    summary: str = Field(default="Code change analysis", description="High-level concise summary of what changed")
+    purpose: str = Field(default="Architectural updates", description="The underlying intent/goal of this code change")
     key_changes: List[str] = Field(default_factory=list, description="List of granular code modifications")
     affected_components: List[str] = Field(default_factory=list, description="Modules, services, classes, or endpoints affected")
     behavior_changes: List[str] = Field(default_factory=list, description="Observable behavioral or runtime changes")
     dependencies: List[str] = Field(default_factory=list, description="New or modified internal/external dependencies")
     evidence: List[str] = Field(default_factory=list, description="Concrete evidence extracted directly from the diffs/files")
     uncertainties: List[str] = Field(default_factory=list, description="Ambiguities or unverified assumptions")
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_analysis(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+
+        # Normalize summary
+        if not data.get("summary"):
+            data["summary"] = data.get("overview") or data.get("description") or data.get("title") or "Code changes analyzed."
+
+        # Normalize purpose
+        if not data.get("purpose"):
+            data["purpose"] = data.get("intent") or data.get("goal") or data.get("rationale") or data["summary"]
+
+        # Ensure list fields are always lists
+        list_fields = ["key_changes", "affected_components", "behavior_changes", "dependencies", "evidence", "uncertainties"]
+        for f in list_fields:
+            val = data.get(f)
+            if val is None:
+                data[f] = []
+            elif isinstance(val, str):
+                data[f] = [val]
+            elif not isinstance(val, list):
+                data[f] = [str(val)]
+
+        return data
 
 
 SYSTEM_PROMPT = """You are AGENT 1: ANALYSIS AGENT of TracePath AI, an autonomous documentation synchronization platform.
@@ -104,9 +134,11 @@ Branch: {branch}
 Please provide your factual, structured JSON analysis strictly following the schema."""
 
         try:
+            telemetry_collector = context.get("telemetry_collector")
             raw_response = await self.llm.call_llm(
                 system_prompt=SYSTEM_PROMPT,
                 user_prompt=user_prompt,
+                telemetry_collector=telemetry_collector,
             )
             # Schema validation
             validated = AnalysisOutput.model_validate(raw_response)

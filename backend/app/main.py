@@ -22,6 +22,30 @@ async def lifespan(app: FastAPI):
             await conn.run_sync(Base.metadata.create_all)
         logger.info("Database tables verified / created.")
 
+    # Reset any stale/orphaned in-flight executions on startup
+    try:
+        from app.database.session import AsyncSessionLocal
+        from app.models.execution import Execution, ExecutionStatus
+        from sqlalchemy import update
+        async with AsyncSessionLocal() as session:
+            await session.execute(
+                update(Execution)
+                .where(Execution.status.in_([
+                    ExecutionStatus.PENDING,
+                    ExecutionStatus.ANALYZING,
+                    ExecutionStatus.PLANNING,
+                    ExecutionStatus.GENERATING,
+                    ExecutionStatus.COMMITTING,
+                ]))
+                .values(
+                    status=ExecutionStatus.FAILED,
+                    error_information={"error": "Server restarted while execution was in progress."},
+                )
+            )
+            await session.commit()
+    except Exception as e:
+        logger.warning(f"Could not reset stale executions on startup: {e}")
+
     yield
 
     # Teardown

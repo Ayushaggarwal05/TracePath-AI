@@ -56,6 +56,7 @@ class ExecutionUpdate(BaseModel):
     final_commit_sha: Optional[str] = None
     pull_request_url: Optional[str] = None
     error_information: Optional[Dict[str, Any]] = None
+    telemetry_logs: Optional[List[Dict[str, Any]]] = None
 
 
 class ExecutionResponse(ExecutionBase):
@@ -69,6 +70,7 @@ class ExecutionResponse(ExecutionBase):
     pull_request_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime
+    telemetry_logs: Optional[List[Dict[str, Any]]] = None
 
 
 class ExecutionDetailResponse(ExecutionResponse):
