@@ -22,7 +22,7 @@ interface DashboardPageProps {
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const { repositories, refetch: refetchRepos } = useRepositories();
-  const { executions, refetch: refetchExecs } = useExecutions();
+  const { executions, total: totalExecutionsCount, refetch: refetchExecs } = useExecutions({ autoRefresh: true });
   const [selectedExecution, setSelectedExecution] = useState<Execution | null>(null);
   const [activeStreamingExecution, setActiveStreamingExecution] = useState<Execution | null>(null);
   const [isTriggerModalOpen, setIsTriggerModalOpen] = useState(false);
@@ -96,7 +96,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       <MetricCards
         totalRepos={repositories.length}
         activeAutomations={activeAutomations}
-        totalExecutions={executions.length}
+        totalExecutions={totalExecutionsCount ?? executions.length}
         totalDocUpdates={totalDocUpdates}
         successRate={successRate}
       />

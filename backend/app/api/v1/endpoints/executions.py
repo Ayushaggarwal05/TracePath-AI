@@ -28,6 +28,8 @@ async def _run_pipeline_background(execution_id: UUID, repo_id: UUID, commit_sha
         try:
             repo = await repository_service.get_repository(session, repo_id)
             doc_paths = repo.automation.doc_paths if repo.automation else None
+            auto_commit = repo.automation.auto_commit if (repo.automation and repo.automation.auto_commit is not None) else True
+            create_pr = repo.automation.create_pull_request if (repo.automation and repo.automation.create_pull_request is not None) else False
             await pipeline_orchestrator.execute_sync_pipeline(
                 db=session,
                 execution_id=execution_id,
@@ -35,7 +37,8 @@ async def _run_pipeline_background(execution_id: UUID, repo_id: UUID, commit_sha
                 commit_sha=commit_sha,
                 branch=branch or "main",
                 doc_paths=doc_paths,
-                auto_commit=True,
+                auto_commit=auto_commit,
+                create_pull_request=create_pr,
             )
         except Exception as e:
             logger.error(f"Background pipeline execution failed for {execution_id}: {e}", exc_info=True)

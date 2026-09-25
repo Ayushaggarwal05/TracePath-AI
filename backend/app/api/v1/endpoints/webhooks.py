@@ -51,6 +51,8 @@ async def _run_orchestrator_in_background(
     commit_sha: str,
     branch: str,
     doc_paths: Optional[list] = None,
+    auto_commit: bool = True,
+    create_pull_request: bool = False,
 ):
     """Background worker task executed outside the webhook HTTP response lifecycle."""
     async with async_session_factory() as db_session:
@@ -62,6 +64,8 @@ async def _run_orchestrator_in_background(
                 commit_sha=commit_sha,
                 branch=branch,
                 doc_paths=doc_paths,
+                auto_commit=auto_commit,
+                create_pull_request=create_pull_request,
             )
         except Exception as exc:
             logger.error(f"Background pipeline execution failed: {exc}", exc_info=True)
@@ -213,6 +217,8 @@ async def handle_github_webhook(
     # 9. Start Background Processing & Return 202 Accepted Fast
     # =========================================================================
     doc_paths = repo.automation.doc_paths if repo.automation else None
+    auto_commit = repo.automation.auto_commit if (repo.automation and repo.automation.auto_commit is not None) else True
+    create_pr = repo.automation.create_pull_request if (repo.automation and repo.automation.create_pull_request is not None) else False
 
     background_tasks.add_task(
         _run_orchestrator_in_background,
@@ -221,6 +227,8 @@ async def handle_github_webhook(
         commit_sha=commit_sha,
         branch=branch,
         doc_paths=doc_paths,
+        auto_commit=auto_commit,
+        create_pull_request=create_pr,
     )
 
     logger.info(
