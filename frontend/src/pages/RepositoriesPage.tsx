@@ -46,6 +46,15 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
     return matchesSearch && matchesStatus;
   });
 
+  // Sort active repositories above inactive ones, then alphabetically
+  const sortedRepos = [...filteredRepos].sort((a, b) => {
+    const aActive = a.automation?.status === 'ACTIVE';
+    const bActive = b.automation?.status === 'ACTIVE';
+    if (aActive && !bActive) return -1;
+    if (!aActive && bActive) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
   const handleToggleClick = (repo: Repository) => {
     const currentStatus = repo.automation?.status || 'INACTIVE';
     if (currentStatus === 'ACTIVE') {
@@ -113,8 +122,8 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-100 tracking-tight">Connected Repositories</h2>
-          <p className="text-xs text-slate-400 mt-0.5 font-mono">
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Connected Repositories</h2>
+          <p className="text-xs text-slate-500 mt-0.5 font-mono">
             Manage documentation automation, view workspaces, and configure sync rules
           </p>
         </div>
@@ -134,10 +143,10 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
         activeCount={activeCount}
       />
 
-      {/* Repository Cards Grid */}
+      {/* Repository Cards Grid with White Background */}
       {loading ? (
         <LoadingSpinner label="Loading repositories..." />
-      ) : filteredRepos.length === 0 ? (
+      ) : sortedRepos.length === 0 ? (
         <EmptyState
           icon={<GitBranch className="w-8 h-8" />}
           title="No repositories found"
@@ -157,8 +166,8 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
           }
         />
       ) : (
-        <div className="bg-slate-900/60 border border-dark-border rounded-xl divide-y divide-dark-border/60 overflow-hidden shadow-sm">
-          {filteredRepos.map((repo) => (
+        <div className="bg-white border border-slate-200 rounded-2xl divide-y divide-slate-100 overflow-hidden shadow-sm">
+          {sortedRepos.map((repo) => (
             <RepositoryCard
               key={repo.id}
               repository={repo}

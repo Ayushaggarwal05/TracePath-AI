@@ -20,13 +20,13 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         type="text"
         value={value}
         placeholder={placeholder}
-        className="w-full pl-9 pr-8 py-2 bg-dark-card border border-dark-border rounded-lg text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500/60 focus:ring-1 focus:ring-brand-500/60 transition-colors"
+        className="w-full pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors shadow-xs"
         {...props}
       />
       {value && onClear && (
         <button
           onClick={onClear}
-          className="absolute right-2.5 text-slate-400 hover:text-slate-200 p-0.5 rounded"
+          className="absolute right-2.5 text-slate-400 hover:text-slate-600 p-0.5 rounded"
         >
           <X className="w-3.5 h-3.5" />
         </button>

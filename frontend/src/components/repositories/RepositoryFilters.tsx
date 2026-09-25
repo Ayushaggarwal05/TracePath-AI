@@ -30,33 +30,34 @@ export const RepositoryFilters: React.FC<RepositoryFiltersProps> = ({
         />
       </div>
 
-      <div className="flex items-center gap-1.5 p-1 bg-dark-card border border-dark-border rounded-lg self-start sm:self-auto overflow-x-auto">
+      <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-xl shadow-xs self-start sm:self-auto overflow-x-auto">
         <button
           onClick={() => onStatusFilterChange('ALL')}
-          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
             statusFilter === 'ALL'
-              ? 'bg-slate-800 text-slate-100 shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-slate-900 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           All ({totalCount})
         </button>
         <button
           onClick={() => onStatusFilterChange('ACTIVE')}
-          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
             statusFilter === 'ACTIVE'
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-              : 'text-slate-400 hover:text-emerald-400'
+              ? 'bg-emerald-950 text-emerald-300 border border-emerald-800 shadow-xs'
+              : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50'
           }`}
         >
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
           Active ({activeCount})
         </button>
         <button
           onClick={() => onStatusFilterChange('INACTIVE')}
-          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
             statusFilter === 'INACTIVE'
-              ? 'bg-slate-800 text-slate-300'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-slate-200 text-slate-900 shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           Inactive ({totalCount - activeCount})

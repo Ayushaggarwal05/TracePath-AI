@@ -15,8 +15,8 @@ export const Card: React.FC<CardProps> = ({
   ...props
 }) => {
   const glowStyles = {
-    emerald: 'hover:border-emerald-500/40 hover:shadow-glow-emerald',
-    indigo: 'hover:border-indigo-500/40 hover:shadow-glow-indigo',
+    emerald: 'hover:border-emerald-500/50 hover:shadow-md hover:shadow-emerald-500/10',
+    indigo: 'hover:border-slate-400 hover:shadow-md',
     none: '',
   };
 
@@ -24,8 +24,8 @@ export const Card: React.FC<CardProps> = ({
     <div
       className={twMerge(
         clsx(
-          'bg-dark-card border border-dark-border rounded-xl p-5 transition-all duration-200',
-          hoverable && 'hover:bg-dark-hover hover:border-slate-700 cursor-pointer',
+          'bg-white border border-slate-200/90 rounded-2xl p-5 transition-all duration-200 shadow-xs',
+          hoverable && 'hover:bg-slate-50/80 hover:border-slate-300 cursor-pointer',
           glowStyles[glow],
           className
         )

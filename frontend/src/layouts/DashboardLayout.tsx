@@ -111,7 +111,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-dark-base flex flex-col selection:bg-brand-500/20 selection:text-brand-300">
+    <div className="min-h-screen bg-white flex flex-col selection:bg-emerald-500/20 selection:text-emerald-800">
       {/* Top Navigation Header (Full Width & Spacious) */}
       <header className="sticky top-0 z-40 w-full border-b border-dark-border/90 bg-slate-950/95 backdrop-blur-md transition-all">
         <div className="w-full px-6 sm:px-10 lg:px-12 h-20 flex items-center justify-between gap-8">
@@ -238,10 +238,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     className="fixed inset-0 z-40"
                     onClick={() => setIsAccountMenuOpen(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-slate-950 border border-dark-border shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                    <div className="p-3 border-b border-dark-border/80 bg-slate-900/40 rounded-xl mb-1">
+                  <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-slate-200 shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="p-3 border-b border-slate-100 bg-[#F7F5F0] rounded-xl mb-1">
                       <div className="flex items-center gap-2.5">
-                        <div className="relative w-8 h-8 rounded-lg overflow-hidden bg-brand-500/20 border border-brand-500/30 flex items-center justify-center font-bold text-xs text-brand-400 shrink-0">
+                        <div className="relative w-8 h-8 rounded-lg overflow-hidden bg-brand-500/20 border border-brand-500/30 flex items-center justify-center font-bold text-xs text-brand-600 shrink-0">
                           {avatarUrl && !avatarError ? (
                             <img
                               src={avatarUrl}
@@ -254,9 +254,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs font-bold text-slate-200 truncate">{displayName}</p>
-                          <p className="text-[11px] font-mono text-emerald-400 truncate flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          <p className="text-xs font-bold text-slate-900 truncate">{displayName}</p>
+                          <p className="text-[11px] font-mono text-emerald-700 truncate flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             @{savedUsername}
                           </p>
                         </div>
@@ -269,9 +269,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                           setIsAccountMenuOpen(false);
                           onRouteChange('settings');
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-900 transition-colors text-left"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors text-left"
                       >
-                        <Settings className="w-4 h-4 text-slate-400" />
+                        <Settings className="w-4 h-4 text-slate-500" />
                         <span>Settings & API Keys</span>
                       </button>
 
@@ -280,7 +280,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                           setIsAccountMenuOpen(false);
                           onRouteChange('connect');
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-amber-400/90 hover:text-amber-300 hover:bg-amber-500/10 transition-colors text-left"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors text-left"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>Sign Out / Switch Account</span>

@@ -51,19 +51,19 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {metrics.map((m, i) => (
-        <Card key={i} glow={m.glow} className="relative overflow-hidden">
+        <Card key={i} glow={m.glow} className="relative overflow-hidden bg-white border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               {m.title}
             </span>
-            <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-700/40">
+            <div className="p-2.5 rounded-xl bg-[#F7F5F0] border border-stone-200/80">
               {m.icon}
             </div>
           </div>
-          <div className="text-2xl font-bold text-slate-100 font-mono tracking-tight">
+          <div className="text-2xl font-bold text-slate-900 font-mono tracking-tight">
             {m.value}
           </div>
-          <p className="text-xs text-slate-400 mt-1">{m.subtext}</p>
+          <p className="text-xs text-slate-500 mt-1">{m.subtext}</p>
         </Card>
       ))}
     </div>

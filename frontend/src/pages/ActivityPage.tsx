@@ -114,21 +114,21 @@ export const ActivityPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-100 tracking-tight">Audit & Activity Log</h2>
-          <p className="text-xs text-slate-400 mt-0.5 font-mono">
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Audit & Activity Log</h2>
+          <p className="text-xs text-slate-500 mt-0.5 font-mono">
             Chronological audit stream of webhooks, AI agent executions, and documentation commits
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Mode Switcher */}
-          <div className="flex items-center p-0.5 bg-dark-card border border-dark-border rounded-lg text-xs">
+          <div className="flex items-center p-1 bg-white border border-slate-200 rounded-xl text-xs shadow-xs">
             <button
               onClick={() => setViewMode('events')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all ${
                 viewMode === 'events'
-                  ? 'bg-slate-800 text-slate-100 shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <Clock className="w-3.5 h-3.5" />
@@ -136,10 +136,10 @@ export const ActivityPage: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode('traces')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all ${
                 viewMode === 'traces'
-                  ? 'bg-slate-800 text-slate-100 shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -175,7 +175,7 @@ export const ActivityPage: React.FC = () => {
             <select
               value={repoFilter}
               onChange={(e) => setRepoFilter(e.target.value)}
-              className="w-full appearance-none pl-8 pr-8 py-2 bg-dark-card border border-dark-border rounded-lg text-xs text-slate-200 font-medium focus:outline-none focus:border-brand-500/60 cursor-pointer hover:border-slate-700 transition-colors"
+              className="w-full appearance-none pl-8 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-slate-900 cursor-pointer hover:border-slate-300 transition-colors shadow-xs"
             >
               <option value="ALL">
                 All Active Repos ({repositories.filter((r) => r.automation?.status === 'ACTIVE').length})
@@ -188,7 +188,7 @@ export const ActivityPage: React.FC = () => {
                   </option>
                 ))}
             </select>
-            <FolderGit2 className="w-3.5 h-3.5 text-emerald-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <FolderGit2 className="w-3.5 h-3.5 text-emerald-600 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
@@ -196,7 +196,7 @@ export const ActivityPage: React.FC = () => {
           {repoFilter !== 'ALL' && (
             <button
               onClick={() => setRepoFilter('ALL')}
-              className="text-xs text-brand-400 hover:underline shrink-0 whitespace-nowrap self-center"
+              className="text-xs text-emerald-700 font-semibold hover:underline shrink-0 whitespace-nowrap self-center"
             >
               Reset Repo
             </button>
@@ -204,7 +204,7 @@ export const ActivityPage: React.FC = () => {
         </div>
 
         {viewMode === 'events' ? (
-          <div className="flex items-center gap-1.5 p-1 bg-dark-card border border-dark-border rounded-lg overflow-x-auto self-start lg:self-auto text-xs">
+          <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-xl overflow-x-auto self-start lg:self-auto text-xs shadow-xs">
             {(
               [
                 { id: 'ALL', label: 'All Events' },
@@ -219,10 +219,10 @@ export const ActivityPage: React.FC = () => {
               <button
                 key={filter.id}
                 onClick={() => setEventTypeFilter(filter.id as any)}
-                className={`px-2.5 py-1.5 rounded-md font-medium whitespace-nowrap transition-all ${
+                className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-all ${
                   eventTypeFilter === filter.id
-                    ? 'bg-slate-800 text-slate-100 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 {filter.label}
@@ -230,15 +230,15 @@ export const ActivityPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 p-1 bg-dark-card border border-dark-border rounded-lg overflow-x-auto self-start lg:self-auto text-xs">
+          <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-xl overflow-x-auto self-start lg:self-auto text-xs shadow-xs">
             {(['ALL', 'COMPLETED', 'SKIPPED', 'FAILED'] as const).map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
-                className={`px-3 py-1.5 rounded-md font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                   statusFilter === st
-                    ? 'bg-slate-800 text-slate-100 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 {st === 'ALL' ? 'All Traces' : st.charAt(0) + st.slice(1).toLowerCase()}
