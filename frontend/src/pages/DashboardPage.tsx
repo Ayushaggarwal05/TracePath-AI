@@ -71,8 +71,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       {/* Top Banner Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0F2742] dark:text-slate-100 tracking-tight">System Dashboard</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0F2742] dark:text-slate-100 tracking-tight font-sans">System Dashboard</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal font-sans">
             Autonomous documentation synchronization status across all repositories
           </p>
         </div>

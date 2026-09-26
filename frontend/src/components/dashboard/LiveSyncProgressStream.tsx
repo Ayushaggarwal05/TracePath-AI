@@ -298,42 +298,42 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
       case 'completed':
         return {
           badge: 'emerald',
-          circle: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 shadow-emerald-500/10 shadow-lg',
+          circle: 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/40 shadow-xs',
           line: 'bg-emerald-500',
-          container: 'border-emerald-500/30 bg-emerald-950/10',
+          container: 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/10',
           label: 'Completed',
         };
       case 'in_progress':
         return {
           badge: 'amber',
-          circle: 'bg-amber-500/20 text-amber-300 border-amber-500/50 animate-pulse shadow-amber-500/20 shadow-lg',
+          circle: 'bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 border-amber-300 dark:border-amber-500/50 animate-pulse shadow-xs',
           line: 'bg-gradient-to-r from-emerald-500 via-amber-500 to-slate-800 animate-pulse',
-          container: 'border-amber-500/40 bg-amber-950/10 ring-1 ring-amber-500/20',
+          container: 'border-amber-200 dark:border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/10 ring-1 ring-amber-300 dark:ring-amber-500/20',
           label: 'In Progress...',
         };
       case 'failed':
         return {
           badge: 'rose',
-          circle: 'bg-rose-500/20 text-rose-400 border-rose-500/50 shadow-rose-500/10 shadow-lg',
+          circle: 'bg-rose-50 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/50 shadow-xs',
           line: 'bg-rose-500',
-          container: 'border-rose-500/40 bg-rose-950/20',
+          container: 'border-rose-200 dark:border-rose-500/40 bg-rose-50/40 dark:bg-rose-950/20',
           label: 'Failed',
         };
       case 'skipped':
         return {
           badge: 'slate',
-          circle: 'bg-slate-800 text-slate-400 border-slate-700',
-          line: 'bg-slate-800',
-          container: 'border-dark-border bg-slate-900/40',
+          circle: 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+          line: 'bg-slate-200 dark:bg-slate-800',
+          container: 'border-stone-200/90 dark:border-slate-800 bg-[#F7F5F0] dark:bg-slate-900/40',
           label: 'Skipped',
         };
       case 'pending':
       default:
         return {
           badge: 'slate',
-          circle: 'bg-slate-900/80 text-slate-500 border-slate-800',
-          line: 'bg-slate-800',
-          container: 'border-dark-border/60 bg-slate-900/20 opacity-70',
+          circle: 'bg-stone-100 dark:bg-slate-900/80 text-slate-400 dark:text-slate-500 border-stone-200 dark:border-slate-800',
+          line: 'bg-stone-200 dark:bg-slate-800',
+          container: 'border-stone-200/70 dark:border-slate-800/60 bg-[#F7F5F0]/60 dark:bg-slate-900/20 opacity-75',
           label: 'Waiting',
         };
     }
@@ -342,22 +342,22 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Header Summary Card */}
-      <div className="p-4 rounded-xl bg-slate-900/80 border border-dark-border space-y-3">
+      <div className="p-4 rounded-2xl bg-[#F7F5F0] dark:bg-slate-900/80 border border-stone-200/90 dark:border-slate-800 space-y-3 shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-slate-400">Target Repository:</span>
-              <span className="text-xs font-bold text-slate-100">{repoFullName}</span>
+              <span className="text-xs font-sans font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Target Repository:</span>
+              <span className="text-xs font-bold text-slate-900 dark:text-slate-100 font-sans">{repoFullName}</span>
             </div>
-            <div className="flex items-center gap-3 text-xs text-slate-400 font-mono">
+            <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-mono">
               {execution?.commit_sha && (
                 <span className="flex items-center gap-1">
-                  <GitCommit className="w-3.5 h-3.5 text-brand-400" />
+                  <GitCommit className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   {formatShortSha(execution.commit_sha)}
                 </span>
               )}
               <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-amber-400" />
+                <Clock className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
                 Elapsed: {elapsedSeconds}s
               </span>
             </div>
@@ -387,7 +387,7 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
         </div>
 
         {/* 5-Segment Progress Bar */}
-        <div className="pt-2 border-t border-dark-border/80">
+        <div className="pt-2 border-t border-stone-200/80 dark:border-slate-800/80">
           <LivePipelineSegments
             status={execStatus}
             errorStage={execution?.error_information?.stage}
@@ -399,9 +399,9 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
 
       {/* 5-Step Animated Progression Journey */}
       <div className="space-y-3">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center justify-between">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between font-sans">
           <span>Live Multi-Agent Pipeline Progression</span>
-          <span className="text-[11px] font-mono text-slate-500 font-normal">Step-by-Step AI Execution</span>
+          <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 font-normal">Step-by-Step AI Execution</span>
         </h4>
 
         <div className="space-y-2.5">
@@ -410,16 +410,16 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
             return (
               <div
                 key={step.id}
-                className={`p-3.5 rounded-xl border transition-all duration-300 flex items-start gap-3.5 ${style.container}`}
+                className={`p-3.5 rounded-2xl border transition-all duration-300 flex items-start gap-3.5 ${style.container}`}
               >
                 {/* Step number circle with icon */}
                 <div
-                  className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 text-xs font-bold transition-all ${style.circle}`}
+                  className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 text-xs font-bold transition-all ${style.circle}`}
                 >
                   {step.status === 'completed' ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   ) : step.status === 'failed' ? (
-                    <XCircle className="w-4 h-4 text-rose-400" />
+                    <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                   ) : (
                     step.icon
                   )}
@@ -428,9 +428,9 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
                 {/* Content */}
                 <div className="flex-1 min-w-0 space-y-1">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-bold text-slate-100">{step.name}</span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700/60">
+                    <div className="flex items-center gap-2 flex-wrap font-sans">
+                      <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{step.name}</span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-stone-200 dark:border-slate-700/60">
                         {step.agentLabel}
                       </span>
                     </div>
@@ -439,10 +439,10 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
                     </Badge>
                   </div>
 
-                  <p className="text-[11px] text-slate-400 leading-relaxed">{step.description}</p>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-sans">{step.description}</p>
 
                   {step.detail && (
-                    <div className="pt-1 text-[11px] font-mono text-brand-300 bg-dark-bg/60 p-2 rounded-lg border border-dark-border/80">
+                    <div className="pt-1 text-[11px] font-mono text-slate-800 dark:text-emerald-300 bg-white/80 dark:bg-black/40 p-2 rounded-xl border border-stone-200/80 dark:border-slate-800">
                       {step.detail}
                     </div>
                   )}

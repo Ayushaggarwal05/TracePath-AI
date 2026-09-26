@@ -192,19 +192,20 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="p-2 rounded-lg bg-dark-card hover:bg-slate-800 border border-dark-border text-slate-400 hover:text-slate-100 transition-colors"
+            className="p-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-stone-100 dark:hover:bg-slate-800 border border-stone-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer shadow-2xs"
+            title="Back to Repositories"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div>
             <div className="flex items-center gap-2.5">
-              <h2 className="text-2xl font-bold text-slate-100 tracking-tight">{repository.name}</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0F2742] dark:text-slate-100 tracking-tight font-sans">{repository.name}</h2>
               <Badge variant={isAutomationActive ? 'emerald' : 'slate'}>
                 {isAutomationActive ? 'Automation Active' : 'Automation Paused'}
               </Badge>
               {repository.is_private && <Badge variant="slate">Private</Badge>}
             </div>
-            <p className="text-xs font-mono text-slate-400 mt-0.5">{repository.full_name}</p>
+            <p className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-0.5">{repository.full_name}</p>
           </div>
         </div>
 
@@ -223,7 +224,7 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
             size="sm"
             variant="outline"
             onClick={() => setShowSyncModal(true)}
-            leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+            leftIcon={<RefreshCw className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
           >
             Trigger Sync
           </Button>
@@ -242,7 +243,7 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
               href={repository.html_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-dark-card hover:bg-slate-800 border border-dark-border text-slate-400 hover:text-slate-100 transition-colors"
+              className="p-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-stone-100 dark:hover:bg-slate-800 border border-stone-200/90 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer shadow-2xs"
               title="View on GitHub"
             >
               <ExternalLink className="w-4 h-4" />
@@ -253,37 +254,37 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
 
       {/* Metadata KPI Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs">
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-dark-border">
-          <span className="text-slate-500 uppercase tracking-wider text-[11px] block">Target Branch</span>
-          <span className="text-brand-400 font-bold text-sm mt-1 block">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
+          <span className="text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px] block font-sans font-bold">Target Branch</span>
+          <span className="text-[#0F2742] dark:text-slate-100 font-bold text-sm mt-1 block font-mono">
             {repository.automation?.target_branch || repository.default_branch}
           </span>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-dark-border">
-          <span className="text-slate-500 uppercase tracking-wider text-[11px] block">Tracked Documents</span>
-          <span className="text-slate-200 font-bold text-sm mt-1 block">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
+          <span className="text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px] block font-sans font-bold">Tracked Documents</span>
+          <span className="text-[#0F2742] dark:text-slate-100 font-bold text-sm mt-1 block font-mono">
             {documents.length} files
           </span>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-dark-border">
-          <span className="text-slate-500 uppercase tracking-wider text-[11px] block">Last Pipeline Run</span>
-          <span className="text-slate-200 font-semibold mt-1 block">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
+          <span className="text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px] block font-sans font-bold">Last Pipeline Run</span>
+          <span className="text-slate-700 dark:text-slate-300 font-semibold mt-1 block font-mono">
             {latestExecution ? formatDate(latestExecution.created_at) : 'Never'}
           </span>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-dark-border">
-          <span className="text-slate-500 uppercase tracking-wider text-[11px] block">Last Doc Sync</span>
-          <span className="text-slate-200 font-semibold mt-1 block">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
+          <span className="text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px] block font-sans font-bold">Last Doc Sync</span>
+          <span className="text-slate-700 dark:text-slate-300 font-semibold mt-1 block font-mono">
             {latestDocUpdate ? formatDate(latestDocUpdate) : 'Never'}
           </span>
         </div>
       </div>
 
       {/* Interactive Tabs Header */}
-      <div className="flex items-center gap-2 border-b border-dark-border bg-dark-card px-2 rounded-t-xl">
+      <div className="flex items-center gap-1.5 p-1 bg-[#F4F2EB] dark:bg-[#131D2E] border border-stone-200/90 dark:border-slate-800 rounded-2xl shadow-xs overflow-x-auto">
         {[
           { id: 'changes', label: 'Recent Changes', icon: <GitCommit className="w-3.5 h-3.5" /> },
           { id: 'executions', label: `Executions (${executions.length})`, icon: <Activity className="w-3.5 h-3.5" /> },
@@ -293,10 +294,10 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center gap-2 py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all ${
+            className={`flex items-center gap-2 py-2 px-3.5 text-xs font-bold rounded-xl transition-all whitespace-nowrap cursor-pointer ${
               activeTab === tab.id
-                ? 'border-brand-400 text-brand-400 bg-brand-500/5'
-                : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
+                ? 'bg-white dark:bg-[#0D1526] text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60'
             }`}
           >
             {tab.icon}
@@ -307,29 +308,29 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
 
       {/* TAB 1: RECENT CODE CHANGES */}
       {activeTab === 'changes' && (
-        <Card className="p-0 overflow-hidden">
-          <div className="p-4 border-b border-dark-border bg-slate-900/40 flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+        <Card className="p-0 overflow-hidden bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
+          <div className="p-4 border-b border-stone-100 dark:border-slate-800 bg-[#F7F5F0] dark:bg-[#131D2E] flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 font-sans">
               Incoming GitHub Commits
             </h3>
-            <span className="text-[11px] font-mono text-slate-500">Autonomous webhook listening active</span>
+            <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">Autonomous webhook listening active</span>
           </div>
 
-          <div className="divide-y divide-dark-border font-mono text-xs">
+          <div className="divide-y divide-stone-100 dark:divide-slate-800/80 font-mono text-xs">
             {mockRecentCommits.map((commit, idx) => (
-              <div key={idx} className="p-4 flex items-center justify-between gap-4 hover:bg-slate-900/30 transition-colors">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-slate-800 text-indigo-400 shrink-0 mt-0.5">
+              <div key={idx} className="p-4 flex items-center justify-between gap-4 hover:bg-stone-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 shrink-0 mt-0.5">
                     <GitCommit className="w-4 h-4" />
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 font-sans">
-                      <span className="font-mono text-xs font-bold text-slate-200">
+                      <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
                         {formatShortSha(commit.sha)}
                       </span>
-                      <span className="text-slate-300 font-medium text-xs">{commit.message}</span>
+                      <span className="text-slate-800 dark:text-slate-200 font-medium text-xs truncate">{commit.message}</span>
                     </div>
-                    <div className="flex items-center gap-3 text-[11px] text-slate-500">
+                    <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
                       <span>{commit.author}</span>
                       <span>•</span>
                       <span>{commit.files_count} files changed</span>
@@ -364,41 +365,42 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
 
       {/* TAB 2: EXECUTIONS */}
       {activeTab === 'executions' && (
-        <Card className="p-0 overflow-hidden">
-          <div className="p-4 border-b border-dark-border bg-slate-900/40 flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+        <Card className="p-0 overflow-hidden bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
+          <div className="p-4 border-b border-stone-100 dark:border-slate-800 bg-[#F7F5F0] dark:bg-[#131D2E] flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 font-sans">
               Pipeline Execution History
             </h3>
-            <span className="text-[11px] font-mono text-slate-500">3-agent autonomous traces</span>
+            <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">3-agent autonomous traces</span>
           </div>
 
           {executions.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 italic text-xs">
+            <div className="p-8 text-center text-slate-500 dark:text-slate-400 italic text-xs">
               No executions recorded for this repository yet.
             </div>
           ) : (
-            <div className="divide-y divide-dark-border font-mono text-xs">
+            <div className="divide-y divide-stone-100 dark:divide-slate-800/80 font-mono text-xs">
               {executions.map((exec) => {
                 const style = getExecutionStatusStyle(exec.status);
                 return (
                   <div
                     key={exec.id}
                     onClick={() => setSelectedExecution(exec)}
-                    className="p-4 flex items-center justify-between gap-4 hover:bg-slate-900/40 cursor-pointer transition-colors"
+                    className="p-4 flex items-center justify-between gap-4 hover:bg-stone-50/70 dark:hover:bg-slate-800/40 cursor-pointer transition-colors"
                   >
-                    <div className="flex items-start gap-3 font-sans">
-                      <div className="p-2 rounded-lg bg-slate-800 text-brand-400 shrink-0 mt-0.5 font-mono">
+                    <div className="flex items-start gap-3 font-sans min-w-0">
+                      <div className={`p-2 rounded-xl border shrink-0 mt-0.5 ${style.bg} ${style.border} ${style.text}`}>
                         <Activity className="w-4 h-4" />
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-slate-200">
+                          <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
                             {formatShortSha(exec.commit_sha)}
                           </span>
-                          <Badge variant={exec.status === 'COMPLETED' ? 'emerald' : exec.status === 'FAILED' ? 'rose' : exec.status === 'SKIPPED' ? 'slate' : 'amber'}>
+                          <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${style.bg} ${style.text} ${style.border}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
                             {style.label}
-                          </Badge>
-                          <span className={`text-xs font-medium ${exec.status === 'FAILED' ? 'text-rose-400 font-mono text-[11px]' : 'text-slate-300'}`}>
+                          </span>
+                          <span className={`text-xs font-medium truncate ${exec.status === 'FAILED' ? 'text-rose-600 dark:text-rose-400 font-mono text-[11px]' : 'text-slate-700 dark:text-slate-300'}`}>
                             {exec.status === 'FAILED'
                               ? exec.error_information?.error
                                 ? `Failed at ${exec.error_information.stage || 'Pipeline'}: ${exec.error_information.error}`
@@ -408,7 +410,7 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
                               : exec.analysis_result?.summary || 'Execution run'}
                           </span>
                         </div>
-                        <div className="flex items-center gap-3 text-[11px] font-mono text-slate-500">
+                        <div className="flex items-center gap-3 text-[11px] font-mono text-slate-500 dark:text-slate-400">
                           <span>Branch: {exec.branch}</span>
                           <span>•</span>
                           <span>Duration: {formatDuration(exec.start_time, exec.completion_time)}</span>
@@ -419,7 +421,7 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-[11px] text-slate-400 font-mono">
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                         {exec.updated_documents?.length || 0} docs updated
                       </span>
                       <Button size="sm" variant="ghost">
@@ -444,7 +446,7 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
 
       {/* TAB 4: AUDIT ACTIVITY */}
       {activeTab === 'activity' && (
-        <Card className="p-0 overflow-hidden">
+        <Card className="p-0 overflow-hidden bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
           <ActivityFeedList
             events={activities}
             onSelectExecution={async (id, tab = 'pipeline') => {

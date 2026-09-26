@@ -81,12 +81,12 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
   }
 
   return (
-    <div className={`flex flex-col rounded-xl border border-dark-border bg-slate-950 overflow-hidden ${className}`}>
+    <div className={`flex flex-col rounded-2xl border border-stone-200/90 dark:border-slate-800 bg-white dark:bg-slate-950 overflow-hidden shadow-2xs ${className}`}>
       {/* Top Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-slate-900 border-b border-dark-border">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-[#F7F5F0] dark:bg-slate-900 border-b border-stone-200/90 dark:border-slate-800">
         <div className="flex items-center gap-3">
           {docPath && (
-            <span className="font-mono text-xs font-semibold text-slate-200">
+            <span className="font-mono text-xs font-semibold text-slate-800 dark:text-slate-200">
               {docPath}
             </span>
           )}
@@ -98,13 +98,13 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
 
         <div className="flex items-center gap-2">
           {/* View Mode Toggle */}
-          <div className="flex items-center p-0.5 rounded-lg bg-slate-950 border border-dark-border text-xs">
+          <div className="flex items-center p-0.5 rounded-xl bg-[#F4F2EB] dark:bg-slate-950 border border-stone-200/90 dark:border-slate-800 text-xs">
             <button
               onClick={() => setViewMode('unified')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-medium transition-all cursor-pointer ${
                 viewMode === 'unified'
-                  ? 'bg-slate-800 text-slate-100 shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-2xs font-semibold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               <AlignLeft className="w-3.5 h-3.5" />
@@ -112,10 +112,10 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
             </button>
             <button
               onClick={() => setViewMode('split')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-medium transition-all cursor-pointer ${
                 viewMode === 'split'
-                  ? 'bg-slate-800 text-slate-100 shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-2xs font-semibold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               <Columns className="w-3.5 h-3.5" />
@@ -124,10 +124,10 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
             {updatedContent && (
               <button
                 onClick={() => setViewMode('preview')}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-medium transition-all cursor-pointer ${
                   viewMode === 'preview'
-                    ? 'bg-slate-800 text-slate-100 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-2xs font-semibold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
@@ -139,9 +139,9 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
           {/* Copy Button */}
           <button
             onClick={() => handleCopy(viewMode === 'preview' && updatedContent ? updatedContent : rawDiff)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-slate-300 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-stone-100 dark:hover:bg-slate-700 border border-stone-200/90 dark:border-slate-700 text-xs font-mono text-slate-700 dark:text-slate-300 transition-colors cursor-pointer shadow-2xs"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Copied' : viewMode === 'preview' ? 'Copy Markdown' : 'Copy Diff'}</span>
           </button>
         </div>
@@ -150,41 +150,41 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
       {/* Main Diff Content */}
       <div className="overflow-x-auto max-h-[65vh] font-mono text-xs leading-relaxed">
         {diffLines.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 italic">
+          <div className="p-8 text-center text-slate-500 dark:text-slate-400 italic">
             No documentation diff generated for this revision.
           </div>
         ) : viewMode === 'unified' ? (
           /* Unified Diff View */
-          <div className="divide-y divide-slate-900/50">
+          <div className="divide-y divide-stone-100 dark:divide-slate-900/50">
             {diffLines.map((line, idx) => {
-              let lineBg = 'hover:bg-slate-900/40';
-              let textColor = 'text-slate-300';
+              let lineBg = 'hover:bg-stone-50 dark:hover:bg-slate-900/40';
+              let textColor = 'text-slate-700 dark:text-slate-300';
               let prefix = ' ';
 
               if (line.type === 'add') {
-                lineBg = 'bg-emerald-500/10 hover:bg-emerald-500/15 border-l-2 border-emerald-500';
-                textColor = 'text-emerald-300';
+                lineBg = 'bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100/60 dark:hover:bg-emerald-500/15 border-l-2 border-emerald-600 dark:border-emerald-500';
+                textColor = 'text-emerald-800 dark:text-emerald-300';
                 prefix = '+';
               } else if (line.type === 'delete') {
-                lineBg = 'bg-rose-500/10 hover:bg-rose-500/15 border-l-2 border-rose-500';
-                textColor = 'text-rose-300';
+                lineBg = 'bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100/60 dark:hover:bg-rose-500/15 border-l-2 border-rose-600 dark:border-rose-500';
+                textColor = 'text-rose-800 dark:text-rose-300';
                 prefix = '-';
               } else if (line.type === 'header') {
-                lineBg = 'bg-indigo-500/10 text-indigo-400 font-semibold py-1';
+                lineBg = 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-semibold py-1';
                 prefix = '@';
               } else if (line.type === 'file') {
-                lineBg = 'bg-slate-900 text-slate-400 font-semibold py-1';
+                lineBg = 'bg-[#F7F5F0] dark:bg-slate-900 text-slate-700 dark:text-slate-400 font-semibold py-1';
               }
 
               return (
                 <div key={idx} className={`flex items-start px-3 py-0.5 select-text ${lineBg}`}>
-                  <span className="w-10 shrink-0 text-slate-600 text-right pr-2 select-none text-[11px]">
+                  <span className="w-10 shrink-0 text-slate-400 dark:text-slate-600 text-right pr-2 select-none text-[11px]">
                     {line.oldLineNumber || ''}
                   </span>
-                  <span className="w-10 shrink-0 text-slate-600 text-right pr-3 select-none text-[11px]">
+                  <span className="w-10 shrink-0 text-slate-400 dark:text-slate-600 text-right pr-3 select-none text-[11px]">
                     {line.newLineNumber || ''}
                   </span>
-                  <span className="w-4 shrink-0 text-slate-500 select-none font-bold">{prefix}</span>
+                  <span className="w-4 shrink-0 text-slate-400 dark:text-slate-500 select-none font-bold">{prefix}</span>
                   <span className={`flex-1 whitespace-pre-wrap break-all ${textColor}`}>
                     {line.content}
                   </span>
@@ -194,13 +194,13 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
           </div>
         ) : viewMode === 'split' ? (
           /* Split Diff View */
-          <div className="grid grid-cols-2 divide-x divide-dark-border">
+          <div className="grid grid-cols-2 divide-x divide-stone-200 dark:divide-slate-800">
             {/* Left Header */}
-            <div className="bg-slate-900/90 px-3 py-1.5 text-[11px] font-semibold text-rose-400 border-b border-dark-border">
+            <div className="bg-rose-50 dark:bg-slate-900/90 px-3 py-1.5 text-[11px] font-semibold text-rose-700 dark:text-rose-400 border-b border-stone-200 dark:border-slate-800">
               Original / Removed Content
             </div>
             {/* Right Header */}
-            <div className="bg-slate-900/90 px-3 py-1.5 text-[11px] font-semibold text-emerald-400 border-b border-dark-border">
+            <div className="bg-emerald-50 dark:bg-slate-900/90 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 border-b border-stone-200 dark:border-slate-800">
               Updated / Added Content
             </div>
 
@@ -208,23 +208,23 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
             {splitRows.map((row, idx) => {
               const leftBg =
                 row.left?.type === 'delete'
-                  ? 'bg-rose-500/10 text-rose-300'
+                  ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-800 dark:text-rose-300'
                   : row.left?.type === 'header'
-                  ? 'bg-indigo-500/10 text-indigo-400 font-semibold'
-                  : 'text-slate-300';
+                  ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-semibold'
+                  : 'text-slate-700 dark:text-slate-300';
 
               const rightBg =
                 row.right?.type === 'add'
-                  ? 'bg-emerald-500/10 text-emerald-300'
+                  ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300'
                   : row.right?.type === 'header'
-                  ? 'bg-indigo-500/10 text-indigo-400 font-semibold'
-                  : 'text-slate-300';
+                  ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-semibold'
+                  : 'text-slate-700 dark:text-slate-300';
 
               return (
                 <React.Fragment key={idx}>
                   {/* Left Column */}
-                  <div className={`flex items-start px-2 py-0.5 border-b border-slate-900/40 min-h-[22px] ${leftBg}`}>
-                    <span className="w-8 shrink-0 text-slate-600 text-right pr-2 select-none text-[11px]">
+                  <div className={`flex items-start px-2 py-0.5 border-b border-stone-100 dark:border-slate-900/40 min-h-[22px] ${leftBg}`}>
+                    <span className="w-8 shrink-0 text-slate-400 dark:text-slate-600 text-right pr-2 select-none text-[11px]">
                       {row.left?.line || ''}
                     </span>
                     <span className="flex-1 whitespace-pre-wrap break-all">
@@ -233,8 +233,8 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
                   </div>
 
                   {/* Right Column */}
-                  <div className={`flex items-start px-2 py-0.5 border-b border-slate-900/40 min-h-[22px] ${rightBg}`}>
-                    <span className="w-8 shrink-0 text-slate-600 text-right pr-2 select-none text-[11px]">
+                  <div className={`flex items-start px-2 py-0.5 border-b border-stone-100 dark:border-slate-900/40 min-h-[22px] ${rightBg}`}>
+                    <span className="w-8 shrink-0 text-slate-400 dark:text-slate-600 text-right pr-2 select-none text-[11px]">
                       {row.right?.line || ''}
                     </span>
                     <span className="flex-1 whitespace-pre-wrap break-all">
@@ -247,12 +247,12 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
           </div>
         ) : (
           /* Rendered Markdown Preview */
-          <div className="p-6 bg-slate-950 font-sans text-sm text-slate-200 max-h-[65vh] overflow-y-auto space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-dark-border text-xs text-brand-400 font-mono">
+          <div className="p-6 bg-white dark:bg-slate-950 font-sans text-sm text-slate-800 dark:text-slate-200 max-h-[65vh] overflow-y-auto space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-stone-200/90 dark:border-slate-800 text-xs text-emerald-700 dark:text-brand-400 font-mono">
               <Sparkles className="w-4 h-4" />
               <span>Rendered Autonomous Sync Output</span>
             </div>
-            <pre className="whitespace-pre-wrap font-mono text-xs bg-slate-900/80 p-4 rounded-xl border border-dark-border text-slate-200">
+            <pre className="whitespace-pre-wrap font-mono text-xs bg-[#F7F5F0] dark:bg-slate-900/80 p-4 rounded-xl border border-stone-200/90 dark:border-slate-800 text-slate-900 dark:text-slate-200">
               {updatedContent}
             </pre>
           </div>

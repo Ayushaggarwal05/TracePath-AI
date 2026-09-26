@@ -50,7 +50,7 @@ export const DocHistoryModal: React.FC<DocHistoryModalProps> = ({
         {loading ? (
           <LoadingSpinner label="Loading document history..." />
         ) : history.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 italic">No revision history found.</div>
+          <div className="p-8 text-center text-slate-500 dark:text-slate-400 italic">No revision history found.</div>
         ) : (
           <div className="space-y-3">
             {history.map((entry) => {
@@ -59,28 +59,28 @@ export const DocHistoryModal: React.FC<DocHistoryModalProps> = ({
               return (
                 <div
                   key={entry.id}
-                  className="rounded-xl border border-dark-border bg-slate-900/60 overflow-hidden transition-all"
+                  className="rounded-2xl border border-stone-200/90 dark:border-slate-800 bg-[#F7F5F0] dark:bg-slate-900/60 overflow-hidden transition-all shadow-2xs"
                 >
                   <div
                     onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                    className="p-4 flex items-center justify-between gap-4 cursor-pointer hover:bg-slate-800/40 transition-colors"
+                    className="p-4 flex items-center justify-between gap-4 cursor-pointer hover:bg-stone-200/50 dark:hover:bg-slate-800/40 transition-colors"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-lg bg-slate-800 text-brand-400 shrink-0 mt-0.5">
+                      <div className="p-2 rounded-xl bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border border-stone-200/80 dark:border-slate-700 shrink-0 mt-0.5 shadow-2xs">
                         <GitCommit className="w-4 h-4" />
                       </div>
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-xs font-mono font-bold text-slate-200">
+                          <span className="text-xs font-mono font-bold text-slate-900 dark:text-slate-100">
                             {formatShortSha(entry.commit_sha)}
                           </span>
                           <Badge variant="emerald">Validated</Badge>
-                          <span className="text-xs text-slate-400 font-medium">
+                          <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">
                             {entry.commit_message}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-300">{entry.summary_of_changes}</p>
-                        <div className="flex items-center gap-3 text-[11px] font-mono text-slate-500">
+                        <p className="text-xs text-slate-600 dark:text-slate-300">{entry.summary_of_changes}</p>
+                        <div className="flex items-center gap-3 text-[11px] font-mono text-slate-500 dark:text-slate-400">
                           <span>{entry.author}</span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
@@ -91,14 +91,14 @@ export const DocHistoryModal: React.FC<DocHistoryModalProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-slate-400">
+                    <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </div>
                   </div>
 
                   {/* Expanded Diff Viewer */}
                   {isExpanded && (
-                    <div className="p-4 border-t border-dark-border bg-slate-950/60">
+                    <div className="p-4 border-t border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-950/60">
                       <DiffViewer
                         rawDiff={entry.diff}
                         updatedContent={entry.updated_content}

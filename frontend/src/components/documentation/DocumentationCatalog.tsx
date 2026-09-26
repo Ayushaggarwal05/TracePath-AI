@@ -38,28 +38,28 @@ export const DocumentationCatalog: React.FC<DocumentationCatalogProps> = ({
         {documents.map((doc) => (
           <div
             key={doc.id}
-            className="p-5 rounded-xl bg-slate-900/60 border border-dark-border hover:border-slate-700 transition-all space-y-4"
+            className="p-5 rounded-2xl bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 hover:border-stone-300 dark:hover:border-slate-700 shadow-xs transition-all space-y-4"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <div className="p-2.5 rounded-xl bg-dark-card border border-dark-border text-brand-400 mt-0.5">
+              <div className="flex items-start gap-3 min-w-0">
+                <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-stone-200 dark:border-slate-700 text-emerald-700 dark:text-emerald-400 mt-0.5 shrink-0">
                   <FileCode className="w-5 h-5" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono font-bold text-sm text-slate-100">
+                    <span className="font-mono font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
                       {doc.doc_path}
                     </span>
                     {getCategoryBadge(doc.category)}
-                    <span className="text-[11px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-dark-border">
+                    <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 bg-stone-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-md border border-stone-200 dark:border-slate-700">
                       {doc.total_updates_count} sync revisions
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 font-medium mt-0.5">{doc.title}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium mt-0.5">{doc.title}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 self-start sm:self-auto">
+              <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
                 {doc.diff && (
                   <Button
                     size="sm"
@@ -85,28 +85,28 @@ export const DocumentationCatalog: React.FC<DocumentationCatalogProps> = ({
 
             {/* Last Change Summary */}
             {doc.summary_of_last_change && (
-              <div className="p-3 rounded-lg bg-dark-card border border-dark-border text-xs space-y-1.5">
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+              <div className="p-3.5 rounded-xl bg-[#F7F5F0] dark:bg-slate-900/80 border border-stone-200/80 dark:border-slate-800 text-xs space-y-1.5">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between font-sans">
                   <span>Latest Synchronized Update</span>
                   <div className="flex items-center gap-1.5 font-mono">
-                    <span className="text-emerald-400 font-bold">+{doc.lines_added || 0}</span>
-                    <span className="text-rose-400 font-bold">-{doc.lines_removed || 0}</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-bold">+{doc.lines_added || 0}</span>
+                    <span className="text-rose-600 dark:text-rose-400 font-bold">-{doc.lines_removed || 0}</span>
                   </div>
                 </div>
-                <p className="text-slate-300 leading-relaxed">{doc.summary_of_last_change}</p>
+                <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-sans">{doc.summary_of_last_change}</p>
               </div>
             )}
 
             {/* Metadata Footer */}
-            <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono text-slate-500 pt-1 border-t border-slate-900">
+            <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono text-slate-500 dark:text-slate-400 pt-1 border-t border-stone-100 dark:border-slate-800">
               <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-slate-600" />
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
                 Updated {formatDate(doc.last_updated_at)}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <GitCommit className="w-3.5 h-3.5 text-slate-600" />
-                Commit: <code className="text-slate-400">{formatShortSha(doc.last_commit_sha)}</code>
+                <GitCommit className="w-3.5 h-3.5 text-slate-400" />
+                Commit: <code className="text-slate-700 dark:text-slate-300 font-bold">{formatShortSha(doc.last_commit_sha)}</code>
               </span>
             </div>
           </div>

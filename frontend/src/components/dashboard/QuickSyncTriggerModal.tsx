@@ -211,18 +211,18 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
         <div className="space-y-5">
           {/* Repository selector */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 font-sans">
               Target Repository (Active Only)
             </label>
             {activeRepos.length === 0 ? (
-              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-300">
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-700 dark:text-amber-300">
                 No active repositories found. Please activate automation on a repository in the Repositories tab first.
               </div>
             ) : (
               <select
                 value={selectedRepoId}
                 onChange={(e) => handleRepoChange(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-dark-card border border-dark-border rounded-lg text-sm text-slate-100 focus:outline-none focus:border-brand-500/60"
+                className="w-full px-3.5 py-2.5 bg-[#F4F2EB] dark:bg-slate-900/90 border border-stone-200/90 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 font-mono focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 focus:bg-white dark:focus:bg-slate-950 transition-all shadow-2xs"
               >
                 {activeRepos.map((repo) => (
                   <option key={repo.id} value={repo.id}>
@@ -235,63 +235,63 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
 
           {/* Sync Mode Tabs */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-sans">
               Execution Source Mode
             </label>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setSyncMode('latest')}
-                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border text-xs font-medium transition-all cursor-pointer ${
                   syncMode === 'latest'
-                    ? 'border-brand-500/80 bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/40'
-                    : 'border-dark-border bg-dark-card/50 text-slate-400 hover:border-slate-700'
+                    ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-slate-900 dark:text-slate-100 ring-1 ring-emerald-600 shadow-xs'
+                    : 'border-stone-200/90 dark:border-slate-800 bg-[#F7F5F0] dark:bg-slate-900/40 text-slate-600 dark:text-slate-400 hover:border-stone-300 dark:hover:border-slate-700'
                 }`}
               >
-                <Zap className="w-4 h-4 text-brand-400" />
-                <span>Latest Commit</span>
-                <span className="text-[10px] text-slate-500 font-normal">Real GitHub HEAD</span>
+                <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="font-bold font-sans">Latest Commit</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Real GitHub HEAD</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setSyncMode('custom')}
-                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border text-xs font-medium transition-all cursor-pointer ${
                   syncMode === 'custom'
-                    ? 'border-brand-500/80 bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/40'
-                    : 'border-dark-border bg-dark-card/50 text-slate-400 hover:border-slate-700'
+                    ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-slate-900 dark:text-slate-100 ring-1 ring-emerald-600 shadow-xs'
+                    : 'border-stone-200/90 dark:border-slate-800 bg-[#F7F5F0] dark:bg-slate-900/40 text-slate-600 dark:text-slate-400 hover:border-stone-300 dark:hover:border-slate-700'
                 }`}
               >
-                <GitCommit className="w-4 h-4 text-sky-400" />
-                <span>Custom SHA</span>
-                <span className="text-[10px] text-slate-500 font-normal">Specific Commit</span>
+                <GitCommit className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="font-bold font-sans">Custom SHA</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Specific Commit</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setSyncMode('simulate')}
-                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border text-xs font-medium transition-all cursor-pointer ${
                   syncMode === 'simulate'
-                    ? 'border-brand-500/80 bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/40'
-                    : 'border-dark-border bg-dark-card/50 text-slate-400 hover:border-slate-700'
+                    ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-slate-900 dark:text-slate-100 ring-1 ring-emerald-600 shadow-xs'
+                    : 'border-stone-200/90 dark:border-slate-800 bg-[#F7F5F0] dark:bg-slate-900/40 text-slate-600 dark:text-slate-400 hover:border-stone-300 dark:hover:border-slate-700'
                 }`}
               >
-                <Code className="w-4 h-4 text-purple-400" />
-                <span>Simulated Demo</span>
-                <span className="text-[10px] text-slate-500 font-normal">Mock Changes</span>
+                <Code className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <span className="font-bold font-sans">Simulated Demo</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Mock Changes</span>
               </button>
             </div>
           </div>
 
           {/* Mode Specific Inputs */}
           {syncMode === 'latest' && (
-            <div className="p-3.5 bg-brand-500/5 border border-brand-500/20 rounded-xl space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-brand-300">
-                <Zap className="w-4 h-4" />
+            <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Live GitHub Auto-Fetch Enabled</span>
               </div>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                TracePath will fetch the latest live commit from branch <code className="text-brand-300 bg-brand-500/10 px-1 py-0.5 rounded">{targetBranch}</code> on <strong className="text-slate-200">{selectedRepo?.full_name || 'selected repo'}</strong>, fetch the live code diffs, run the 3 AI agents, and commit documentation updates directly to <strong className="text-emerald-400">{targetBranch}</strong>!
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+                TracePath will fetch the latest live commit from branch <code className="text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-500/15 px-1 py-0.5 rounded font-mono text-[11px]">{targetBranch}</code> on <strong className="text-slate-900 dark:text-slate-100">{selectedRepo?.full_name || 'selected repo'}</strong>, fetch live code diffs, execute the 3 AI agents, and commit documentation updates directly to <strong className="text-emerald-700 dark:text-emerald-400">{targetBranch}</strong>!
               </p>
             </div>
           )}
@@ -299,7 +299,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
           {syncMode === 'custom' && (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 font-sans">
                   GitHub Commit SHA (40-character hash or prefix)
                 </label>
                 <input
@@ -307,7 +307,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
                   placeholder="e.g. 3727b3dc9ebeedafec9d0f2b58430f7b44889c1"
                   value={customCommitSha}
                   onChange={(e) => setCustomCommitSha(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-dark-card border border-dark-border rounded-lg text-xs font-mono text-slate-100 focus:outline-none focus:border-brand-500/60"
+                  className="w-full px-3.5 py-2.5 bg-[#F4F2EB] dark:bg-slate-900/90 border border-stone-200/90 dark:border-slate-800 rounded-xl text-xs font-mono text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 focus:bg-white dark:focus:bg-slate-950 transition-all shadow-2xs"
                 />
               </div>
             </div>
@@ -315,7 +315,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
 
           {syncMode === 'simulate' && (
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-sans">
                 Select Demo Scenario
               </label>
               <div className="space-y-2">
@@ -323,17 +323,17 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
                   <div
                     key={s.id}
                     onClick={() => setScenario(s.id as any)}
-                    className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                    className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
                       scenario === s.id
-                        ? 'border-brand-500/60 bg-brand-500/10 text-slate-100'
-                        : 'border-dark-border bg-dark-card/50 text-slate-400 hover:border-slate-700'
+                        ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 text-slate-900 dark:text-slate-100 ring-1 ring-emerald-600 shadow-xs'
+                        : 'border-stone-200/90 dark:border-slate-800 bg-[#F7F5F0] dark:bg-slate-900/40 text-slate-600 dark:text-slate-400 hover:border-stone-300 dark:hover:border-slate-700'
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <Code className={`w-4 h-4 ${scenario === s.id ? 'text-brand-400' : 'text-slate-500'}`} />
-                      <span className="text-xs font-semibold">{s.title}</span>
+                      <Code className={`w-4 h-4 ${scenario === s.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
+                      <span className="text-xs font-bold font-sans">{s.title}</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">{s.desc}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-sans">{s.desc}</p>
                   </div>
                 ))}
               </div>
@@ -341,7 +341,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
           )}
 
           {/* Footer Actions */}
-          <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-dark-border">
+          <div className="mt-8 flex justify-end gap-2.5 pt-4 border-t border-stone-100 dark:border-slate-800">
             <Button variant="outline" size="sm" onClick={onClose} disabled={triggering}>
               Cancel
             </Button>
@@ -351,7 +351,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
               onClick={handleTrigger}
               isLoading={triggering}
               disabled={triggering || activeRepos.length === 0}
-              leftIcon={<Sparkles className="w-4 h-4" />}
+              leftIcon={<Sparkles className="w-3.5 h-3.5" />}
             >
               {syncMode === 'latest' ? 'Sync Live GitHub Commit' : 'Run Multi-Agent Pipeline'}
             </Button>
