@@ -33,11 +33,11 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
   });
 
   return (
-    <Card className="p-0 overflow-hidden bg-white border border-slate-200 shadow-xs">
-      <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-[#F7F5F0]">
+    <Card className="p-0 overflow-hidden bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
+      <div className="flex items-center justify-between p-5 border-b border-stone-100 dark:border-slate-800 bg-[#F7F5F0] dark:bg-[#131D2E]">
         <div>
-          <h3 className="text-base font-bold text-slate-900">Live Sync Stream</h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Live Sync Stream</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Real-time multi-agent documentation updates from code commits
           </p>
         </div>
@@ -46,9 +46,9 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
         </Button>
       </div>
 
-      <div className="divide-y divide-slate-100">
+      <div className="divide-y divide-stone-100 dark:divide-slate-800/80">
         {sortedExecutions.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 italic text-sm">
+          <div className="p-8 text-center text-slate-500 dark:text-slate-400 italic text-sm">
             No execution runs recorded yet.
           </div>
         ) : (
@@ -105,7 +105,7 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
               <div
                 key={exec.id}
                 onClick={handleClick}
-                className="flex items-center justify-between p-4 hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                className="flex items-center justify-between p-4 hover:bg-stone-50/80 dark:hover:bg-slate-800/40 transition-colors cursor-pointer group"
               >
                 <div className="flex items-center gap-3.5 min-w-0 flex-1">
                   <div className={`p-2 rounded-xl border shrink-0 ${style.bg} ${style.border} ${style.text}`}>
@@ -114,11 +114,11 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
 
                   <div className="min-w-0 flex-1 pr-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold px-2 py-0.5 rounded-md bg-[#F7F5F0] text-slate-800 border border-stone-200">
-                        <FolderGit2 className="w-3 h-3 text-slate-600" />
+                      <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold px-2 py-0.5 rounded-md bg-[#F7F5F0] dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-stone-200 dark:border-slate-700">
+                        <FolderGit2 className="w-3 h-3 text-slate-600 dark:text-slate-400" />
                         {repoDisplayName}
                       </span>
-                      <span className="text-xs font-mono font-bold text-slate-900">
+                      <span className="text-xs font-mono font-bold text-slate-900 dark:text-slate-100">
                         {formatShortSha(exec.commit_sha)}
                       </span>
                       <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${style.bg} ${style.text} ${style.border}`}>
@@ -126,13 +126,13 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
                         {style.label}
                       </span>
                     </div>
-                    <p className={`text-xs truncate mt-1 group-hover:text-slate-900 transition-colors ${exec.status === 'FAILED' ? 'text-rose-700 font-mono text-[11px]' : 'text-slate-700'}`}>
+                    <p className={`text-xs truncate mt-1 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors ${exec.status === 'FAILED' ? 'text-rose-700 dark:text-rose-400 font-mono text-[11px]' : 'text-slate-700 dark:text-slate-300'}`}>
                       {getSummaryText()}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs text-slate-500 font-mono shrink-0">
+                <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-mono shrink-0">
                   {/* Segmented Pipeline Bar */}
                   <div className="hidden lg:block w-32">
                     <LivePipelineSegments
@@ -143,8 +143,8 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
                   </div>
 
                   {docUpdatesCount > 0 && (
-                    <span className="hidden sm:inline-flex items-center gap-1 text-emerald-700 font-semibold font-mono">
-                      <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="hidden sm:inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold font-mono">
+                      <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       +{docUpdatesCount}
                     </span>
                   )}
@@ -158,7 +158,7 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
                         if (onOpenLiveStream) onOpenLiveStream(exec);
                         else onSelectExecution(exec);
                       }}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-[11px] font-mono font-bold hover:bg-amber-100 transition-colors shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 text-[11px] font-mono font-bold hover:bg-amber-100 transition-colors shadow-xs"
                     >
                       <Activity className="w-3 h-3 text-amber-600 animate-pulse" />
                       <span>Live Stream</span>
@@ -170,14 +170,14 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
                         e.stopPropagation();
                         onSelectExecution(exec);
                       }}
-                      className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F7F5F0] border border-stone-200 text-slate-700 text-[11px] font-mono font-medium hover:text-slate-900 hover:bg-stone-200/60 transition-colors"
+                      className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F7F5F0] dark:bg-slate-800 border border-stone-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-mono font-medium hover:text-slate-900 dark:hover:text-white hover:bg-stone-200/60 dark:hover:bg-slate-700 transition-colors"
                     >
-                      <Compass className="w-3 h-3 text-slate-600" />
+                      <Compass className="w-3 h-3 text-slate-600 dark:text-slate-400" />
                       <span>Trace</span>
                     </button>
                   )}
 
-                  <span className="text-slate-500 text-[11px] w-14 text-right">{formatTimeAgo(exec.created_at)}</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[11px] w-14 text-right">{formatTimeAgo(exec.created_at)}</span>
                 </div>
               </div>
             );

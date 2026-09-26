@@ -122,8 +122,8 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Connected Repositories</h2>
-          <p className="text-xs text-slate-500 mt-0.5 font-mono">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Connected Repositories</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono">
             Manage documentation automation, view workspaces, and configure sync rules
           </p>
         </div>
@@ -166,7 +166,7 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
           }
         />
       ) : (
-        <div className="bg-white border border-slate-200 rounded-2xl divide-y divide-slate-100 overflow-hidden shadow-sm">
+        <div className="bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 rounded-2xl divide-y divide-stone-100 dark:divide-slate-800/80 overflow-hidden shadow-sm">
           {sortedRepos.map((repo) => (
             <RepositoryCard
               key={repo.id}

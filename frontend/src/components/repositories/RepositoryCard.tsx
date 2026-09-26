@@ -27,10 +27,10 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
     <div
       className={`group relative flex flex-col md:flex-row md:items-center justify-between p-4 sm:px-6 gap-4 transition-all duration-150 ${
         isSelected
-          ? 'bg-emerald-50 border-l-4 border-l-emerald-600'
+          ? 'bg-emerald-50 dark:bg-emerald-950/40 border-l-4 border-l-emerald-600'
           : isActive
-          ? 'bg-white hover:bg-emerald-50/40'
-          : 'bg-white hover:bg-slate-50'
+          ? 'bg-white dark:bg-[#0D1526] hover:bg-emerald-50/40 dark:hover:bg-slate-800/50'
+          : 'bg-white dark:bg-[#0D1526] hover:bg-stone-50 dark:hover:bg-slate-800/40'
       }`}
     >
       {/* Left: Checkbox + Repo Info */}
@@ -40,7 +40,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
             type="checkbox"
             checked={isSelected}
             onChange={() => onSelect(repository.id)}
-            className="w-4 h-4 mt-1 sm:mt-0 rounded bg-white border-slate-300 text-emerald-600 focus:ring-emerald-500/40 cursor-pointer shrink-0"
+            className="w-4 h-4 mt-1 sm:mt-0 rounded bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-emerald-600 focus:ring-emerald-500/40 cursor-pointer shrink-0"
           />
         )}
 
@@ -48,7 +48,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
           className={`p-2.5 rounded-xl border shrink-0 transition-colors ${
             isActive
               ? 'bg-emerald-950 border-emerald-800 text-emerald-300 shadow-sm'
-              : 'bg-slate-100 border-slate-200 text-slate-500'
+              : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
           }`}
         >
           <FolderGit2 className="w-4 h-4" />
@@ -58,7 +58,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => onViewDetail?.(repository)}
-              className="text-sm font-bold text-slate-900 hover:text-emerald-700 transition-colors text-left truncate"
+              className="text-sm font-bold text-slate-900 dark:text-slate-100 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors text-left truncate"
             >
               {repository.name}
             </button>
@@ -73,13 +73,13 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
               </span>
             )}
 
-            <span className="text-xs text-slate-500 font-mono hidden sm:inline truncate">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono hidden sm:inline truncate">
               {repository.full_name}
             </span>
           </div>
 
           {repository.description && (
-            <p className="text-xs text-slate-600 line-clamp-1 mt-0.5 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1 mt-0.5 leading-relaxed">
               {repository.description}
             </p>
           )}
@@ -88,19 +88,19 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
 
       {/* Middle: Badges & Meta */}
       <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 shrink-0 text-xs">
-        <span className="inline-flex items-center gap-1 font-mono text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200 text-[11px]">
+        <span className="inline-flex items-center gap-1 font-mono text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700 text-[11px]">
           <GitBranch className="w-3.5 h-3.5 text-slate-400" />
           {repository.default_branch || 'main'}
         </span>
 
         {repository.language && (
-          <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-100 text-slate-600 border border-slate-200 font-medium">
+          <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-medium">
             {repository.language}
           </span>
         )}
 
         {repository.automation?.doc_paths && (
-          <span className="hidden lg:inline-flex items-center gap-1 font-mono text-[11px] text-slate-500">
+          <span className="hidden lg:inline-flex items-center gap-1 font-mono text-[11px] text-slate-500 dark:text-slate-400">
             <FileText className="w-3.5 h-3.5 text-slate-400" />
             {repository.automation.doc_paths.length} docs tracked
           </span>
@@ -113,7 +113,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
             <span>ACTIVE</span>
           </div>
         ) : (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
             <span className="w-2 h-2 rounded-full bg-slate-400" />
             <span>INACTIVE</span>
           </div>
@@ -121,13 +121,13 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
       </div>
 
       {/* Right: Action Buttons */}
-      <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end">
+      <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-100 dark:border-slate-800 justify-end">
         {repository.html_url && (
           <a
             href={repository.html_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             title="View on GitHub"
           >
             <ExternalLink className="w-4 h-4" />
@@ -136,7 +136,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
 
         <button
           onClick={() => onOpenSettings(repository)}
-          className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+          className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           title="Configure Automation Rules"
         >
           <Settings className="w-4 h-4" />
@@ -145,7 +145,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
         {onViewDetail && (
           <button
             onClick={() => onViewDetail(repository)}
-            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors"
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-colors"
           >
             <span>Workspace</span>
             <ChevronRight className="w-3.5 h-3.5" />
