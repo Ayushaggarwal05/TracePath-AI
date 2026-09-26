@@ -16,19 +16,19 @@ export const Badge: React.FC<BadgeProps> = ({
   className,
 }) => {
   const variants = {
-    emerald: 'bg-emerald-50 text-emerald-800 border-emerald-200/80 font-semibold',
-    indigo: 'bg-slate-100 text-slate-800 border-slate-200 font-semibold',
-    amber: 'bg-amber-50 text-amber-800 border-amber-200/80 font-semibold',
-    rose: 'bg-rose-50 text-rose-800 border-rose-200/80 font-semibold',
-    slate: 'bg-stone-100 text-slate-700 border-stone-200',
+    emerald: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-500/30 font-semibold',
+    indigo: 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-800 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/30 font-semibold',
+    amber: 'bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-200/80 dark:border-amber-500/30 font-semibold',
+    rose: 'bg-rose-50 dark:bg-rose-500/10 text-rose-800 dark:text-rose-300 border-rose-200/80 dark:border-rose-500/30 font-semibold',
+    slate: 'bg-stone-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-stone-200 dark:border-slate-700',
   };
 
   const dotColors = {
     emerald: 'bg-emerald-500',
-    indigo: 'bg-slate-700',
+    indigo: 'bg-indigo-500 dark:bg-indigo-400',
     amber: 'bg-amber-500',
     rose: 'bg-rose-500',
-    slate: 'bg-slate-400',
+    slate: 'bg-slate-400 dark:bg-slate-500',
   };
 
   return (

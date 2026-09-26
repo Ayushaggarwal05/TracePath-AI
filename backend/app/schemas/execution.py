@@ -70,16 +70,16 @@ class ExecutionResponse(ExecutionBase):
     pull_request_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime
-    telemetry_logs: Optional[List[Dict[str, Any]]] = None
-
-
-class ExecutionDetailResponse(ExecutionResponse):
     changed_files: Optional[List[Dict[str, Any]]] = None
     analysis_result: Optional[Dict[str, Any]] = None
     documentation_decision: Optional[Dict[str, Any]] = None
     updated_documents: Optional[List[Dict[str, Any]]] = None
-    generated_diff: Optional[str] = None
     error_information: Optional[Dict[str, Any]] = None
+    telemetry_logs: Optional[List[Dict[str, Any]]] = None
+
+
+class ExecutionDetailResponse(ExecutionResponse):
+    generated_diff: Optional[str] = None
 
 
 class ExecutionFilterParams(BaseModel):
