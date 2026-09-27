@@ -18,7 +18,7 @@ interface AgentHealthAndCoverageCardProps {
 export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProps> = ({
   activeReposCount,
 }) => {
-  const savedUser = localStorage.getItem('tracepath_github_user') || 'Ayushaggarwal05';
+  const savedUser = localStorage.getItem('tracepath_github_user') || 'Developer';
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

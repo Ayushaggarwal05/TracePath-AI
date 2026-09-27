@@ -62,11 +62,11 @@ export default {
           red: '#c7374d',
         },
         dark: {
-          base: '#F7F5F0',
-          card: '#FFFFFF',
-          border: '#E2E8F0',
-          hover: '#F8FAFC',
-          muted: '#64748B',
+          base: '#060913',
+          card: '#0B111F',
+          border: '#1E293B',
+          hover: '#131D2E',
+          muted: '#94A3B8',
         }
       },
       fontFamily: {

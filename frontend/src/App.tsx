@@ -33,16 +33,29 @@ const VALID_ROUTES: AppRoute[] = [
 ];
 
 const getInitialRoute = (): AppRoute => {
+  const isConnected = localStorage.getItem('tracepath_github_connected') === 'true';
+
   // 1. Check URL Hash first (e.g. #/dashboard)
   const hash = window.location.hash.replace('#/', '').replace('#', '') as AppRoute;
   if (hash && VALID_ROUTES.includes(hash)) {
+    // If attempting to access protected route without being connected, fallback to landing
+    const isProtected = ['dashboard', 'repositories', 'repository-detail', 'activity', 'settings'].includes(hash);
+    if (isProtected && !isConnected) {
+      return 'landing';
+    }
     return hash;
   }
+
   // 2. Check localStorage persistence
   const saved = localStorage.getItem('tracepath_current_route') as AppRoute;
   if (saved && VALID_ROUTES.includes(saved)) {
+    const isProtected = ['dashboard', 'repositories', 'repository-detail', 'activity', 'settings'].includes(saved);
+    if (isProtected && !isConnected) {
+      return 'landing';
+    }
     return saved;
   }
+
   // 3. Default to landing page on initial visit
   return 'landing';
 };
@@ -54,17 +67,40 @@ export const App: React.FC = () => {
   });
   const { user } = useUser();
 
+  const isConnected = localStorage.getItem('tracepath_github_connected') === 'true';
+
   const navigateTo = (route: AppRoute) => {
+    const isProtected = ['dashboard', 'repositories', 'repository-detail', 'activity', 'settings'].includes(route);
+    const currentlyConnected = localStorage.getItem('tracepath_github_connected') === 'true';
+
+    if (isProtected && !currentlyConnected) {
+      // Guard protected routes: redirect to landing or connect
+      setCurrentRoute('landing');
+      localStorage.setItem('tracepath_current_route', 'landing');
+      window.location.hash = '#/landing';
+      return;
+    }
+
     setCurrentRoute(route);
     localStorage.setItem('tracepath_current_route', route);
     window.location.hash = `#/${route}`;
   };
 
-  // Sync route on hashchange (browser Back/Forward navigation)
+  // Sync route on hashchange (browser Back/Forward navigation) with safety guard
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#/', '').replace('#', '') as AppRoute;
       if (hash && VALID_ROUTES.includes(hash)) {
+        const isProtected = ['dashboard', 'repositories', 'repository-detail', 'activity', 'settings'].includes(hash);
+        const currentlyConnected = localStorage.getItem('tracepath_github_connected') === 'true';
+
+        if (isProtected && !currentlyConnected) {
+          setCurrentRoute('landing');
+          localStorage.setItem('tracepath_current_route', 'landing');
+          window.location.hash = '#/landing';
+          return;
+        }
+
         setCurrentRoute(hash);
         localStorage.setItem('tracepath_current_route', hash);
       }
@@ -84,12 +120,19 @@ export const App: React.FC = () => {
     navigateTo('dashboard');
   };
 
-  // Route Rendering
+  const handleSignOut = () => {
+    localStorage.removeItem('tracepath_github_connected');
+    navigateTo('landing');
+  };
+
+  // Public Route Rendering
   if (currentRoute === 'landing') {
     return (
       <PublicLayout
-        onNavigateToApp={() => navigateTo('dashboard')}
+        currentRoute="landing"
+        onNavigateToApp={() => (isConnected ? navigateTo('dashboard') : navigateTo('connect'))}
         onConnectGitHub={() => navigateTo('connect')}
+        onNavigateToLanding={() => navigateTo('landing')}
       >
         <LandingPage
           onGetStarted={() => navigateTo('connect')}
@@ -102,8 +145,10 @@ export const App: React.FC = () => {
   if (currentRoute === 'connect') {
     return (
       <PublicLayout
-        onNavigateToApp={() => navigateTo('dashboard')}
+        currentRoute="connect"
+        onNavigateToApp={() => (isConnected ? navigateTo('dashboard') : navigateTo('connect'))}
         onConnectGitHub={() => navigateTo('connect')}
+        onNavigateToLanding={() => navigateTo('landing')}
       >
         <ConnectGitHubPage
           onConnected={() => navigateTo('dashboard')}
@@ -116,10 +161,29 @@ export const App: React.FC = () => {
   if (currentRoute === 'select-repos') {
     return (
       <PublicLayout
-        onNavigateToApp={() => navigateTo('dashboard')}
+        currentRoute="select-repos"
+        onNavigateToApp={() => (isConnected ? navigateTo('dashboard') : navigateTo('connect'))}
         onConnectGitHub={() => navigateTo('connect')}
+        onNavigateToLanding={() => navigateTo('landing')}
       >
         <RepositorySelectPage onComplete={handleCompleteRepoSelect} />
+      </PublicLayout>
+    );
+  }
+
+  // Fallback guard: if someone is unauthenticated and hits protected view
+  if (!isConnected) {
+    return (
+      <PublicLayout
+        currentRoute="landing"
+        onNavigateToApp={() => navigateTo('connect')}
+        onConnectGitHub={() => navigateTo('connect')}
+        onNavigateToLanding={() => navigateTo('landing')}
+      >
+        <LandingPage
+          onGetStarted={() => navigateTo('connect')}
+          onConnectGitHub={() => navigateTo('connect')}
+        />
       </PublicLayout>
     );
   }
@@ -132,6 +196,7 @@ export const App: React.FC = () => {
       user={user}
       activeRoute={activeSidebarRoute}
       onRouteChange={(route) => navigateTo(route as AppRoute)}
+      onSignOut={handleSignOut}
     >
       {currentRoute === 'dashboard' && (
         <DashboardPage onNavigate={(route) => navigateTo(route as AppRoute)} />

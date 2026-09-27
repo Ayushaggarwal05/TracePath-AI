@@ -24,6 +24,7 @@ interface DashboardLayoutProps {
   user: User | null;
   activeRoute: NavRoute;
   onRouteChange: (route: NavRoute | "landing" | "connect") => void;
+  onSignOut?: () => void;
   children: React.ReactNode;
 }
 
@@ -55,25 +56,24 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   user,
   activeRoute,
   onRouteChange,
+  onSignOut,
   children,
 }) => {
   const savedUsername =
     localStorage.getItem("tracepath_github_user") ||
     user?.github_connections?.[0]?.username ||
-    "Ayushaggarwal05";
+    (user?.email ? user.email.split("@")[0] : "Developer");
   const avatarUrl =
     localStorage.getItem("tracepath_github_avatar") ||
     user?.github_connections?.[0]?.avatar_url ||
-    (savedUsername ? `https://github.com/${savedUsername}.png` : "");
+    (savedUsername && savedUsername !== "Developer"
+      ? `https://github.com/${savedUsername}.png`
+      : "");
 
   const savedName =
     localStorage.getItem("tracepath_github_name") ||
-    (user?.full_name &&
-    user.full_name !== "TracePath Developer" &&
-    user.full_name !== "TracePath Dev"
-      ? user.full_name
-      : null) ||
-    (savedUsername === "Ayushaggarwal05" ? "Ayush Aggarwal" : savedUsername);
+    user?.full_name ||
+    savedUsername;
 
   const displayName = savedName || savedUsername;
   const initial = displayName.charAt(0).toUpperCase();
@@ -314,12 +314,16 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   <button
                     onClick={() => {
                       setIsAccountMenuOpen(false);
-                      onRouteChange("connect");
+                      if (onSignOut) {
+                        onSignOut();
+                      } else {
+                        onRouteChange("landing");
+                      }
                     }}
                     className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors text-left cursor-pointer"
                   >
                     <LogOut className="w-4 h-4 shrink-0" />
-                    <span>Sign Out / Switch Account</span>
+                    <span>Sign Out</span>
                   </button>
                 </div>
               </div>
@@ -577,12 +581,16 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                       <button
                         onClick={() => {
                           setIsTopMenuOpen(false);
-                          onRouteChange("connect");
+                          if (onSignOut) {
+                            onSignOut();
+                          } else {
+                            onRouteChange("landing");
+                          }
                         }}
                         className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors text-left cursor-pointer"
                       >
                         <LogOut className="w-4 h-4 shrink-0" />
-                        <span>Sign Out / Switch Account</span>
+                        <span>Sign Out</span>
                       </button>
                     </div>
                   </div>

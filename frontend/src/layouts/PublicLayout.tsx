@@ -1,26 +1,49 @@
 import React from 'react';
 import { ToastContainer } from '../components/common/ToastContainer';
 import { Button } from '../components/common/Button';
-import { Github } from 'lucide-react';
+import { Github, LayoutDashboard, Home } from 'lucide-react';
 
 interface PublicLayoutProps {
   onNavigateToApp: () => void;
   onConnectGitHub?: () => void;
+  onNavigateToLanding?: () => void;
+  currentRoute?: string;
   children: React.ReactNode;
 }
 
 export const PublicLayout: React.FC<PublicLayoutProps> = ({
   onNavigateToApp,
   onConnectGitHub,
+  onNavigateToLanding,
+  currentRoute = 'landing',
   children,
 }) => {
   const isConnected = localStorage.getItem('tracepath_github_connected') === 'true';
+  const savedUser = localStorage.getItem('tracepath_github_user');
+
+  const handleLogoClick = () => {
+    if (onNavigateToLanding) {
+      onNavigateToLanding();
+    }
+  };
+
+  const isLanding = currentRoute === 'landing';
 
   return (
-    <div className="min-h-screen bg-dark-base flex flex-col justify-between selection:bg-brand-500/20 selection:text-brand-300">
-      {/* Header */}
-      <header className="h-20 border-b border-dark-border/80 bg-slate-950/70 backdrop-blur-md px-6 sm:px-12 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-3.5 cursor-pointer group" onClick={() => (isConnected ? onNavigateToApp() : onConnectGitHub?.())}>
+    <div
+      className={`min-h-screen flex flex-col justify-between ${
+        isLanding
+          ? 'bg-[#FAF9F6] text-slate-900 selection:bg-indigo-500/20 selection:text-indigo-900'
+          : 'bg-[#060913] text-slate-100 selection:bg-rose-500/20 selection:text-rose-300'
+      }`}
+    >
+      {/* Navy Header */}
+      <header className="h-20 border-b border-slate-800/80 bg-[#0B111F]/95 backdrop-blur-md px-6 sm:px-12 flex items-center justify-between sticky top-0 z-40">
+        <div
+          className="flex items-center gap-3.5 cursor-pointer group"
+          onClick={handleLogoClick}
+          title="Go to Home / Landing Page"
+        >
           <div className="relative flex items-center justify-center">
             <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full group-hover:bg-indigo-500/35 transition-all" />
             <img
@@ -40,22 +63,42 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
+          {!isLanding && onNavigateToLanding && (
+            <button
+              onClick={onNavigateToLanding}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all cursor-pointer"
+            >
+              <Home className="w-4 h-4" />
+              <span>Landing Page</span>
+            </button>
+          )}
+
           {isConnected ? (
             <Button
               variant="primary"
               size="sm"
               onClick={onNavigateToApp}
+              leftIcon={<LayoutDashboard className="w-4 h-4" />}
             >
               Go to Dashboard
+            </Button>
+          ) : savedUser ? (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onConnectGitHub || onNavigateToApp}
+              leftIcon={<Github className="w-4 h-4 text-white" />}
+            >
+              {currentRoute === 'connect' ? `Continue as @${savedUser}` : `Sign In (@${savedUser})`}
             </Button>
           ) : (
             <Button
               variant="primary"
               size="sm"
               onClick={onConnectGitHub || onNavigateToApp}
-              leftIcon={<Github className="w-4 h-4" />}
+              leftIcon={<Github className="w-4 h-4 text-white" />}
             >
-              Connect GitHub
+              {currentRoute === 'connect' ? 'Sign In / Connect' : 'Connect GitHub'}
             </Button>
           )}
         </div>
@@ -64,8 +107,8 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
       {/* Main Content */}
       <main className="flex-1">{children}</main>
 
-      {/* Footer */}
-      <footer className="border-t border-dark-border/80 bg-slate-950 py-10 px-6 sm:px-12 text-center text-xs text-slate-500 font-mono">
+      {/* Navy Footer */}
+      <footer className="border-t border-slate-800/80 bg-[#0B111F] py-10 px-6 sm:px-12 text-center text-xs font-mono text-slate-400">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>© 2026 TracePath AI. Autonomous GitHub-native documentation synchronization.</p>
           <p className="text-slate-400">Powered by 3 Independent AI Agents</p>
@@ -76,3 +119,5 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
     </div>
   );
 };
+
+export default PublicLayout;

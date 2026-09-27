@@ -42,7 +42,7 @@ export const SettingsPage: React.FC = () => {
   const connectedUsername =
     user?.github_connections?.[0]?.username ||
     localStorage.getItem('tracepath_github_user') ||
-    'Ayushaggarwal05';
+    'Developer';
 
   // Persistent Form States
   const [defaultTargetBranch, setDefaultTargetBranch] = useState(DEFAULT_GLOBAL_SETTINGS.defaultTargetBranch);

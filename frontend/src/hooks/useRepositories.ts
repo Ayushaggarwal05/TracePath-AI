@@ -15,7 +15,7 @@ export function useRepositories() {
       setLoading(true);
       setError(null);
 
-      const savedUser = localStorage.getItem('tracepath_github_user') || 'Ayushaggarwal05';
+      const savedUser = localStorage.getItem('tracepath_github_user') || undefined;
 
       // Fetch both registered DB repos and live GitHub repos in parallel
       const [dbRes, ghRepos] = await Promise.all([

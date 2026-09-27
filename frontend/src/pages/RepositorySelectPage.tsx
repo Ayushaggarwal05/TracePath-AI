@@ -26,7 +26,7 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
   const loadRepos = async () => {
     try {
       setLoading(true);
-      const savedUser = localStorage.getItem('tracepath_github_user') || 'Ayushaggarwal05';
+      const savedUser = localStorage.getItem('tracepath_github_user') || undefined;
       const repos = await githubService.getAvailableRepositories(savedUser);
       setAvailableRepos(repos);
       if (repos && repos.length > 0) {
