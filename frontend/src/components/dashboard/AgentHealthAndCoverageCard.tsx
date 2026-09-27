@@ -3,7 +3,7 @@ import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 import {
   Brain,
-  Sparkles,
+  Cpu,
   FileCode,
   ShieldCheck,
   Lock,
@@ -26,8 +26,8 @@ export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProp
       <Card className="p-0 overflow-hidden lg:col-span-2 bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
         <div className="flex items-center justify-between p-5 border-b border-stone-100 dark:border-slate-800 bg-[#F7F5F0] dark:bg-[#131D2E]">
           <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80">
-              <Layers className="w-4 h-4" />
+            <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 shadow-xs">
+              <Layers className="w-5 h-5 fill-emerald-500/25" />
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Multi-Agent Engine Status</h3>
@@ -46,8 +46,8 @@ export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProp
           {/* Agent 1 */}
           <div className="p-4 space-y-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
-                <Brain className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100">
+                <Brain className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400 fill-indigo-500/30" />
                 <span>Agent 1</span>
               </div>
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80">
@@ -63,8 +63,8 @@ export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProp
           {/* Agent 2 */}
           <div className="p-4 space-y-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
-                <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100">
+                <Cpu className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400 fill-amber-500/35" />
                 <span>Agent 2</span>
               </div>
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80">
@@ -80,8 +80,8 @@ export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProp
           {/* Agent 3 */}
           <div className="p-4 space-y-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
-                <FileCode className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100">
+                <FileCode className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/30" />
                 <span>Agent 3</span>
               </div>
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80">
@@ -101,7 +101,7 @@ export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProp
         <div>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/30" />
               <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Protected Doc Targets</h3>
             </div>
             <Badge variant="emerald">{activeReposCount > 0 ? '100% Tracked' : '0% Active'}</Badge>
@@ -110,7 +110,7 @@ export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProp
           <div className="space-y-2.5 text-xs">
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F7F5F0] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700/80">
               <div className="flex items-center gap-2 font-mono text-slate-800 dark:text-slate-200 font-semibold">
-                <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400 fill-emerald-500/20" />
                 <span>README.md</span>
               </div>
               <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-mono font-bold">Sync Enabled</span>
@@ -118,7 +118,7 @@ export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProp
 
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F7F5F0] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700/80">
               <div className="flex items-center gap-2 font-mono text-slate-800 dark:text-slate-200 font-semibold">
-                <FileText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400 fill-indigo-500/20" />
                 <span>ARCHITECTURE.md</span>
               </div>
               <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-mono font-bold">Sync Enabled</span>
@@ -126,7 +126,7 @@ export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProp
 
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F7F5F0] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700/80">
               <div className="flex items-center gap-2 font-mono text-slate-800 dark:text-slate-200 font-semibold">
-                <FileText className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                <FileText className="w-4 h-4 text-amber-600 dark:text-amber-400 fill-amber-500/20" />
                 <span>docs/ directory</span>
               </div>
               <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-mono font-bold">Sync Enabled</span>
@@ -141,7 +141,7 @@ export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProp
             <span className="text-slate-800 dark:text-slate-200 font-bold truncate font-mono">@{savedUser}</span>
           </div>
           <span className="inline-flex items-center gap-1 text-[10px] font-mono text-slate-500 dark:text-slate-400 shrink-0">
-            <Lock className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+            <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/25" />
             AES-256
           </span>
         </div>

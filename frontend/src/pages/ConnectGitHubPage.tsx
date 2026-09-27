@@ -13,7 +13,7 @@ import {
   ExternalLink,
   Eye,
   EyeOff,
-  Sparkles,
+  Zap,
 } from 'lucide-react';
 
 interface ConnectGitHubPageProps {
@@ -112,7 +112,7 @@ export const ConnectGitHubPage: React.FC<ConnectGitHubPageProps> = ({
       {/* Top Header */}
       <div className="text-center space-y-3 mb-10">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-semibold font-mono shadow-glow-emerald">
-          <Sparkles className="w-3.5 h-3.5" />
+          <Zap className="w-4 h-4 fill-emerald-500/30" />
           <span>High-Rate Limit GitHub Integration (5,000 req/hr)</span>
         </div>
         <h2 className="text-3xl sm:text-4xl font-black text-slate-100 font-brand tracking-tight">
@@ -448,7 +448,7 @@ export const ConnectGitHubPage: React.FC<ConnectGitHubPageProps> = ({
 
             {/* Bottom Tip */}
             <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center gap-2.5 text-xs text-indigo-300">
-              <Sparkles className="w-4 h-4 shrink-0 text-indigo-400" />
+              <Zap className="w-4.5 h-4.5 shrink-0 text-indigo-400 fill-indigo-500/30" />
               <p className="text-[11px]">
                 Click <strong>"Generate token"</strong> at the bottom of GitHub, copy the generated <code className="text-white font-mono">github_pat_...</code> string, and paste it into the left form!
               </p>

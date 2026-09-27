@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { parseUnifiedDiff, DiffLine } from '../../utils/diffViewer';
-import { Copy, Check, Columns, AlignLeft, Eye, Sparkles } from 'lucide-react';
+import { Copy, Check, Columns, AlignLeft, Eye, Bot } from 'lucide-react';
 import { Badge } from '../common/Badge';
 
 interface DiffViewerProps {
@@ -249,7 +249,7 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
           /* Rendered Markdown Preview */
           <div className="p-6 bg-white dark:bg-slate-950 font-sans text-sm text-slate-800 dark:text-slate-200 max-h-[65vh] overflow-y-auto space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-stone-200/90 dark:border-slate-800 text-xs text-emerald-700 dark:text-brand-400 font-mono">
-              <Sparkles className="w-4 h-4" />
+              <Bot className="w-4.5 h-4.5 fill-emerald-500/25" />
               <span>Rendered Autonomous Sync Output</span>
             </div>
             <pre className="whitespace-pre-wrap font-mono text-xs bg-[#F7F5F0] dark:bg-slate-900/80 p-4 rounded-xl border border-stone-200/90 dark:border-slate-800 text-slate-900 dark:text-slate-200">

@@ -6,7 +6,7 @@ import { Button } from '../common/Button';
 import { LiveSyncProgressStream } from './LiveSyncProgressStream';
 import { executionService } from '../../services/executionService';
 import { useToast } from '../../hooks/useToast';
-import { Sparkles, GitCommit, Code, Zap, RotateCcw } from 'lucide-react';
+import { Bot, GitCommit, Code, Zap, RotateCcw } from 'lucide-react';
 
 interface QuickSyncTriggerModalProps {
   repositories: Repository[];
@@ -200,7 +200,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
                   setActiveView('form');
                   setCurrentExecution(null);
                 }}
-                leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+                leftIcon={<RotateCcw className="w-4 h-4" />}
               >
                 Run Another Sync
               </Button>
@@ -248,7 +248,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
                     : 'border-stone-200/90 dark:border-slate-800 bg-[#F7F5F0] dark:bg-slate-900/40 text-slate-600 dark:text-slate-400 hover:border-stone-300 dark:hover:border-slate-700'
                 }`}
               >
-                <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/30" />
                 <span className="font-bold font-sans">Latest Commit</span>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Real GitHub HEAD</span>
               </button>
@@ -262,7 +262,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
                     : 'border-stone-200/90 dark:border-slate-800 bg-[#F7F5F0] dark:bg-slate-900/40 text-slate-600 dark:text-slate-400 hover:border-stone-300 dark:hover:border-slate-700'
                 }`}
               >
-                <GitCommit className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <GitCommit className="w-5 h-5 text-indigo-600 dark:text-indigo-400 fill-indigo-500/30" />
                 <span className="font-bold font-sans">Custom SHA</span>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Specific Commit</span>
               </button>
@@ -276,7 +276,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
                     : 'border-stone-200/90 dark:border-slate-800 bg-[#F7F5F0] dark:bg-slate-900/40 text-slate-600 dark:text-slate-400 hover:border-stone-300 dark:hover:border-slate-700'
                 }`}
               >
-                <Code className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <Code className="w-5 h-5 text-purple-600 dark:text-purple-400 fill-purple-500/20" />
                 <span className="font-bold font-sans">Simulated Demo</span>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Mock Changes</span>
               </button>
@@ -287,7 +287,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
           {syncMode === 'latest' && (
             <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl space-y-2">
               <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
-                <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <Zap className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/30" />
                 <span>Live GitHub Auto-Fetch Enabled</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
@@ -351,7 +351,7 @@ export const QuickSyncTriggerModal: React.FC<QuickSyncTriggerModalProps> = ({
               onClick={handleTrigger}
               isLoading={triggering}
               disabled={triggering || activeRepos.length === 0}
-              leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+              leftIcon={<Bot className="w-4 h-4 fill-white/30" />}
             >
               {syncMode === 'latest' ? 'Sync Live GitHub Commit' : 'Run Multi-Agent Pipeline'}
             </Button>

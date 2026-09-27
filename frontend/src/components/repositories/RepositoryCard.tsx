@@ -51,7 +51,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
               : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
           }`}
         >
-          <FolderGit2 className="w-4 h-4" />
+          <FolderGit2 className={`w-4 h-4 ${isActive ? 'fill-emerald-400/30' : 'fill-slate-400/20'}`} />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -65,11 +65,11 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
 
             {repository.is_private ? (
               <span title="Private Repository" className="inline-flex items-center text-slate-400">
-                <Lock className="w-3.5 h-3.5" />
+                <Lock className="w-3.5 h-3.5 fill-slate-400/30" />
               </span>
             ) : (
               <span title="Public Repository" className="inline-flex items-center text-slate-400">
-                <Globe className="w-3.5 h-3.5" />
+                <Globe className="w-3.5 h-3.5 fill-slate-400/30" />
               </span>
             )}
 
@@ -89,7 +89,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
       {/* Middle: Badges & Meta */}
       <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 shrink-0 text-xs">
         <span className="inline-flex items-center gap-1 font-mono text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700 text-[11px]">
-          <GitBranch className="w-3.5 h-3.5 text-slate-400" />
+          <GitBranch className="w-3.5 h-3.5 text-slate-400 fill-slate-400/25" />
           {repository.default_branch || 'main'}
         </span>
 
@@ -101,7 +101,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
 
         {repository.automation?.doc_paths && (
           <span className="hidden lg:inline-flex items-center gap-1 font-mono text-[11px] text-slate-500 dark:text-slate-400">
-            <FileText className="w-3.5 h-3.5 text-slate-400" />
+            <FileText className="w-3.5 h-3.5 text-slate-400 fill-slate-400/25" />
             {repository.automation.doc_paths.length} docs tracked
           </span>
         )}
@@ -139,7 +139,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
           className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           title="Configure Automation Rules"
         >
-          <Settings className="w-4 h-4" />
+          <Settings className="w-4 h-4 fill-slate-400/20" />
         </button>
 
         {onViewDetail && (
@@ -158,9 +158,9 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
             type="button"
             onClick={() => onToggleAutomation(repository)}
             disabled={isToggling}
-            className="inline-flex items-center justify-center gap-1.5 min-w-[92px] px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950 hover:bg-rose-950 text-emerald-200 hover:text-rose-200 border border-emerald-800 hover:border-rose-800 transition-all shadow-sm group/btn"
+            className="inline-flex items-center justify-center gap-1.5 min-w-[92px] px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950 hover:bg-rose-950 text-emerald-200 hover:text-rose-200 border border-emerald-800 hover:border-rose-800 transition-all shadow-sm group/btn cursor-pointer"
           >
-            <Pause className="w-3.5 h-3.5 text-emerald-400 group-hover/btn:text-rose-400" />
+            <Pause className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400/40 group-hover/btn:text-rose-400 group-hover/btn:fill-rose-400/40" />
             <span className="group-hover/btn:hidden">Active</span>
             <span className="hidden group-hover/btn:inline">Pause</span>
           </button>
@@ -169,7 +169,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
             type="button"
             onClick={() => onToggleAutomation(repository)}
             disabled={isToggling}
-            className="inline-flex items-center justify-center gap-1.5 min-w-[92px] px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white transition-all shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-[1.02] active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-1.5 min-w-[92px] px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white transition-all shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
             <Play className="w-3.5 h-3.5 text-white fill-white" />
             <span>Activate</span>

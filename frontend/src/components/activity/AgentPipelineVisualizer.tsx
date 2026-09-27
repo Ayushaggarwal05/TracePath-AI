@@ -1,6 +1,6 @@
 import React from 'react';
 import { ExecutionStatus } from '../../types/execution';
-import { CheckCircle2, Clock, AlertCircle, Sparkles, Brain, FileCode, Check } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, Cpu, Brain, FileCode, Check } from 'lucide-react';
 
 interface AgentPipelineVisualizerProps {
   status: ExecutionStatus;
@@ -31,28 +31,28 @@ export const AgentPipelineVisualizer: React.FC<AgentPipelineVisualizerProps> = (
       name: 'Agent 1: Analysis',
       desc: 'Semantic Code Extraction',
       detail: analysisSummary ? 'Code semantics analyzed' : 'Extracts AST & purpose',
-      icon: <Brain className="w-4 h-4" />,
+      icon: <Brain className="w-5 h-5 fill-indigo-500/30 text-indigo-600 dark:text-indigo-400" />,
     },
     {
       id: 'PLANNING',
       name: 'Agent 2: Decision',
       desc: 'Doc Impact Evaluation',
       detail: decisionRationale ? 'Impact evaluated' : 'Checks README, Arch & Specs',
-      icon: <Sparkles className="w-4 h-4" />,
+      icon: <Cpu className="w-5 h-5 fill-amber-500/40 text-amber-600 dark:text-amber-400" />,
     },
     {
       id: 'GENERATING',
       name: 'Agent 3: Generator',
       desc: 'Minimal Diff Assembly',
       detail: updatedDocsCount ? `${updatedDocsCount} docs generated` : 'Builds minimal unified diffs',
-      icon: <FileCode className="w-4 h-4" />,
+      icon: <FileCode className="w-5 h-5 fill-emerald-500/30 text-emerald-600 dark:text-emerald-400" />,
     },
     {
       id: 'COMMITTING',
       name: 'Sync Backend',
       desc: 'GitHub Commit / PR',
       detail: status === 'COMPLETED' ? 'Synced to GitHub' : 'Direct commit or PR write-back',
-      icon: <Check className="w-4 h-4" />,
+      icon: <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />,
     },
   ];
 
@@ -127,7 +127,7 @@ export const AgentPipelineVisualizer: React.FC<AgentPipelineVisualizerProps> = (
 
               {/* Status Circle Icon */}
               <div
-                className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border z-10 transition-all ${
+                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border z-10 transition-all ${
                   state === 'completed'
                     ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-300 dark:border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shadow-2xs'
                     : state === 'active'
@@ -140,11 +140,11 @@ export const AgentPipelineVisualizer: React.FC<AgentPipelineVisualizerProps> = (
                 }`}
               >
                 {state === 'completed' ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/30" />
                 ) : state === 'failed' ? (
-                  <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                  <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 fill-rose-500/30" />
                 ) : state === 'active' ? (
-                  <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-300 animate-spin" />
+                  <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-300 animate-spin" />
                 ) : (
                   step.icon
                 )}
@@ -222,12 +222,12 @@ export const AgentPipelineVisualizer: React.FC<AgentPipelineVisualizerProps> = (
             >
               <div className="p-2 rounded-lg bg-white dark:bg-slate-950/60 border border-stone-200 dark:border-slate-800 shrink-0">
                 {state === 'completed' ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/30" />
                 ) : state === 'failed' ? (
-                  <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                  <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 fill-rose-500/30" />
                 ) : state === 'active' ? (
-                  <div className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin">
-                    <Clock className="w-4 h-4" />
+                  <div className="w-5 h-5 text-indigo-600 dark:text-indigo-400 animate-spin">
+                    <Clock className="w-5 h-5" />
                   </div>
                 ) : (
                   step.icon

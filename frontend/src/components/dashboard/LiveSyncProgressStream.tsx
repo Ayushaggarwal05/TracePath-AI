@@ -7,7 +7,7 @@ import { formatShortSha } from '../../utils/formatters';
 import {
   GitCommit,
   Brain,
-  Sparkles,
+  Cpu,
   ShieldCheck,
   CheckCircle2,
   XCircle,
@@ -265,7 +265,7 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
       name: 'Documentation Impact Decision',
       agentLabel: 'Agent 2 (Gemini Flash)',
       description: 'Evaluating impact on README, Architecture, and API specifications.',
-      icon: <Sparkles className="w-4 h-4" />,
+      icon: <Cpu className="w-4.5 h-4.5 fill-amber-500/35" />,
       status: stageStatuses.step3,
       detail: execution?.documentation_decision?.decision_rationale,
     },

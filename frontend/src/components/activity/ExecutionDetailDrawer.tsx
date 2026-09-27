@@ -12,7 +12,6 @@ import {
   GitPullRequest,
   GitCommit,
   Brain,
-  Sparkles,
   AlertCircle,
   ExternalLink,
   Clock,
@@ -145,11 +144,11 @@ export const ExecutionDetailDrawer: React.FC<ExecutionDetailDrawerProps> = ({
             {/* Navigation Tabs */}
             <div className="flex items-center gap-1 px-4 sm:px-6 border-b border-stone-200/90 dark:border-slate-800 bg-[#ECE9E2]/50 dark:bg-slate-900/40 shrink-0 overflow-x-auto">
               {[
-                { id: 'pipeline', label: 'Overview & Flow', icon: <Compass className="w-4 h-4" /> },
-                { id: 'agents', label: '3-Agent Deep Trace', icon: <Brain className="w-4 h-4" /> },
-                { id: 'files', label: `Code Changes (${execution.changed_files?.length || 0})`, icon: <Code2 className="w-4 h-4" /> },
-                { id: 'diff', label: `Docs Diff (${execution.updated_documents?.length || 0})`, icon: <FileText className="w-4 h-4" /> },
-                { id: 'telemetry', label: `Engine Telemetry (${execution.telemetry_logs?.length || 0})`, icon: <Activity className="w-4 h-4" /> },
+                { id: 'pipeline', label: 'Overview & Flow', icon: <Compass className="w-4.5 h-4.5 fill-slate-400/20" /> },
+                { id: 'agents', label: '3-Agent Deep Trace', icon: <Brain className="w-4.5 h-4.5 fill-indigo-500/25" /> },
+                { id: 'files', label: `Code Changes (${execution.changed_files?.length || 0})`, icon: <Code2 className="w-4.5 h-4.5 fill-indigo-500/20" /> },
+                { id: 'diff', label: `Docs Diff (${execution.updated_documents?.length || 0})`, icon: <FileText className="w-4.5 h-4.5 fill-emerald-500/20" /> },
+                { id: 'telemetry', label: `Engine Telemetry (${execution.telemetry_logs?.length || 0})`, icon: <Activity className="w-4.5 h-4.5" /> },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -423,7 +422,7 @@ export const ExecutionDetailDrawer: React.FC<ExecutionDetailDrawerProps> = ({
                   <div className="p-5 rounded-2xl bg-[#F7F5F0] dark:bg-slate-900/60 border border-stone-200/90 dark:border-slate-800 space-y-4">
                     <div className="flex items-center justify-between pb-3 border-b border-stone-200/90 dark:border-slate-800">
                       <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 font-sans">
-                        <Sparkles className="w-4 h-4" />
+                        <Cpu className="w-4.5 h-4.5 fill-amber-500/35" />
                         <span>Agent 2 — Documentation Impact & Decision Agent</span>
                       </div>
                       <Badge variant="amber">

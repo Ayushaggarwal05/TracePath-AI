@@ -6,8 +6,8 @@ import {
   GitCommit,
   GitBranch,
   FileCode,
-  Brain,
-  Sparkles,
+  Bot,
+  FileCheck2,
   AlertCircle,
   CheckCircle2,
   Power,
@@ -31,44 +31,63 @@ export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
   const getEventIcon = (type: ActivityEventType) => {
     switch (type) {
       case 'REPOSITORY_CONNECTED':
-        return <GitBranch className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />;
+        return <GitBranch className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/25" />;
       case 'AUTOMATION_ACTIVATED':
-        return <Power className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />;
+        return <Power className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/30" />;
       case 'AUTOMATION_DEACTIVATED':
-        return <PowerOff className="w-4 h-4 text-rose-600 dark:text-rose-400" />;
+        return <PowerOff className="w-5 h-5 text-rose-600 dark:text-rose-400 fill-rose-500/20" />;
       case 'CODE_CHANGE_DETECTED':
-        return <GitCommit className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />;
+        return <GitCommit className="w-5 h-5 text-indigo-600 dark:text-indigo-400 fill-indigo-500/30" />;
       case 'AI_ANALYSIS_COMPLETED':
-        return <Brain className="w-4 h-4 text-amber-600 dark:text-amber-400" />;
+        return <Bot className="w-5 h-5 text-amber-600 dark:text-amber-400 fill-amber-500/30" />;
       case 'DOCUMENTATION_UPDATED':
-        return <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />;
+        return <FileCheck2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/30" />;
       case 'COMMIT_CREATED':
-        return <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />;
+        return <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/30" />;
       case 'EXECUTION_FAILED':
-        return <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />;
+        return <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 fill-rose-500/30" />;
       default:
-        return <FileCode className="w-4 h-4 text-slate-600 dark:text-slate-400" />;
+        return <FileCode className="w-5 h-5 text-slate-600 dark:text-slate-400 fill-slate-400/25" />;
+    }
+  };
+
+  const getEventContainerClass = (type: ActivityEventType) => {
+    switch (type) {
+      case 'REPOSITORY_CONNECTED':
+      case 'AUTOMATION_ACTIVATED':
+      case 'DOCUMENTATION_UPDATED':
+      case 'COMMIT_CREATED':
+        return 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200/80 dark:border-emerald-800/60 shadow-xs';
+      case 'CODE_CHANGE_DETECTED':
+        return 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200/80 dark:border-indigo-800/60 shadow-xs';
+      case 'AI_ANALYSIS_COMPLETED':
+        return 'bg-amber-50 dark:bg-amber-950/50 border-amber-200/80 dark:border-amber-800/60 shadow-xs';
+      case 'AUTOMATION_DEACTIVATED':
+      case 'EXECUTION_FAILED':
+        return 'bg-rose-50 dark:bg-rose-950/50 border-rose-200/80 dark:border-rose-800/60 shadow-xs';
+      default:
+        return 'bg-stone-100 dark:bg-slate-900 border-stone-200 dark:border-slate-800 shadow-2xs';
     }
   };
 
   const getEventBadge = (type: ActivityEventType) => {
     switch (type) {
       case 'REPOSITORY_CONNECTED':
-        return <Badge variant="indigo">Connected</Badge>;
       case 'AUTOMATION_ACTIVATED':
         return <Badge variant="emerald">Activated</Badge>;
       case 'AUTOMATION_DEACTIVATED':
         return <Badge variant="rose">Deactivated</Badge>;
       case 'CODE_CHANGE_DETECTED':
-        return <Badge variant="indigo">Code Push</Badge>;
+        return <Badge variant="indigo">In Progress</Badge>;
       case 'AI_ANALYSIS_COMPLETED':
-        return <Badge variant="indigo">Agent 1</Badge>;
+        return <Badge variant="amber">AI Evaluated</Badge>;
       case 'DOCUMENTATION_UPDATED':
-        return <Badge variant="emerald">Agent 3</Badge>;
       case 'COMMIT_CREATED':
-        return <Badge variant="emerald">Synced</Badge>;
+        return <Badge variant="emerald">Doc Updated</Badge>;
       case 'EXECUTION_FAILED':
         return <Badge variant="rose">Failed</Badge>;
+      default:
+        return <Badge variant="slate">Event</Badge>;
     }
   };
 
@@ -82,7 +101,7 @@ export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-xs font-mono text-indigo-800 dark:text-indigo-300 hover:text-indigo-950 dark:hover:text-indigo-200 transition-colors border border-indigo-200 dark:border-indigo-500/30 cursor-pointer shadow-2xs font-semibold"
           title="Inspect code changes and AI reasoning"
         >
-          <Code2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+          <Code2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 fill-indigo-500/20" />
           <span>View Code Changes</span>
           <ChevronRight className="w-3.5 h-3.5 opacity-70" />
         </button>
@@ -96,7 +115,7 @@ export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-xs font-mono text-emerald-800 dark:text-emerald-300 hover:text-emerald-950 dark:hover:text-emerald-200 transition-colors border border-emerald-200 dark:border-emerald-500/30 cursor-pointer shadow-2xs font-semibold"
           title="Inspect documentation diff and PR"
         >
-          <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400 fill-emerald-500/25" />
           <span>View Doc Updates</span>
           <ChevronRight className="w-3.5 h-3.5 opacity-70" />
         </button>
@@ -110,7 +129,7 @@ export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 text-xs font-mono text-amber-900 dark:text-amber-300 hover:text-amber-950 dark:hover:text-amber-200 transition-colors border border-amber-200 dark:border-amber-500/30 cursor-pointer shadow-2xs font-semibold"
           title="View 3-Agent deep trace"
         >
-          <Brain className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+          <Bot className="w-4 h-4 text-amber-600 dark:text-amber-400 fill-amber-500/30" />
           <span>View AI Trace</span>
           <ChevronRight className="w-3.5 h-3.5 opacity-70" />
         </button>
@@ -124,7 +143,7 @@ export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-xs font-mono text-rose-800 dark:text-rose-300 hover:text-rose-950 dark:hover:text-rose-200 transition-colors border border-rose-200 dark:border-rose-500/30 cursor-pointer shadow-2xs font-semibold"
           title="Inspect failure diagnostics and stage error"
         >
-          <AlertCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+          <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 fill-rose-500/25" />
           <span>View Error Trace</span>
           <ChevronRight className="w-3.5 h-3.5 opacity-70" />
         </button>
@@ -150,7 +169,7 @@ export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
           className="p-4 sm:p-5 hover:bg-stone-50/70 dark:hover:bg-slate-800/40 transition-colors flex items-start justify-between gap-4 group"
         >
           <div className="flex items-start gap-3.5 min-w-0">
-            <div className="p-2.5 rounded-xl bg-stone-100 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 shrink-0 mt-0.5 group-hover:border-stone-300 dark:group-hover:border-slate-700 transition-colors shadow-2xs">
+            <div className={`p-2.5 rounded-xl border shrink-0 mt-0.5 transition-colors ${getEventContainerClass(evt.type)}`}>
               {getEventIcon(evt.type)}
             </div>
 

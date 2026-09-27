@@ -121,7 +121,7 @@ export const AutomationSettingsModal: React.FC<AutomationSettingsModalProps> = (
                 className="flex items-center justify-between px-3.5 py-2.5 bg-white/95 dark:bg-slate-900/90 border border-stone-300/80 dark:border-slate-800 rounded-xl text-xs font-mono text-slate-800 dark:text-slate-200 shadow-2xs"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400 fill-emerald-500/25 shrink-0" />
                   <span className="truncate font-semibold text-xs">{path}</span>
                 </div>
                 <button
@@ -130,7 +130,7 @@ export const AutomationSettingsModal: React.FC<AutomationSettingsModalProps> = (
                   className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 rounded-lg hover:bg-stone-200/70 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0 ml-2"
                   title="Remove path"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-3.5 h-3.5 fill-rose-500/10" />
                 </button>
               </div>
             ))}
@@ -169,7 +169,7 @@ export const AutomationSettingsModal: React.FC<AutomationSettingsModalProps> = (
               }`}
             >
               <div className="flex items-center gap-2 mb-1.5">
-                <GitPullRequest className={`w-4 h-4 ${createPR ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
+                <GitPullRequest className={`w-4 h-4 ${createPR ? 'text-emerald-600 dark:text-emerald-400 fill-emerald-500/30' : 'text-slate-400 fill-slate-400/20'}`} />
                 <span className="text-xs font-bold font-sans">Pull Request</span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-normal font-sans">
@@ -189,7 +189,7 @@ export const AutomationSettingsModal: React.FC<AutomationSettingsModalProps> = (
               }`}
             >
               <div className="flex items-center gap-2 mb-1.5">
-                <GitCommit className={`w-4 h-4 ${autoCommit ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
+                <GitCommit className={`w-4 h-4 ${autoCommit ? 'text-emerald-600 dark:text-emerald-400 fill-emerald-500/30' : 'text-slate-400 fill-slate-400/20'}`} />
                 <span className="text-xs font-bold font-sans">Direct Commit</span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-normal font-sans">

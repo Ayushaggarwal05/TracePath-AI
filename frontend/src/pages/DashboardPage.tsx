@@ -14,7 +14,7 @@ import { Modal } from '../components/common/Modal';
 import { Button } from '../components/common/Button';
 import { executionService } from '../services/executionService';
 import { Execution } from '../types/execution';
-import { Sparkles, RefreshCw } from 'lucide-react';
+import { Bot, RefreshCw } from 'lucide-react';
 
 interface DashboardPageProps {
   onNavigate: (route: 'repositories' | 'activity' | 'settings' | 'connect') => void;
@@ -78,14 +78,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         </div>
 
         <div className="flex items-center gap-2.5">
-          <Button variant="outline" size="sm" onClick={handleRefresh} leftIcon={<RefreshCw className="w-3.5 h-3.5" />}>
+          <Button variant="outline" size="sm" onClick={handleRefresh} leftIcon={<RefreshCw className="w-4 h-4" />}>
             Refresh
           </Button>
           <Button
             variant="primary"
             size="sm"
             onClick={() => setIsTriggerModalOpen(true)}
-            leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+            leftIcon={<Bot className="w-4 h-4 fill-white/30" />}
           >
             Trigger AI Sync Run
           </Button>

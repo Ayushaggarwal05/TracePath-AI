@@ -80,7 +80,7 @@ async def list_activity(
         if status_val == "COMPLETED":
             events.append({
                 "id": f"evt-{exec_item.id}",
-                "type": "COMMIT_CREATED",
+                "type": "DOCUMENTATION_UPDATED",
                 "repository_id": str(exec_item.repository_id),
                 "repository_name": repo_name,
                 "execution_id": str(exec_item.id),

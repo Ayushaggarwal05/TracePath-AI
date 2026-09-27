@@ -11,7 +11,7 @@ import {
   LogOut,
   Search,
   Bell,
-  Sparkles,
+  Bot,
   Menu,
   X,
   Sun,
@@ -27,28 +27,29 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-const NAV_ITEMS: Array<{ id: NavRoute; label: string; icon: React.ReactNode }> = [
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    icon: <LayoutDashboard className="w-4 h-4" />,
-  },
-  {
-    id: "repositories",
-    label: "Repositories",
-    icon: <FolderGit2 className="w-4 h-4" />,
-  },
-  {
-    id: "activity",
-    label: "Activity",
-    icon: <Activity className="w-4 h-4" />,
-  },
-  {
-    id: "settings",
-    label: "Settings",
-    icon: <Settings className="w-4 h-4" />,
-  },
-];
+const NAV_ITEMS: Array<{ id: NavRoute; label: string; icon: (isActive: boolean) => React.ReactNode }> =
+  [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: (isActive) => <LayoutDashboard className={`w-5 h-5 ${isActive ? 'fill-white' : 'fill-slate-400/30'}`} />,
+    },
+    {
+      id: "repositories",
+      label: "Repositories",
+      icon: (isActive) => <FolderGit2 className={`w-5 h-5 ${isActive ? 'fill-white/30' : 'fill-slate-400/30'}`} />,
+    },
+    {
+      id: "activity",
+      label: "Activity",
+      icon: (isActive) => <Activity className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />,
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: (isActive) => <Settings className={`w-5 h-5 ${isActive ? 'fill-white/30' : 'fill-slate-400/30'}`} />,
+    },
+  ];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   user,
@@ -67,7 +68,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   const savedName =
     localStorage.getItem("tracepath_github_name") ||
-    (user?.full_name && user.full_name !== "TracePath Developer" && user.full_name !== "TracePath Dev"
+    (user?.full_name &&
+    user.full_name !== "TracePath Developer" &&
+    user.full_name !== "TracePath Dev"
       ? user.full_name
       : null) ||
     (savedUsername === "Ayushaggarwal05" ? "Ayush Aggarwal" : savedUsername);
@@ -81,16 +84,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Theme Mode: Default to 'light'
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    return (localStorage.getItem('tracepath_theme') as 'light' | 'dark') || 'light';
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    return (
+      (localStorage.getItem("tracepath_theme") as "light" | "dark") || "light"
+    );
   });
 
   useEffect(() => {
-    localStorage.setItem('tracepath_theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
+    localStorage.setItem("tracepath_theme", theme);
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   }, [theme]);
 
@@ -121,21 +126,24 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         (r) =>
           r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           r.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (r.description || "").toLowerCase().includes(searchQuery.toLowerCase())
+          (r.description || "")
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()),
       )
     : repositories;
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
 
   return (
-    <div className={`min-h-screen p-2 sm:p-2.5 lg:p-3 flex gap-2 lg:gap-2.5 transition-colors duration-200 overflow-hidden ${
-      isDark ? 'bg-[#060913] text-slate-100' : 'bg-[#ECE9E2] text-slate-900'
-    } selection:bg-rose-500/20 selection:text-rose-900`}>
-      
+    <div
+      className={`min-h-screen p-2 sm:p-2.5 lg:p-3 flex gap-2 lg:gap-2.5 transition-colors duration-200 overflow-hidden ${
+        isDark ? "bg-[#060913] text-slate-100" : "bg-[#ECE9E2] text-slate-900"
+      } selection:bg-rose-500/20 selection:text-rose-900`}
+    >
       {/* Mobile Backdrop */}
       {isMobileSidebarOpen && (
         <div
@@ -169,10 +177,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 />
               </div>
               <div className="flex items-center gap-1.5 font-brand">
-                <span className="font-extrabold text-xl tracking-tight text-white group-hover:text-slate-100 transition-colors">
+                <span className="font-extrabold text-2xl tracking-tight text-white group-hover:text-slate-100 transition-colors">
                   TracePath
                 </span>
-                <span className="text-xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
                   AI
                 </span>
               </div>
@@ -204,7 +212,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   }`}
                 >
                   <span className={isActive ? "text-white" : "text-slate-400"}>
-                    {item.icon}
+                    {item.icon(isActive)}
                   </span>
                   <span>{item.label}</span>
                 </button>
@@ -215,10 +223,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           {/* AI-Powered Documentation Feature Card */}
           <div className="p-3.5 mx-4 mb-4 rounded-2xl bg-slate-900/90 border border-slate-800/80 flex items-start gap-3 shadow-inner">
             <div className="p-2 rounded-xl bg-gradient-to-br from-[#A8203A] to-indigo-600 text-white shrink-0 shadow-sm">
-              <Sparkles className="w-4 h-4" />
+              <Bot className="w-5 h-5 fill-white/30 text-white" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-slate-200">AI-Powered Documentation</p>
+              <p className="text-xs font-bold text-slate-200">
+                AI-Powered Documentation
+              </p>
               <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
                 Automate. Analyze. Commit.
               </p>
@@ -279,7 +289,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-white truncate">{displayName}</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-white truncate">
+                      {displayName}
+                    </p>
                     <p className="text-xs font-mono text-emerald-700 dark:text-emerald-400 truncate flex items-center gap-1.5 mt-0.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                       @{savedUsername}
@@ -318,7 +330,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
       {/* FLOATING MAIN WINDOW SHELL (Rounded 3xl with internal scroll) */}
       <div className="flex-1 min-w-0 h-[calc(100vh-16px)] sm:h-[calc(100vh-20px)] lg:h-[calc(100vh-24px)] bg-white dark:bg-[#0B101D] rounded-3xl border border-stone-200/90 dark:border-slate-800/90 shadow-xl shadow-stone-900/5 flex flex-col overflow-hidden">
-        
         {/* Top Utility Header Bar */}
         <header className="h-20 px-5 sm:px-7 lg:px-9 border-b border-stone-100 dark:border-slate-800/80 flex items-center justify-between shrink-0 bg-white/90 dark:bg-[#0B101D]/90 backdrop-blur-md z-30">
           <div className="flex items-center gap-3.5 flex-1 min-w-0">
@@ -331,7 +342,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             </button>
 
             {/* Compact Live Repository Search Input */}
-            <div ref={searchContainerRef} className="relative w-64 sm:w-80 md:w-96">
+            <div
+              ref={searchContainerRef}
+              className="relative w-64 sm:w-80 md:w-96"
+            >
               <div className="relative flex items-center w-full">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
                 <input
@@ -346,7 +360,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   placeholder="Search repositories & workflows..."
                   className="w-full pl-9 pr-14 py-2 border rounded-2xl text-xs sm:text-sm transition-all shadow-xs bg-[#F4F2EB] dark:bg-slate-900/90 border-stone-200/90 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 focus:bg-white dark:focus:bg-slate-950"
                 />
-                
+
                 {searchQuery ? (
                   <button
                     onClick={() => {
@@ -374,13 +388,19 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   <div className="absolute left-0 top-12 w-full min-w-[320px] sm:min-w-[380px] p-2 z-50 text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150">
                     <div className="flex items-center justify-between px-3 py-2 border-b border-stone-100 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                       <span>Repositories ({filteredSearchRepos.length})</span>
-                      <span className="text-[10px] font-mono font-normal">Click to open</span>
+                      <span className="text-[10px] font-mono font-normal">
+                        Click to open
+                      </span>
                     </div>
 
                     <div className="max-h-72 overflow-y-auto divide-y divide-stone-100 dark:divide-slate-800/60 py-1">
                       {filteredSearchRepos.length === 0 ? (
                         <div className="p-4 text-center text-xs text-slate-500 dark:text-slate-400">
-                          No repositories matching "<span className="font-semibold text-slate-700 dark:text-slate-200">{searchQuery}</span>"
+                          No repositories matching "
+                          <span className="font-semibold text-slate-700 dark:text-slate-200">
+                            {searchQuery}
+                          </span>
+                          "
                         </div>
                       ) : (
                         filteredSearchRepos.slice(0, 8).map((repo) => {
@@ -395,11 +415,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                               className="p-2.5 rounded-xl hover:bg-stone-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex items-center justify-between gap-3 group"
                             >
                               <div className="flex items-center gap-2.5 min-w-0">
-                                <div className={`p-2 rounded-lg border shrink-0 ${
-                                  isActive
-                                    ? "bg-emerald-950 border-emerald-800 text-emerald-300"
-                                    : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500"
-                                }`}>
+                                <div
+                                  className={`p-2 rounded-lg border shrink-0 ${
+                                    isActive
+                                      ? "bg-emerald-950 border-emerald-800 text-emerald-300"
+                                      : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500"
+                                  }`}
+                                >
                                   <FolderGit2 className="w-3.5 h-3.5" />
                                 </div>
                                 <div className="min-w-0">
@@ -413,12 +435,16 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                               </div>
 
                               <div className="flex items-center gap-2 shrink-0">
-                                <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
-                                  isActive
-                                    ? "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
-                                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700"
-                                }`}>
-                                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
+                                <span
+                                  className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                                    isActive
+                                      ? "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
+                                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700"
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`}
+                                  />
                                   {isActive ? "ACTIVE" : "INACTIVE"}
                                 </span>
                               </div>
@@ -453,9 +479,17 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               type="button"
               onClick={toggleTheme}
               className="p-2.5 sm:p-3 rounded-2xl transition-all text-slate-600 dark:text-amber-400 hover:bg-stone-100 dark:hover:bg-slate-800 cursor-pointer shadow-2xs"
-              title={isDark ? 'Switch to Light Mode (Default)' : 'Switch to Dark Mode'}
+              title={
+                isDark
+                  ? "Switch to Light Mode (Default)"
+                  : "Switch to Dark Mode"
+              }
             >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {isDark ? (
+                <Sun className="w-5 h-5 fill-amber-400 text-amber-500 drop-shadow-xs" />
+              ) : (
+                <Moon className="w-5 h-5 fill-indigo-400 text-indigo-500 drop-shadow-xs" />
+              )}
             </button>
 
             {/* Notification Bell (Enlarged) */}
@@ -464,7 +498,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               className="p-2.5 sm:p-3 rounded-2xl transition-all relative text-slate-500 dark:text-slate-400 hover:bg-stone-100 dark:hover:bg-slate-800 cursor-pointer shadow-2xs"
               title="Notifications"
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-5 h-5 fill-slate-300/30 dark:fill-slate-700/50 text-slate-700 dark:text-slate-200" />
               <span className="w-2.5 h-2.5 rounded-full bg-[#A8203A] absolute top-2 right-2 border-2 border-white dark:border-slate-900" />
             </button>
 
@@ -487,8 +521,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   )}
                 </div>
                 <div className="hidden sm:block text-left">
-                  <p className="text-sm font-bold leading-tight text-slate-900 dark:text-slate-100">{displayName}</p>
-                  <p className="text-xs font-mono text-slate-500 dark:text-slate-400 leading-tight mt-0.5">@{savedUsername}</p>
+                  <p className="text-sm font-bold leading-tight text-slate-900 dark:text-slate-100">
+                    {displayName}
+                  </p>
+                  <p className="text-xs font-mono text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
+                    @{savedUsername}
+                  </p>
                 </div>
               </div>
 
@@ -514,7 +552,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-extrabold text-slate-900 dark:text-white truncate">{displayName}</p>
+                        <p className="text-sm font-extrabold text-slate-900 dark:text-white truncate">
+                          {displayName}
+                        </p>
                         <p className="text-xs font-mono text-emerald-700 dark:text-emerald-400 truncate flex items-center gap-1.5 mt-0.5">
                           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                           @{savedUsername}
@@ -554,9 +594,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         {/* Main Content Body */}
         <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+          <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
 

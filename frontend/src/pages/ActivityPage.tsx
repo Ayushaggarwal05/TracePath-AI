@@ -81,7 +81,8 @@ export const ActivityPage: React.FC = () => {
     const matchesType =
       eventTypeFilter === 'ALL' ||
       evt.type === eventTypeFilter ||
-      (eventTypeFilter === 'AUTOMATION_ACTIVATED' && evt.type === 'REPOSITORY_CONNECTED');
+      (eventTypeFilter === 'DOCUMENTATION_UPDATED' && (evt.type === 'DOCUMENTATION_UPDATED' || evt.type === 'COMMIT_CREATED')) ||
+      (eventTypeFilter === 'AUTOMATION_ACTIVATED' && (evt.type === 'AUTOMATION_ACTIVATED' || evt.type === 'REPOSITORY_CONNECTED'));
 
     const matchesRepo =
       repoFilter === 'ALL' ||
@@ -207,12 +208,10 @@ export const ActivityPage: React.FC = () => {
             {(
               [
                 { id: 'ALL', label: 'All Events' },
-                { id: 'COMMIT_CREATED', label: 'Commits' },
                 { id: 'DOCUMENTATION_UPDATED', label: 'Doc Updates' },
                 { id: 'AI_ANALYSIS_COMPLETED', label: 'AI Analyses' },
-                { id: 'CODE_CHANGE_DETECTED', label: 'Code Pushes' },
                 { id: 'EXECUTION_FAILED', label: 'Failed' },
-                { id: 'AUTOMATION_ACTIVATED', label: 'Activated' },
+                { id: 'AUTOMATION_ACTIVATED', label: 'Automations' },
               ] as const
             ).map((filter) => (
               <button

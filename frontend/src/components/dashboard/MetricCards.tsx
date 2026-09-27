@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from '../common/Card';
-import { GitBranch, Play, FileText, Zap } from 'lucide-react';
+import { FolderGit2, Bot, FileText, Zap } from 'lucide-react';
 
 interface MetricCardsProps {
   totalRepos: number;
@@ -22,29 +22,29 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       title: 'Connected Repositories',
       value: totalRepos,
       subtext: `${activeAutomations} actively syncing`,
-      icon: <GitBranch className="w-5 h-5 text-indigo-400" />,
-      glow: 'indigo' as const,
+      icon: <FolderGit2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400 fill-indigo-500/25" />,
+      badgeBg: 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200/80 dark:border-indigo-800/60 shadow-xs',
     },
     {
       title: 'Active Automations',
       value: activeAutomations,
       subtext: `${Math.round((activeAutomations / (totalRepos || 1)) * 100)}% coverage`,
-      icon: <Zap className="w-5 h-5 text-emerald-400" />,
-      glow: 'emerald' as const,
+      icon: <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/40" />,
+      badgeBg: 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200/80 dark:border-emerald-800/60 shadow-xs',
     },
     {
       title: 'Doc Sync Executions',
       value: totalExecutions,
-      subtext: 'Autonomous multi-agent runs',
-      icon: <Play className="w-5 h-5 text-brand-400" />,
-      glow: 'emerald' as const,
+      subtext: 'Autonomous 3-agent pipeline',
+      icon: <Bot className="w-5 h-5 text-indigo-600 dark:text-indigo-400 fill-indigo-500/30" />,
+      badgeBg: 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200/80 dark:border-indigo-800/60 shadow-xs',
     },
     {
       title: 'Doc Updates Generated',
       value: totalDocUpdates,
       subtext: `${successRate}% successful precision`,
-      icon: <FileText className="w-5 h-5 text-amber-400" />,
-      glow: 'none' as const,
+      icon: <FileText className="w-5 h-5 text-amber-600 dark:text-amber-400 fill-amber-500/30" />,
+      badgeBg: 'bg-amber-50 dark:bg-amber-950/50 border-amber-200/80 dark:border-amber-800/60 shadow-xs',
     },
   ];
 
@@ -56,7 +56,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               {m.title}
             </span>
-            <div className="p-2 rounded-xl bg-[#EEF2F5] dark:bg-slate-800/80 border border-stone-200/60 dark:border-slate-700/60">
+            <div className={`p-2 rounded-xl border ${m.badgeBg}`}>
               {m.icon}
             </div>
           </div>

@@ -49,7 +49,7 @@ export const ExecutionTimeline: React.FC<ExecutionTimelineProps> = ({
           >
             <div className="flex items-start gap-3.5 min-w-0">
               <div className={`mt-0.5 p-2 rounded-xl border shrink-0 ${style.bg} ${style.border} ${style.text} shadow-2xs`}>
-                <GitCommit className="w-4 h-4" />
+                <GitCommit className="w-4 h-4 fill-current/30" />
               </div>
 
               <div className="min-w-0 space-y-1">
@@ -80,7 +80,7 @@ export const ExecutionTimeline: React.FC<ExecutionTimelineProps> = ({
                     <>
                       <span>•</span>
                       <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold">
-                        <FileText className="w-3.5 h-3.5" />
+                        <FileText className="w-3.5 h-3.5 fill-emerald-500/25" />
                         {docUpdatesCount} doc {docUpdatesCount === 1 ? 'update' : 'updates'}
                       </span>
                     </>
@@ -92,7 +92,7 @@ export const ExecutionTimeline: React.FC<ExecutionTimelineProps> = ({
             <div className="flex items-center gap-3 pl-4 shrink-0">
               {exec.pull_request_url && (
                 <span className="hidden sm:inline-flex items-center gap-1 text-xs text-emerald-700 dark:text-brand-400 font-mono font-semibold">
-                  <GitPullRequest className="w-3.5 h-3.5" />
+                  <GitPullRequest className="w-3.5 h-3.5 fill-emerald-500/25" />
                   PR
                 </span>
               )}
