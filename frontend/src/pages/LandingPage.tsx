@@ -165,8 +165,6 @@ Reviewers: @sarahchen, @dev-lead
     },
   ];
 
-  const savedUser = localStorage.getItem('tracepath_github_user');
-
   return (
     <div className="bg-[#FAF9F6] text-slate-900 min-h-full">
       <div className="space-y-24 py-12 px-6 sm:px-12 max-w-7xl mx-auto">
@@ -200,7 +198,7 @@ Reviewers: @sarahchen, @dev-lead
               leftIcon={<Github className="w-5 h-5 text-white" />}
               className="w-full sm:w-auto px-8 py-3.5 text-base font-bold shadow-lg shadow-indigo-500/20"
             >
-              {savedUser ? `Continue as @${savedUser}` : 'Connect GitHub'}
+              Connect GitHub
             </Button>
             <Button
               size="lg"
@@ -395,7 +393,7 @@ Reviewers: @sarahchen, @dev-lead
               leftIcon={<Github className="w-5 h-5 text-white" />}
               className="w-full sm:w-auto px-8 py-3.5 text-base font-bold shadow-xl"
             >
-              {savedUser ? `Continue as @${savedUser}` : 'Connect GitHub Now'}
+              Connect GitHub Now
             </Button>
             <Button
               size="lg"

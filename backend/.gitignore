@@ -44,13 +44,19 @@ MANIFEST
 !.env.example
 
 # ==========================================
-# Databases & Local Data
+# Databases & Local Data (Supabase in Cloud)
 # ==========================================
 *.sqlite
 *.sqlite3
 *.db
+*.db-shm
+*.db-wal
 *.db-journal
+*.sql.dump
+*.dump
 tracepath_dev.db
+.supabase/
+supabase/.temp/
 
 # ==========================================
 # Testing & Code Quality

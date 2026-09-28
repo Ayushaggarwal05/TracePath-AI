@@ -80,9 +80,15 @@ export const ActivityPage: React.FC = () => {
 
     const matchesType =
       eventTypeFilter === 'ALL' ||
-      evt.type === eventTypeFilter ||
-      (eventTypeFilter === 'DOCUMENTATION_UPDATED' && (evt.type === 'DOCUMENTATION_UPDATED' || evt.type === 'COMMIT_CREATED')) ||
-      (eventTypeFilter === 'AUTOMATION_ACTIVATED' && (evt.type === 'AUTOMATION_ACTIVATED' || evt.type === 'REPOSITORY_CONNECTED'));
+      (eventTypeFilter === 'AI_ANALYSIS_COMPLETED' &&
+        (evt.type === 'AI_ANALYSIS_COMPLETED' ||
+          evt.type === 'DOCUMENTATION_UPDATED' ||
+          !!evt.execution_id)) ||
+      (eventTypeFilter === 'DOCUMENTATION_UPDATED' &&
+        (evt.type === 'DOCUMENTATION_UPDATED' || evt.type === 'COMMIT_CREATED')) ||
+      (eventTypeFilter === 'EXECUTION_FAILED' && evt.type === 'EXECUTION_FAILED') ||
+      (eventTypeFilter === 'AUTOMATION_ACTIVATED' &&
+        (evt.type === 'AUTOMATION_ACTIVATED' || evt.type === 'REPOSITORY_CONNECTED'));
 
     const matchesRepo =
       repoFilter === 'ALL' ||
@@ -266,6 +272,7 @@ export const ActivityPage: React.FC = () => {
           ) : (
             <ActivityFeedList
               events={filteredActivities}
+              activeFilter={eventTypeFilter}
               onSelectExecution={handleOpenExecution}
             />
           )

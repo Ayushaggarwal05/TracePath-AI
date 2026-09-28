@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Execution, ExecutionStatus } from '../../types/execution';
-import { Badge } from '../common/Badge';
-import { Button } from '../common/Button';
-import { LivePipelineSegments } from '../common/LivePipelineSegments';
-import { formatShortSha } from '../../utils/formatters';
+import React, { useState, useEffect } from "react";
+import { Execution, ExecutionStatus } from "../../types/execution";
+import { Badge } from "../common/Badge";
+import { Button } from "../common/Button";
+import { LivePipelineSegments } from "../common/LivePipelineSegments";
+import { formatShortSha } from "../../utils/formatters";
 import {
   GitCommit,
   Brain,
@@ -14,7 +14,7 @@ import {
   Clock,
   Terminal,
   ArrowRight,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface LiveSyncProgressStreamProps {
   execution: Execution | null;
@@ -24,7 +24,12 @@ interface LiveSyncProgressStreamProps {
   onDone?: () => void;
 }
 
-type StageStatus = 'pending' | 'in_progress' | 'completed' | 'failed' | 'skipped';
+type StageStatus =
+  | "pending"
+  | "in_progress"
+  | "completed"
+  | "failed"
+  | "skipped";
 
 interface PipelineStep {
   id: string;
@@ -45,10 +50,18 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
   onDone,
 }) => {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [logs, setLogs] = useState<Array<{ time: string; text: string; type: 'info' | 'agent' | 'success' | 'error' }>>([]);
+  const [logs, setLogs] = useState<
+    Array<{
+      time: string;
+      text: string;
+      type: "info" | "agent" | "success" | "error";
+    }>
+  >([]);
 
-  const execStatus: ExecutionStatus = execution?.status || (isLoading ? 'PENDING' : 'PENDING');
-  const isFinished = execution && ['COMPLETED', 'FAILED', 'SKIPPED'].includes(execution.status);
+  const execStatus: ExecutionStatus =
+    execution?.status || (isLoading ? "PENDING" : "PENDING");
+  const isFinished =
+    execution && ["COMPLETED", "FAILED", "SKIPPED"].includes(execution.status);
 
   // Timer for elapsed seconds during execution
   useEffect(() => {
@@ -71,97 +84,127 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
   } => {
     if (!execution) {
       return {
-        step1: isLoading ? 'in_progress' : 'pending',
-        step2: 'pending',
-        step3: 'pending',
-        step4: 'pending',
-        step5: 'pending',
+        step1: isLoading ? "in_progress" : "pending",
+        step2: "pending",
+        step3: "pending",
+        step4: "pending",
+        step5: "pending",
       };
     }
 
-    if (execStatus === 'FAILED') {
-      const stage = execution.error_information?.stage || '';
-      if (stage.includes('Context') || stage.includes('Ingest')) {
-        return { step1: 'failed', step2: 'pending', step3: 'pending', step4: 'pending', step5: 'pending' };
+    if (execStatus === "FAILED") {
+      const stage = execution.error_information?.stage || "";
+      if (stage.includes("Context") || stage.includes("Ingest")) {
+        return {
+          step1: "failed",
+          step2: "pending",
+          step3: "pending",
+          step4: "pending",
+          step5: "pending",
+        };
       }
-      if (stage.includes('Agent1') || stage.includes('Analysis')) {
-        return { step1: 'completed', step2: 'failed', step3: 'pending', step4: 'pending', step5: 'pending' };
+      if (stage.includes("Agent1") || stage.includes("Analysis")) {
+        return {
+          step1: "completed",
+          step2: "failed",
+          step3: "pending",
+          step4: "pending",
+          step5: "pending",
+        };
       }
-      if (stage.includes('Agent2') || stage.includes('Decision')) {
-        return { step1: 'completed', step2: 'completed', step3: 'failed', step4: 'pending', step5: 'pending' };
+      if (stage.includes("Agent2") || stage.includes("Decision")) {
+        return {
+          step1: "completed",
+          step2: "completed",
+          step3: "failed",
+          step4: "pending",
+          step5: "pending",
+        };
       }
-      if (stage.includes('Agent3') || stage.includes('DocGen')) {
-        return { step1: 'completed', step2: 'completed', step3: 'completed', step4: 'failed', step5: 'pending' };
+      if (stage.includes("Agent3") || stage.includes("DocGen")) {
+        return {
+          step1: "completed",
+          step2: "completed",
+          step3: "completed",
+          step4: "failed",
+          step5: "pending",
+        };
       }
-      return { step1: 'completed', step2: 'completed', step3: 'completed', step4: 'completed', step5: 'failed' };
-    }
-
-    if (execStatus === 'SKIPPED') {
       return {
-        step1: 'completed',
-        step2: 'completed',
-        step3: 'completed',
-        step4: 'skipped',
-        step5: 'skipped',
+        step1: "completed",
+        step2: "completed",
+        step3: "completed",
+        step4: "completed",
+        step5: "failed",
       };
     }
 
-    if (execStatus === 'COMPLETED') {
+    if (execStatus === "SKIPPED") {
       return {
-        step1: 'completed',
-        step2: 'completed',
-        step3: 'completed',
-        step4: 'completed',
-        step5: 'completed',
+        step1: "completed",
+        step2: "completed",
+        step3: "completed",
+        step4: "skipped",
+        step5: "skipped",
       };
     }
 
-    if (execStatus === 'COMMITTING') {
+    if (execStatus === "COMPLETED") {
       return {
-        step1: 'completed',
-        step2: 'completed',
-        step3: 'completed',
-        step4: 'completed',
-        step5: 'in_progress',
+        step1: "completed",
+        step2: "completed",
+        step3: "completed",
+        step4: "completed",
+        step5: "completed",
       };
     }
 
-    if (execStatus === 'GENERATING') {
+    if (execStatus === "COMMITTING") {
       return {
-        step1: 'completed',
-        step2: 'completed',
-        step3: 'completed',
-        step4: 'in_progress',
-        step5: 'pending',
+        step1: "completed",
+        step2: "completed",
+        step3: "completed",
+        step4: "completed",
+        step5: "in_progress",
       };
     }
 
-    if (execStatus === 'PLANNING') {
+    if (execStatus === "GENERATING") {
       return {
-        step1: 'completed',
-        step2: 'completed',
-        step3: 'in_progress',
-        step4: 'pending',
-        step5: 'pending',
+        step1: "completed",
+        step2: "completed",
+        step3: "completed",
+        step4: "in_progress",
+        step5: "pending",
       };
     }
 
-    if (execStatus === 'ANALYZING') {
+    if (execStatus === "PLANNING") {
       return {
-        step1: 'completed',
-        step2: 'in_progress',
-        step3: 'pending',
-        step4: 'pending',
-        step5: 'pending',
+        step1: "completed",
+        step2: "completed",
+        step3: "in_progress",
+        step4: "pending",
+        step5: "pending",
+      };
+    }
+
+    if (execStatus === "ANALYZING") {
+      return {
+        step1: "completed",
+        step2: "in_progress",
+        step3: "pending",
+        step4: "pending",
+        step5: "pending",
       };
     }
 
     return {
-      step1: 'in_progress',
-      step2: 'pending',
-      step3: 'pending',
-      step4: 'pending',
-      step5: 'pending',
+      step1: "in_progress",
+      step2: "pending",
+      step3: "pending",
+      step4: "pending",
+      step5: "pending",
     };
   };
 
@@ -169,21 +212,29 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
 
   // Populate dynamic live logs based on stage transitions
   useEffect(() => {
-    const newLogs: Array<{ time: string; text: string; type: 'info' | 'agent' | 'success' | 'error' }> = [];
-    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const newLogs: Array<{
+      time: string;
+      text: string;
+      type: "info" | "agent" | "success" | "error";
+    }> = [];
+    const now = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
 
     newLogs.push({
       time: now,
       text: `Connecting to GitHub repository: ${repoFullName}...`,
-      type: 'info',
+      type: "info",
     });
 
     if (execution) {
       if (execution.commit_sha) {
         newLogs.push({
           time: now,
-          text: `Extracted commit ${formatShortSha(execution.commit_sha)} on branch ${execution.branch || 'main'}. Changed files: ${execution.changed_files?.length || 0}`,
-          type: 'info',
+          text: `Extracted commit ${formatShortSha(execution.commit_sha)} on branch ${execution.branch || "main"}. Changed files: ${execution.changed_files?.length || 0}`,
+          type: "info",
         });
       }
 
@@ -191,7 +242,7 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
         newLogs.push({
           time: now,
           text: `[Agent 1: Analysis] Completed semantic analysis: "${execution.analysis_result.summary}"`,
-          type: 'agent',
+          type: "agent",
         });
       }
 
@@ -200,141 +251,171 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
         newLogs.push({
           time: now,
           text: `[Agent 2: Decision] ${decision}: ${execution.documentation_decision.decision_rationale}`,
-          type: 'agent',
+          type: "agent",
         });
       }
 
-      if (execution.updated_documents && execution.updated_documents.length > 0) {
+      if (
+        execution.updated_documents &&
+        execution.updated_documents.length > 0
+      ) {
         newLogs.push({
           time: now,
-          text: `[Agent 3: Generator] Generated minimal markdown updates for ${execution.updated_documents.map((d) => d.doc_path).join(', ')}`,
-          type: 'success',
+          text: `[Agent 3: Generator] Generated minimal markdown updates for ${execution.updated_documents.map((d) => d.doc_path).join(", ")}`,
+          type: "success",
         });
       }
 
-      if (execution.status === 'COMPLETED') {
+      if (execution.status === "COMPLETED") {
         newLogs.push({
           time: now,
-          text: `[GitHub Commit] Successfully committed documentation changes to ${execution.branch || 'main'} branch!`,
-          type: 'success',
+          text: `[GitHub Commit] Successfully committed documentation changes to ${execution.branch || "main"} branch!`,
+          type: "success",
         });
-      } else if (execution.status === 'SKIPPED') {
+      } else if (execution.status === "SKIPPED") {
         newLogs.push({
           time: now,
           text: `[Pipeline] Zero documentation changes required for this commit. Pipeline complete.`,
-          type: 'info',
+          type: "info",
         });
-      } else if (execution.status === 'FAILED') {
-        const errorStage = execution.error_information?.stage ? ` at ${execution.error_information.stage}` : '';
-        const errorText = execution.error_information?.error || 'Execution encountered an unexpected error.';
+      } else if (execution.status === "FAILED") {
+        const errorStage = execution.error_information?.stage
+          ? ` at ${execution.error_information.stage}`
+          : "";
+        const errorText =
+          execution.error_information?.error ||
+          "Execution encountered an unexpected error.";
         newLogs.push({
           time: now,
           text: `[Error] Pipeline failed${errorStage}: ${errorText}`,
-          type: 'error',
+          type: "error",
         });
       }
     }
 
     setLogs(newLogs);
-  }, [execution?.status, execution?.analysis_result, execution?.documentation_decision, repoFullName]);
+  }, [
+    execution?.status,
+    execution?.analysis_result,
+    execution?.documentation_decision,
+    repoFullName,
+  ]);
 
   const steps: PipelineStep[] = [
     {
-      id: 'ingest',
+      id: "ingest",
       stepNum: 1,
-      name: 'GitHub Commit Ingestion',
-      agentLabel: 'GitHub API',
-      description: 'Fetching commit details, author metadata, and raw file patches.',
+      name: "GitHub Commit Ingestion",
+      agentLabel: "GitHub API",
+      description:
+        "Fetching commit details, author metadata, and raw file patches.",
       icon: <GitCommit className="w-4 h-4" />,
       status: stageStatuses.step1,
-      detail: execution?.commit_sha ? `Commit ${formatShortSha(execution.commit_sha)} (${execution.changed_files?.length || 0} files)` : 'Ingesting diff...',
+      detail: execution?.commit_sha
+        ? `Commit ${formatShortSha(execution.commit_sha)} (${execution.changed_files?.length || 0} files)`
+        : "Ingesting diff...",
     },
     {
-      id: 'agent1',
+      id: "agent1",
       stepNum: 2,
-      name: 'Semantic Code Extraction',
-      agentLabel: 'Agent 1 (Gemini Flash)',
-      description: 'Analyzing structural changes, purpose, and affected components.',
+      name: "Semantic Code Extraction",
+      agentLabel: "Agent 1 (Gemini Flash)",
+      description:
+        "Analyzing structural changes, purpose, and affected components.",
       icon: <Brain className="w-4 h-4" />,
       status: stageStatuses.step2,
       detail: execution?.analysis_result?.summary,
     },
     {
-      id: 'agent2',
+      id: "agent2",
       stepNum: 3,
-      name: 'Documentation Impact Decision',
-      agentLabel: 'Agent 2 (Gemini Flash)',
-      description: 'Evaluating impact on README, Architecture, and API specifications.',
+      name: "Documentation Impact Decision",
+      agentLabel: "Agent 2 (Gemini Flash)",
+      description:
+        "Evaluating impact on README, Architecture, and API specifications.",
       icon: <Cpu className="w-4.5 h-4.5 fill-amber-500/35" />,
       status: stageStatuses.step3,
       detail: execution?.documentation_decision?.decision_rationale,
     },
     {
-      id: 'agent3',
+      id: "agent3",
       stepNum: 4,
-      name: 'Minimal Markdown Assembly',
-      agentLabel: 'Agent 3 (Gemini Flash)',
-      description: 'Assembling targeted documentation deltas and unified diffs.',
+      name: "Minimal Markdown Assembly",
+      agentLabel: "Agent 3 (Gemini Flash)",
+      description:
+        "Assembling targeted documentation deltas and unified diffs.",
       icon: <ShieldCheck className="w-4 h-4" />,
       status: stageStatuses.step4,
       detail: execution?.updated_documents?.length
-        ? `Generated updates for ${execution.updated_documents.map((d) => d.doc_path).join(', ')}`
+        ? `Generated updates for ${execution.updated_documents.map((d) => d.doc_path).join(", ")}`
         : undefined,
     },
     {
-      id: 'commit',
+      id: "commit",
       stepNum: 5,
-      name: 'GitHub Direct Commit',
-      agentLabel: 'TracePath Bot',
-      description: 'Directly pushing documentation commit to main branch.',
+      name: "GitHub Direct Commit",
+      agentLabel: "TracePath Bot",
+      description: "Directly pushing documentation commit to main branch.",
       icon: <CheckCircle2 className="w-4 h-4" />,
       status: stageStatuses.step5,
-      detail: execution?.final_commit_sha ? `Committed: ${formatShortSha(execution.final_commit_sha)}` : undefined,
+      detail: execution?.final_commit_sha
+        ? `Committed: ${formatShortSha(execution.final_commit_sha)}`
+        : undefined,
     },
   ];
 
   const getStepStyle = (status: StageStatus) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return {
-          badge: 'emerald',
-          circle: 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/40 shadow-xs',
-          line: 'bg-emerald-500',
-          container: 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/10',
-          label: 'Completed',
+          badge: "emerald",
+          circle:
+            "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/40 shadow-xs",
+          line: "bg-emerald-500",
+          container:
+            "border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/10",
+          label: "Completed",
         };
-      case 'in_progress':
+      case "in_progress":
         return {
-          badge: 'amber',
-          circle: 'bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 border-amber-300 dark:border-amber-500/50 animate-pulse shadow-xs',
-          line: 'bg-gradient-to-r from-emerald-500 via-amber-500 to-slate-800 animate-pulse',
-          container: 'border-amber-200 dark:border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/10 ring-1 ring-amber-300 dark:ring-amber-500/20',
-          label: 'In Progress...',
+          badge: "amber",
+          circle:
+            "bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 border-amber-300 dark:border-amber-500/50 animate-pulse shadow-xs",
+          line: "bg-gradient-to-r from-emerald-500 via-amber-500 to-slate-800 animate-pulse",
+          container:
+            "border-amber-200 dark:border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/10 ring-1 ring-amber-300 dark:ring-amber-500/20",
+          label: "In Progress...",
         };
-      case 'failed':
+      case "failed":
         return {
-          badge: 'rose',
-          circle: 'bg-rose-50 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/50 shadow-xs',
-          line: 'bg-rose-500',
-          container: 'border-rose-200 dark:border-rose-500/40 bg-rose-50/40 dark:bg-rose-950/20',
-          label: 'Failed',
+          badge: "rose",
+          circle:
+            "bg-rose-50 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/50 shadow-xs",
+          line: "bg-rose-500",
+          container:
+            "border-rose-200 dark:border-rose-500/40 bg-rose-50/40 dark:bg-rose-950/20",
+          label: "Failed",
         };
-      case 'skipped':
+      case "skipped":
         return {
-          badge: 'slate',
-          circle: 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700',
-          line: 'bg-slate-200 dark:bg-slate-800',
-          container: 'border-stone-200/90 dark:border-slate-800 bg-[#F7F5F0] dark:bg-slate-900/40',
-          label: 'Skipped',
+          badge: "slate",
+          circle:
+            "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700",
+          line: "bg-slate-200 dark:bg-slate-800",
+          container:
+            "border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/40",
+          label: "Skipped",
         };
-      case 'pending':
+      case "pending":
       default:
         return {
-          badge: 'slate',
-          circle: 'bg-stone-100 dark:bg-slate-900/80 text-slate-400 dark:text-slate-500 border-stone-200 dark:border-slate-800',
-          line: 'bg-stone-200 dark:bg-slate-800',
-          container: 'border-stone-200/70 dark:border-slate-800/60 bg-[#F7F5F0]/60 dark:bg-slate-900/20 opacity-75',
-          label: 'Waiting',
+          badge: "slate",
+          circle:
+            "bg-slate-100 dark:bg-slate-900/80 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800",
+          line: "bg-slate-200 dark:bg-slate-800",
+          container:
+            "border-slate-200/80 dark:border-slate-800/60 bg-slate-50/40 dark:bg-slate-900/20 opacity-75",
+          label: "Waiting",
         };
     }
   };
@@ -342,12 +423,16 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Header Summary Card */}
-      <div className="p-4 rounded-2xl bg-[#F7F5F0] dark:bg-slate-900/80 border border-stone-200/90 dark:border-slate-800 space-y-3 shadow-2xs">
+      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 space-y-3 shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-sans font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Target Repository:</span>
-              <span className="text-xs font-bold text-slate-900 dark:text-slate-100 font-sans">{repoFullName}</span>
+              <span className="text-xs font-sans font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Target Repository:
+              </span>
+              <span className="text-xs font-bold text-slate-900 dark:text-slate-100 font-sans">
+                {repoFullName}
+              </span>
             </div>
             <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-mono">
               {execution?.commit_sha && (
@@ -366,28 +451,28 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
           <div className="flex items-center gap-2">
             <Badge
               variant={
-                execStatus === 'COMPLETED'
-                  ? 'emerald'
-                  : execStatus === 'FAILED'
-                  ? 'rose'
-                  : execStatus === 'SKIPPED'
-                  ? 'slate'
-                  : 'amber'
+                execStatus === "COMPLETED"
+                  ? "emerald"
+                  : execStatus === "FAILED"
+                    ? "rose"
+                    : execStatus === "SKIPPED"
+                      ? "slate"
+                      : "amber"
               }
             >
-              {execStatus === 'COMPLETED'
-                ? 'SYNCHRONIZED'
-                : execStatus === 'FAILED'
-                ? 'FAILED'
-                : execStatus === 'SKIPPED'
-                ? 'NO UPDATE NEEDED'
-                : 'AI ENGINE RUNNING'}
+              {execStatus === "COMPLETED"
+                ? "SYNCHRONIZED"
+                : execStatus === "FAILED"
+                  ? "FAILED"
+                  : execStatus === "SKIPPED"
+                    ? "NO UPDATE NEEDED"
+                    : "AI ENGINE RUNNING"}
             </Badge>
           </div>
         </div>
 
         {/* 5-Segment Progress Bar */}
-        <div className="pt-2 border-t border-stone-200/80 dark:border-slate-800/80">
+        <div className="pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
           <LivePipelineSegments
             status={execStatus}
             errorStage={execution?.error_information?.stage}
@@ -401,7 +486,9 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
       <div className="space-y-3">
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between font-sans">
           <span>Live Multi-Agent Pipeline Progression</span>
-          <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 font-normal">Step-by-Step AI Execution</span>
+          <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 font-normal">
+            Step-by-Step AI Execution
+          </span>
         </h4>
 
         <div className="space-y-2.5">
@@ -416,9 +503,9 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
                 <div
                   className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 text-xs font-bold transition-all ${style.circle}`}
                 >
-                  {step.status === 'completed' ? (
+                  {step.status === "completed" ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  ) : step.status === 'failed' ? (
+                  ) : step.status === "failed" ? (
                     <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                   ) : (
                     step.icon
@@ -429,20 +516,22 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
                 <div className="flex-1 min-w-0 space-y-1">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 flex-wrap font-sans">
-                      <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{step.name}</span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-stone-200 dark:border-slate-700/60">
+                      <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                        {step.name}
+                      </span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60">
                         {step.agentLabel}
                       </span>
                     </div>
-                    <Badge variant={style.badge as any}>
-                      {style.label}
-                    </Badge>
+                    <Badge variant={style.badge as any}>{style.label}</Badge>
                   </div>
 
-                  <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-sans">{step.description}</p>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
+                    {step.description}
+                  </p>
 
                   {step.detail && (
-                    <div className="pt-1 text-[11px] font-mono text-slate-800 dark:text-emerald-300 bg-white/80 dark:bg-black/40 p-2 rounded-xl border border-stone-200/80 dark:border-slate-800">
+                    <div className="pt-1 text-[11px] font-mono text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-950/80 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
                       {step.detail}
                     </div>
                   )}
@@ -454,28 +543,37 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
       </div>
 
       {/* Live Terminal Console Logs */}
-      <div className="rounded-xl border border-dark-border bg-black/70 overflow-hidden font-mono text-xs">
-        <div className="p-2.5 bg-slate-900 border-b border-dark-border flex items-center justify-between text-slate-400 text-[11px]">
+      <div className="rounded-2xl border border-slate-800 bg-[#060913] overflow-hidden font-mono text-xs shadow-md">
+        <div className="px-4 py-2.5 bg-[#0B111F] border-b border-slate-800 flex items-center justify-between text-slate-300 text-[11px]">
           <div className="flex items-center gap-2">
-            <Terminal className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="font-semibold text-slate-300">Live Agent Stream Output</span>
+            <Terminal className="w-4 h-4 text-emerald-400" />
+            <span className="font-bold text-slate-100">
+              Live Agent Stream Output
+            </span>
           </div>
-          <span className="text-[10px] text-slate-500">Autonomous Trace Logs</span>
+          <span className="text-[10px] text-slate-400 font-mono">
+            Autonomous Trace Logs
+          </span>
         </div>
 
-        <div className="p-3.5 space-y-1.5 max-h-44 overflow-y-auto">
+        <div className="p-4 space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
           {logs.map((log, idx) => (
-            <div key={idx} className="flex items-start gap-2.5 text-[11px] leading-relaxed">
-              <span className="text-slate-500 shrink-0 select-none">[{log.time}]</span>
+            <div
+              key={idx}
+              className="flex items-start gap-2.5 text-[11px] leading-relaxed"
+            >
+              <span className="text-slate-500 shrink-0 select-none">
+                [{log.time}]
+              </span>
               <span
                 className={
-                  log.type === 'error'
-                    ? 'text-rose-400 font-semibold'
-                    : log.type === 'success'
-                    ? 'text-emerald-400 font-semibold'
-                    : log.type === 'agent'
-                    ? 'text-brand-300'
-                    : 'text-slate-300'
+                  log.type === "error"
+                    ? "text-rose-400 font-semibold"
+                    : log.type === "success"
+                      ? "text-emerald-400 font-semibold"
+                      : log.type === "agent"
+                        ? "text-cyan-300 font-medium"
+                        : "text-slate-200"
                 }
               >
                 {log.text}
@@ -483,7 +581,7 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
             </div>
           ))}
           {!isFinished && (
-            <div className="flex items-center gap-2 text-[11px] text-amber-300 animate-pulse pt-1">
+            <div className="flex items-center gap-2 text-[11px] text-amber-300 font-mono font-medium animate-pulse pt-1">
               <span className="w-2 h-2 rounded-full bg-amber-400" />
               <span>Processing stage with Gemini AI engine...</span>
             </div>
@@ -493,19 +591,26 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
 
       {/* Action Buttons when Finished */}
       {isFinished && (
-        <div className="flex items-center justify-end gap-3 pt-2 border-t border-dark-border">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
           {execution && onViewDetails && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => onViewDetails(execution)}
               rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+              className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700 font-semibold shadow-xs"
             >
               View Deep Trace & Unified Diff
             </Button>
           )}
           {onDone && (
-            <Button variant="primary" size="sm" onClick={onDone}>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onDone}
+              leftIcon={<CheckCircle2 className="w-4 h-4 text-white" />}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 shadow-sm border-0"
+            >
               Done
             </Button>
           )}

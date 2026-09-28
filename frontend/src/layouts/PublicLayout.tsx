@@ -19,7 +19,6 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
   children,
 }) => {
   const isConnected = localStorage.getItem('tracepath_github_connected') === 'true';
-  const savedUser = localStorage.getItem('tracepath_github_user');
 
   const handleLogoClick = () => {
     if (onNavigateToLanding) {
@@ -81,15 +80,6 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
               leftIcon={<LayoutDashboard className="w-4 h-4" />}
             >
               Go to Dashboard
-            </Button>
-          ) : savedUser ? (
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={onConnectGitHub || onNavigateToApp}
-              leftIcon={<Github className="w-4 h-4 text-white" />}
-            >
-              {currentRoute === 'connect' ? `Continue as @${savedUser}` : `Sign In (@${savedUser})`}
             </Button>
           ) : (
             <Button

@@ -21,11 +21,13 @@ import {
 
 interface ActivityFeedListProps {
   events: ActivityEvent[];
+  activeFilter?: string;
   onSelectExecution?: (executionId: string, initialTab?: 'pipeline' | 'agents' | 'files' | 'diff') => void;
 }
 
 export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
   events,
+  activeFilter,
   onSelectExecution,
 }) => {
   const getEventIcon = (type: ActivityEventType) => {
@@ -93,6 +95,21 @@ export const ActivityFeedList: React.FC<ActivityFeedListProps> = ({
 
   const renderContextualButton = (evt: ActivityEvent) => {
     if (!evt.execution_id || !onSelectExecution) return null;
+
+    // When explicitly filtering for AI Analyses, prioritize opening the 3-Agent Deep Trace for all runs
+    if (activeFilter === 'AI_ANALYSIS_COMPLETED') {
+      return (
+        <button
+          onClick={() => onSelectExecution(evt.execution_id!, 'agents')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 text-xs font-mono text-amber-900 dark:text-amber-300 hover:text-amber-950 dark:hover:text-amber-200 transition-colors border border-amber-200 dark:border-amber-500/30 cursor-pointer shadow-2xs font-semibold"
+          title="Inspect 3-Agent Deep Trace and AI decision reasoning"
+        >
+          <Bot className="w-4 h-4 text-amber-600 dark:text-amber-400 fill-amber-500/30" />
+          <span>View AI Trace</span>
+          <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+        </button>
+      );
+    }
 
     if (evt.type === 'CODE_CHANGE_DETECTED') {
       return (

@@ -9,16 +9,23 @@ from app.core.config import settings
 
 
 def get_engine_args(database_url: str) -> dict:
-    args = {
+    args: dict = {
         "echo": settings.DB_ECHO,
         "future": True,
     }
     if "sqlite" in database_url:
         args["connect_args"] = {"check_same_thread": False}
     else:
+        # Cloud PostgreSQL / Supabase configuration
         args["pool_size"] = settings.DB_POOL_SIZE
         args["max_overflow"] = settings.DB_MAX_OVERFLOW
         args["pool_pre_ping"] = True
+        args["pool_recycle"] = 300  # Recycle idle connections every 5 minutes
+        # Supavisor / PgBouncer compatibility for asyncpg
+        args["connect_args"] = {
+            "statement_cache_size": 0,
+            "prepared_statement_cache_size": 0,
+        }
     return args
 
 
