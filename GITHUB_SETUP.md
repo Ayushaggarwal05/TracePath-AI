@@ -1,54 +1,71 @@
-# GitHub Integration & Webhook Setup Guide
+# GitHub Integration & Webhook Setup Guide 🐙
 
-This guide explains how to configure GitHub authorization and webhooks for TracePath AI.
+This guide details how to configure GitHub authorization (Personal Access Tokens and OAuth Apps) and automated webhooks for TracePath AI.
 
 ---
 
-## 1. Creating a GitHub OAuth App (User Login & Repo Selection)
+## 1. Connecting via GitHub Personal Access Token (Recommended)
+
+TracePath AI supports both **Fine-Grained Personal Access Tokens** (granular security) and **Classic Personal Access Tokens**.
+
+### Option A: Fine-Grained Personal Access Token (Beta)
+1. Go to **GitHub Settings** &rarr; **Developer settings** &rarr; **Personal access tokens** &rarr; **Fine-grained tokens** &rarr; **Generate new token**.
+2. Set token parameters:
+   - **Token name**: `TracePath AI Sync`
+   - **Expiration**: 90 days or Custom
+   - **Repository access**: Select **All repositories** (or select specific repositories).
+3. Set Permissions:
+   - **Repository permissions**:
+     - **Contents**: `Read and write` (to read diffs and commit documentation updates)
+     - **Pull requests**: `Read and write` (to open sync PRs)
+     - **Metadata**: `Read-only` (selected by default)
+4. Click **Generate token** and copy the token (`github_pat_...`).
+5. Paste the token in TracePath AI during onboarding. It is encrypted at rest using **AES-256** in Supabase PostgreSQL.
+
+### Option B: Classic Personal Access Token
+1. Go to **GitHub Settings** &rarr; **Developer settings** &rarr; **Personal access tokens** &rarr; **Tokens (classic)** &rarr; **Generate new token**.
+2. Select scopes:
+   - `repo` (Full control of private repositories)
+   - `read:user` (Read user profile data)
+3. Generate and paste your token (`ghp_...`).
+
+---
+
+## 2. Optional: GitHub OAuth App Setup
+
+If you prefer OAuth popup authentication:
 
 1. Go to **GitHub Settings** &rarr; **Developer Settings** &rarr; **OAuth Apps** &rarr; **New OAuth App**.
-2. Fill in the fields:
+2. Configure:
    - **Application name**: `TracePath AI`
-   - **Homepage URL**: `https://app.tracepath.ai` (or `http://localhost:5173` for local dev)
-   - **Authorization callback URL**: `https://app.tracepath.ai/connect/github/callback` (or `http://localhost:5173/connect/github/callback`)
-3. Click **Register application**.
-4. Copy the **Client ID** &rarr; Set in frontend `.env` as `VITE_GITHUB_CLIENT_ID`.
-5. Generate a **Client Secret** &rarr; Set in backend `.env` as `GITHUB_APP_CLIENT_SECRET`.
+   - **Homepage URL**: `http://localhost:5173` (or your production URL `https://app.tracepath.ai`)
+   - **Authorization callback URL**: `http://localhost:5173/connect/github/callback`
+3. Copy **Client ID** into frontend `.env` (`VITE_GITHUB_CLIENT_ID`).
+4. Generate a **Client Secret** and add it to backend `.env` (`GITHUB_APP_CLIENT_SECRET`).
 
 ---
 
-## 2. Configuring Webhooks on Connected Repositories
+## 3. Configuring Webhooks on Repositories
 
-When a repository is activated, TracePath AI listens for push events to trigger synchronization:
+To enable automated synchronization upon `git push`:
 
-1. In your GitHub repository, go to **Settings** &rarr; **Webhooks** &rarr; **Add webhook**.
-2. Configure settings:
-   - **Payload URL**: `https://api.yourdomain.com/api/v1/github/webhooks`
+1. In your GitHub repository, navigate to **Settings** &rarr; **Webhooks** &rarr; **Add webhook**.
+2. Fill in the fields:
+   - **Payload URL**: `https://api.yourdomain.com/api/v1/github/webhook` (or your ngrok URL for local dev)
    - **Content type**: `application/json`
-   - **Secret**: Set a strong random string (e.g., generated with `openssl rand -hex 20`).
-   - **Which events would you like to trigger this webhook?**: Select **Just the `push` event**.
-   - **Active**: Check the box.
+   - **Secret**: A secure random string (set in backend `.env` as `GITHUB_WEBHOOK_SECRET`)
+   - **Events**: Select **Just the `push` event**.
+   - **Active**: Checked.
 3. Click **Add webhook**.
-4. Set the exact secret in backend `.env`:
-   ```env
-   GITHUB_WEBHOOK_SECRET=your-chosen-secret
-   ```
 
 ---
 
-## 3. GitHub Permissions Required
+## 4. Loop Prevention & Autonomous Safety Rules
 
-| Scope / Permission | Access Level | Purpose |
-|---|---|---|
-| `repo` / `contents:read` | Read | Read commit diffs, tree structure, and existing documentation |
-| `contents:write` | Write | Commit documentation updates directly to target branches |
-| `pull_requests:write` | Write | Open sync Pull Requests with agent-generated doc updates |
+TracePath AI incorporates deterministic guards against infinite execution loops:
 
----
-
-## 4. Loop Prevention & Autonomous Safety
-
-TracePath AI automatically prevents recursive webhook execution loops:
-1. **Committer Identity**: All autonomous commits use committer `TracePath AI <bot@tracepath.dev>`.
-2. **Signature Tag**: All commit messages contain `[tracepath-sync:<sha>]`.
-3. **Webhook Ingestion Filter**: When GitHub delivers a webhook with these committer identifiers or commit tags, TracePath AI immediately responds with `202 Accepted` and status `skipped`, avoiding recursive triggering.
+1. **Committer Identity**: All autonomous commits use the signature:
+   `TracePath AI <bot@tracepath.dev>`
+2. **Signature Tag**: All automated commit messages contain:
+   `[tracepath-sync:<sha>]`
+3. **Webhook Guard**: When a webhook arrives, TracePath AI inspects the commit author and message. If generated by TracePath, the webhook is immediately acknowledged with `202 Accepted` and status `skipped` without triggering downstream agents.

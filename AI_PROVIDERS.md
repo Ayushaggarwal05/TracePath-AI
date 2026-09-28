@@ -1,6 +1,6 @@
-# AI Provider Configuration & Multi-Agent Architecture
+# AI Provider Configuration & Multi-Agent Architecture 🤖
 
-TracePath AI uses **THREE INDEPENDENT AI AGENTS**. Each agent is decoupled, allowing you to configure different LLM providers, model families, and temperature thresholds for each step of the pipeline.
+TracePath AI coordinates **three independent AI agents**. Each agent is decoupled, allowing you to configure different LLM providers, model families, and temperature thresholds for each step of the pipeline.
 
 ---
 
@@ -85,9 +85,9 @@ AGENT_3_API_KEY=sk-ant-...
 
 TracePath AI supports any OpenAI-compatible API provider:
 - **OpenAI**: `https://api.openai.com/v1`
-- **Anthropic Claude**: Via OpenAI-compatible proxy or adapter
 - **Google Gemini**: Via Google OpenAI-compatible endpoint (`https://generativelanguage.googleapis.com/v1beta/openai/`)
-- **Groq / Together / DeepSeek / Local Ollama**: Set `AGENT_X_BASE_URL=http://localhost:11434/v1`
+- **Anthropic Claude**: Via OpenAI-compatible gateway / adapter
+- **Groq / DeepSeek / Local Ollama**: Set `AGENT_X_BASE_URL=http://localhost:11434/v1`
 
 ---
 

@@ -1,8 +1,8 @@
 # TracePath AI ⚡
 
-**TracePath AI** is an autonomous, multi-agent documentation synchronization platform built for modern engineering teams.
+**TracePath AI** is an enterprise-grade autonomous, multi-agent documentation synchronization platform built for modern engineering teams.
 
-Whenever code is pushed to a connected GitHub repository, TracePath AI automatically analyzes the change, determines the exact documentation impact across PRDs, Architecture diagrams, and API docs, and commits verified, minimal markdown updates or opens a Pull Request.
+Whenever code is pushed to a connected GitHub repository, TracePath AI analyzes the commit semantic changes, determines the exact documentation impact across PRDs, Architecture diagrams, and API docs, and commits verified, minimal markdown updates or opens a Pull Request.
 
 ---
 
@@ -11,55 +11,55 @@ Whenever code is pushed to a connected GitHub repository, TracePath AI automatic
 TracePath AI coordinates **three independent AI agents**, ensuring separation of concerns, high accuracy, and zero hallucinations:
 
 ```
-                      GitHub Push Event
-                             │
-                             ▼
-                 [Bounded Context Builder]
-                             │
-                             ▼
-                ┌─────────────────────────┐
-                │ AGENT 1: ANALYSIS AGENT │
-                │  - Semantic Code Diff   │
-                │  - Architecture Impact  │
-                │  - Behavioral Changes   │
-                └────────────┬────────────┘
-                             │
-                             ▼
-                ┌─────────────────────────┐
-                │ AGENT 2: DECISION AGENT │
-                │  - Differential Matrix  │
-                │  - No-op Diff Filter    │
-                │  - Target Doc Decision  │
-                └────────────┬────────────┘
-                             │
-                      [If Affected]
-                             │
-                             ▼
-                ┌─────────────────────────┐
-                │ AGENT 3: DOC GENERATOR  │
-                │  - Minimal Delta Edits  │
-                │  - Syntax & Heading Val │
-                │  - Unified Diff Output  │
-                └────────────┬────────────┘
-                             │
-                             ▼
-              [Deterministic Backend Commit/PR]
+                      GitHub Push Event / Webhook
+                                 │
+                                 ▼
+                     [Bounded Context Builder]
+                                 │
+                                 ▼
+                    ┌─────────────────────────┐
+                    │ AGENT 1: ANALYSIS AGENT │
+                    │  - Semantic Code Diff   │
+                    │  - Architecture Impact  │
+                    │  - Behavioral Changes   │
+                    └────────────┬────────────┘
+                                 │
+                                 ▼
+                    ┌─────────────────────────┐
+                    │ AGENT 2: DECISION AGENT │
+                    │  - Differential Matrix  │
+                    │  - No-op Diff Filter    │
+                    │  - Target Doc Decision  │
+                    └────────────┬────────────┘
+                                 │
+                          [If Affected]
+                                 │
+                                 ▼
+                    ┌─────────────────────────┐
+                    │ AGENT 3: DOC GENERATOR  │
+                    │  - Minimal Delta Edits  │
+                    │  - Syntax & Heading Val │
+                    │  - Unified Diff Output  │
+                    └────────────┬────────────┘
+                                 │
+                                 ▼
+                  [Deterministic Backend Commit/PR]
 ```
 
-1. **Agent 1 — Analysis Agent**: Understands the code changes deeply and factually from git diffs and commit metadata.
+1. **Agent 1 — Analysis Agent**: Understands code changes deeply and factually from git diffs and commit metadata.
 2. **Agent 2 — Differential / Decision Agent**: Evaluates existing documentation (`ARCHITECTURE.md`, `PRD.md`, `README.md`, etc.) to determine if updates are strictly necessary, preventing unnecessary churn on trivial bug fixes.
 3. **Agent 3 — Documentation Generator**: Generates minimal, surgical markdown edits that preserve document structure, heading hierarchy, and formatting.
 
 ---
 
-## 🔒 Security & Reliability Architecture
+## 🚀 Key Features
 
-- **Prompt Injection Defense**: All repository inputs, commit messages, and diffs are wrapped in untrusted boundary tags (`<UNTRUSTED_REPOSITORY_INPUT>`) with strict instructions to ignore embedded instructions.
-- **Infinite Loop Prevention**: Detects and rejects self-triggered webhooks using `bot@tracepath.dev` and `[tracepath-sync]` signature tags.
-- **Webhook HMAC-SHA256**: Timing-attack safe signature verification using `hmac.compare_digest`.
-- **Zero-Diff Safety**: Never commits or creates empty Pull Requests when documentation is unchanged.
-- **Path Traversal Protection**: Sanitizes all file paths to prevent directory traversal outside the repository.
-- **No Private Secret Exposure**: The frontend never receives GitHub credentials, private keys, or AI tokens.
+- **🔐 Enterprise Authentication**: Email and Password registration with bcrypt hashing (12 rounds) & secure HTTP-Only JWT session cookies.
+- **🐙 Flexible GitHub Integration**: Connect via Fine-Grained Personal Access Tokens (`github_pat_...`), Classic PATs (`ghp_...`), or public username preview with AES-256 encrypted storage at rest.
+- **⚡ Instant Zero-Wait UI**: Optimistic local session caching with silent background revalidation (SWR pattern) for 0ms reload latency.
+- **📊 Real-Time Dashboard**: Track active automations, executions, documentation revisions, diff comparisons, and live pipeline traces.
+- **🛡️ Prompt Injection & Loop Defense**: All untrusted git inputs are sandboxed with boundary markers, and commit loops are rejected deterministically.
+- **☁️ Supabase Cloud PostgreSQL**: Production-grade async database layer with relationship cascades and schema migrations.
 
 ---
 
@@ -67,100 +67,117 @@ TracePath AI coordinates **three independent AI agents**, ensuring separation of
 
 ```
 TracePath AI/
-├── backend/                  # FastAPI Python backend
+├── backend/                  # FastAPI Python backend (Async SQLAlchemy + Supabase)
 │   ├── alembic/              # Database schema migrations
 │   ├── app/                  # Application source code
 │   │   ├── agents/           # 3 Independent AI agents (Analysis, Decision, DocGenerator)
-│   │   ├── api/              # Versioned REST APIs (Repositories, Executions, Activity, Webhooks)
-│   │   ├── core/             # Configuration, logging, security
-│   │   ├── database/         # Async SQLAlchemy 2.0 engine & sessions
+│   │   ├── api/              # Versioned REST APIs (Auth, Repositories, Executions, Activity, Webhooks)
+│   │   ├── core/             # Security (bcrypt, JWT, AES-256), exceptions, settings
+│   │   ├── database/         # Async SQLAlchemy 2.0 session engine
 │   │   ├── github/           # GitHub REST API client & loop prevention
-│   │   ├── models/           # SQLAlchemy ORM models
+│   │   ├── models/           # SQLAlchemy models (User, GitHubConnection, Repository, Execution)
 │   │   ├── pipeline/         # Bounded context builder & pipeline orchestrator
-│   │   └── repositories/     # Data access CRUD layer
-│   ├── tests/                # Automated pytest suite (31 tests)
+│   │   ├── repositories/     # Data access CRUD layer
+│   │   └── services/         # Domain business logic (Auth, Automation, Execution, Repository)
+│   ├── tests/                # Automated pytest suite (31/31 tests passing)
 │   ├── Dockerfile            # Production backend Docker image
 │   └── requirements.txt      # Python dependencies
 ├── frontend/                 # React + TypeScript + Vite + Tailwind CSS
 │   ├── src/
-│   │   ├── components/       # UI components (Agent traces, Diff viewers, Breadcrumbs, Modals)
-│   │   ├── pages/            # Workspace, Execution detail, Repositories, Dashboard
-│   │   ├── services/         # Typed API clients connected to FastAPI
-│   │   └── types/            # TypeScript domain interfaces
+│   │   ├── components/       # Reusable components (Agent traces, Diff viewer, Modals, Badges)
+│   │   ├── context/          # Optimistic AuthProvider and application state
+│   │   ├── hooks/            # Custom hooks (useRepositories, useExecutions, useAutomation)
+│   │   ├── pages/            # Landing, Auth, ConnectGitHub, SelectRepos, Dashboard, Repositories, Detail, Activity, Settings
+│   │   ├── services/         # Typed API client services
+│   │   └── types/            # Domain TypeScript models
 │   ├── Dockerfile            # Production frontend Docker image (Nginx)
 │   └── vercel.json           # Vercel SPA routing & security headers
 ├── docker-compose.yml        # Multi-service production/local orchestration
-├── DEPLOYMENT.md             # Cloud deployment guide (Vercel, Render, Railway, Docker)
+├── DEPLOYMENT.md             # Cloud deployment guide (Vercel, Render, Railway, Supabase)
 ├── DEVELOPMENT.md            # Local development setup instructions
-├── GITHUB_SETUP.md           # GitHub OAuth & Webhook configuration guide
-└── AI_PROVIDERS.md           # AI model configuration for OpenAI, Anthropic, Gemini
+├── GITHUB_SETUP.md           # GitHub Personal Access Token & Webhook setup guide
+└── AI_PROVIDERS.md           # AI model configuration (OpenAI, Anthropic, Gemini, Ollama)
 ```
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Getting Started
 
-### Option 1: Docker Compose (Recommended)
+### 1. Backend Setup
 
-```bash
-# Clone the repository
-git clone https://github.com/Ayushaggarwal05/TracePath-AI.git
-cd TracePath-AI
-
-# Start PostgreSQL, Backend, and Frontend
-docker-compose up -d --build
-```
-- Frontend: `http://localhost:3000`
-- Backend API Docs: `http://localhost:8000/docs`
-
-### Option 2: Local Development
-
-**1. Backend:**
 ```bash
 cd backend
+
+# Create & activate virtual environment
 python -m venv venv
-.\venv\Scripts\activate   # Or source venv/bin/activate on Linux/macOS
+.\venv\Scripts\activate   # On Windows
+# source venv/bin/activate # On Linux/macOS
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Configure environment
 cp .env.example .env
+
+# Run database migrations
 alembic upgrade head
-uvicorn app.main:app --reload --port 8000
+
+# Start backend server
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-**2. Frontend:**
+- **API Documentation (Swagger UI)**: `http://localhost:8000/docs`
+- **Health Check**: `http://localhost:8000/api/v1/health`
+
+### 2. Frontend Setup
+
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
+
+# Configure environment
 cp .env.example .env
+
+# Start Vite development server
 npm run dev
 ```
+
+- **Application URL**: `http://localhost:5173`
 
 ---
 
 ## 🧪 Testing & Verification
 
-Run the comprehensive backend test suite (31 tests covering agents, pipeline, webhooks, security, and APIs):
+Run the automated test suite covering agents, auth, pipeline, webhooks, security, and API endpoints:
+
 ```bash
+# Backend pytest suite (31 tests)
 cd backend
 pytest tests -v
-```
 
-Build and validate the frontend production bundle:
-```bash
+# Frontend TypeScript & Vite production build
 cd frontend
 npm run build
 ```
 
 ---
 
-## 📖 Documentation Guides
+## 🔒 Security Architecture
 
-- [Production Deployment Guide (Vercel, Render, Railway, Docker)](DEPLOYMENT.md)
-- [Local Development Guide](DEVELOPMENT.md)
-- [GitHub App & Webhook Configuration](GITHUB_SETUP.md)
-- [Multi-Agent AI Provider Configuration](AI_PROVIDERS.md)
+| Security Feature | Implementation Mechanism |
+|---|---|
+| **Password Hashing** | 12-round bcrypt with PBKDF2-SHA256 fallback |
+| **Session Management** | HTTP-Only, SameSite=Lax JWT cookies signed with HS256 |
+| **Token Encryption** | AES-256 Fernet authenticated encryption at rest |
+| **Prompt Injection** | Untrusted repository inputs wrapped in `<UNTRUSTED_REPOSITORY_INPUT>` |
+| **Loop Prevention** | Automatic detection of `bot@tracepath.dev` and `[tracepath-sync]` commit signatures |
+| **Webhook HMAC** | Timing-attack safe SHA-256 validation via `hmac.compare_digest` |
+| **Path Traversal** | Strict path sanitization to prevent arbitrary file access |
 
 ---
 
 ## 📄 License
 
-MIT License. Built for high-velocity software teams.
+MIT License. Built with ❤️ for autonomous engineering documentation.
