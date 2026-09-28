@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAuth } from '../context/AuthContext';
 import { ToastContainer } from '../components/common/ToastContainer';
 import { Button } from '../components/common/Button';
 import { Github, LayoutDashboard, Home } from 'lucide-react';
@@ -18,7 +19,8 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
   currentRoute = 'landing',
   children,
 }) => {
-  const isConnected = localStorage.getItem('tracepath_github_connected') === 'true';
+  const { user, isAuthenticated } = useAuth();
+  const isConnected = isAuthenticated && (user?.github_connected || localStorage.getItem('tracepath_github_connected') === 'true');
 
   const handleLogoClick = () => {
     if (onNavigateToLanding) {
@@ -27,6 +29,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
   };
 
   const isLanding = currentRoute === 'landing';
+  const isAuthPage = currentRoute === 'auth';
 
   return (
     <div
@@ -81,14 +84,22 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
             >
               Go to Dashboard
             </Button>
-          ) : (
+          ) : isAuthPage ? null : isAuthenticated ? (
             <Button
               variant="primary"
               size="sm"
               onClick={onConnectGitHub || onNavigateToApp}
               leftIcon={<Github className="w-4 h-4 text-white" />}
             >
-              {currentRoute === 'connect' ? 'Sign In / Connect' : 'Connect GitHub'}
+              Connect GitHub
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onConnectGitHub || onNavigateToApp}
+            >
+              Sign In / Get Started
             </Button>
           )}
         </div>

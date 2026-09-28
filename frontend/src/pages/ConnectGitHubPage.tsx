@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '../components/common/Button';
 import { useToast } from '../hooks/useToast';
-import { githubService } from '../services/githubService';
+import { useAuth } from '../context/AuthContext';
+import { authService } from '../services/authService';
 import {
   Github,
   ShieldCheck,
@@ -24,6 +25,7 @@ export const ConnectGitHubPage: React.FC<ConnectGitHubPageProps> = ({
   onConnected,
   onCancel,
 }) => {
+  const { refreshUser } = useAuth();
   const [savedUser, setSavedUser] = useState<string | null>(() => {
     return localStorage.getItem('tracepath_github_user') || null;
   });
@@ -43,9 +45,10 @@ export const ConnectGitHubPage: React.FC<ConnectGitHubPageProps> = ({
   const [showToken, setShowToken] = useState(false);
   const { success, error } = useToast();
 
-  const handleResumeSaved = () => {
+  const handleResumeSaved = async () => {
     if (!savedUser) return;
     localStorage.setItem('tracepath_github_connected', 'true');
+    await refreshUser();
     success('Welcome Back!', `Continuing session for @${savedUser}`);
     onConnected();
   };
@@ -74,26 +77,28 @@ export const ConnectGitHubPage: React.FC<ConnectGitHubPageProps> = ({
 
     try {
       setConnecting(true);
-      const res = await githubService.connectToken(
+      const res = await authService.connectGitHub(
         token.trim() || undefined,
         username.trim() || undefined
       );
 
-      const avatarUrl = res.avatar_url || `https://github.com/${res.username}.png`;
-      const githubName = res.name || res.username;
+      const avatarUrl = res.user?.github_avatar_url || `https://github.com/${res.github_username}.png`;
+      const githubName = res.user?.full_name || res.github_username;
       localStorage.setItem('tracepath_github_connected', 'true');
-      localStorage.setItem('tracepath_github_user', res.username);
+      localStorage.setItem('tracepath_github_user', res.github_username);
       localStorage.setItem('tracepath_github_name', githubName);
       localStorage.setItem('tracepath_github_avatar', avatarUrl);
       if (token.trim()) {
         localStorage.setItem('tracepath_has_token', 'true');
       }
-      setSavedUser(res.username);
+      setSavedUser(res.github_username);
       setSavedAvatar(avatarUrl);
+
+      await refreshUser();
 
       success(
         'GitHub Connected!',
-        `Successfully connected repositories for @${res.username} with 5,000 req/hr rate limit.`
+        `Successfully linked @${res.github_username} to your account with ${res.repositories_imported} repositories imported.`
       );
       onConnected();
     } catch (err: any) {

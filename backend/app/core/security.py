@@ -1,16 +1,90 @@
 import base64
+from datetime import datetime, timedelta, timezone
 import hashlib
 import hmac
 import logging
 import secrets
 import time
-from typing import Optional
+from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 from cryptography.fernet import Fernet, InvalidToken
 from pydantic import BaseModel
 from app.core.config import settings
 
+try:
+    import bcrypt
+    _HAS_BCRYPT = True
+except ImportError:
+    _HAS_BCRYPT = False
+
+try:
+    import jwt
+    _HAS_JWT = True
+except ImportError:
+    _HAS_JWT = False
+
 logger = logging.getLogger("tracepath.security")
+
+COOKIE_SESSION_NAME = "tracepath_session"
+JWT_ALGORITHM = "HS256"
+DEFAULT_SESSION_DAYS = 7
+
+
+def hash_password(password: str) -> str:
+    """Hashes a plaintext password using bcrypt or secure PBKDF2 fallback."""
+    if not password:
+        raise ValueError("Password cannot be empty.")
+    if _HAS_BCRYPT:
+        salt = bcrypt.gensalt(rounds=12)
+        return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
+    else:
+        salt = secrets.token_hex(16)
+        key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt.encode("utf-8"), 100000)
+        return f"pbkdf2:{salt}:{key.hex()}"
+
+
+def verify_password(plain_password: str, hashed_password: Optional[str]) -> bool:
+    """Verifies plaintext password against a stored hash."""
+    if not plain_password or not hashed_password:
+        return False
+    try:
+        if hashed_password.startswith("pbkdf2:"):
+            _, salt, expected_hex = hashed_password.split(":")
+            key = hashlib.pbkdf2_hmac("sha256", plain_password.encode("utf-8"), salt.encode("utf-8"), 100000)
+            return hmac.compare_digest(key.hex(), expected_hex)
+        elif _HAS_BCRYPT:
+            return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
+        else:
+            return False
+    except Exception as e:
+        logger.warning(f"Password verification error: {e}")
+        return False
+
+
+def create_access_token(user_id: str, email: str, expires_delta: Optional[timedelta] = None) -> str:
+    """Creates a cryptographically signed JWT session token."""
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(days=DEFAULT_SESSION_DAYS))
+    payload: Dict[str, Any] = {
+        "sub": str(user_id),
+        "email": email,
+        "exp": expire,
+        "iat": datetime.now(timezone.utc),
+    }
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=JWT_ALGORITHM)
+
+
+def decode_access_token(token: str) -> Optional[Dict[str, Any]]:
+    """Decodes and validates a JWT session token."""
+    if not token:
+        return None
+    try:
+        return jwt.decode(token, settings.SECRET_KEY, algorithms=[JWT_ALGORITHM])
+    except jwt.ExpiredSignatureError:
+        logger.debug("Session token expired.")
+        return None
+    except (jwt.PyJWTError, Exception) as e:
+        logger.debug(f"Invalid session token: {e}")
+        return None
 
 
 class CurrentUser(BaseModel):

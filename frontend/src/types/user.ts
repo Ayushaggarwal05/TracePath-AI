@@ -13,7 +13,10 @@ export interface User {
   email: string;
   full_name?: string;
   is_active: boolean;
-  github_connections: GitHubConnection[];
-  created_at: string;
-  updated_at: string;
+  github_connected?: boolean;
+  github_username?: string;
+  github_avatar_url?: string;
+  github_connections?: GitHubConnection[];
+  created_at?: string;
+  updated_at?: string;
 }

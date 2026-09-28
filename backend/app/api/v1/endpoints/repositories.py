@@ -97,7 +97,7 @@ async def register_repository(
     status_code=status.HTTP_200_OK,
 )
 async def get_repository_details(
-    repository_id: UUID,
+    repository_id: str,
     db: AsyncSession = Depends(get_database_session),
 ) -> RepositoryDetailResponse:
     """
@@ -114,7 +114,7 @@ async def get_repository_details(
     status_code=status.HTTP_200_OK,
 )
 async def update_repository(
-    repository_id: UUID,
+    repository_id: str,
     update_in: RepositoryUpdate,
     db: AsyncSession = Depends(get_database_session),
 ) -> RepositoryResponse:
@@ -132,7 +132,7 @@ async def update_repository(
     status_code=status.HTTP_200_OK,
 )
 async def get_repository_automation(
-    repository_id: UUID,
+    repository_id: str,
     db: AsyncSession = Depends(get_database_session),
 ) -> RepositoryAutomationResponse:
     """
@@ -149,7 +149,7 @@ async def get_repository_automation(
     status_code=status.HTTP_200_OK,
 )
 async def activate_automation(
-    repository_id: UUID,
+    repository_id: str,
     db: AsyncSession = Depends(get_database_session),
 ) -> AutomationToggleResponse:
     """
@@ -165,7 +165,7 @@ async def activate_automation(
     status_code=status.HTTP_200_OK,
 )
 async def deactivate_automation(
-    repository_id: UUID,
+    repository_id: str,
     db: AsyncSession = Depends(get_database_session),
 ) -> AutomationToggleResponse:
     """
@@ -181,7 +181,7 @@ async def deactivate_automation(
     status_code=status.HTTP_200_OK,
 )
 async def update_automation_config(
-    repository_id: UUID,
+    repository_id: str,
     update_in: RepositoryAutomationUpdate,
     db: AsyncSession = Depends(get_database_session),
 ) -> RepositoryAutomationResponse:
@@ -199,7 +199,7 @@ async def update_automation_config(
     status_code=status.HTTP_200_OK,
 )
 async def list_repository_executions(
-    repository_id: UUID,
+    repository_id: str,
     status: Optional[ExecutionStatus] = None,
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
@@ -208,10 +208,11 @@ async def list_repository_executions(
     """
     List execution history specifically for this repository.
     """
+    repo = await repository_service.get_repository(db, repository_id)
     skip = (page - 1) * page_size
     items, total = await execution_service.get_executions_by_repository(
         db,
-        repository_id=repository_id,
+        repository_id=repo.id,
         status=status,
         skip=skip,
         limit=page_size,
@@ -233,7 +234,7 @@ async def list_repository_executions(
     status_code=status.HTTP_200_OK,
 )
 async def list_repository_documents(
-    repository_id: UUID,
+    repository_id: str,
     db: AsyncSession = Depends(get_database_session),
 ) -> List[Dict[str, Any]]:
     """
@@ -242,7 +243,7 @@ async def list_repository_documents(
     """
     repo = await repository_service.get_repository(db, repository_id)
     doc_paths = repo.automation.doc_paths if repo.automation and repo.automation.doc_paths else ["ARCHITECTURE.md", "PRD.md", "README.md"]
-    executions = await execution_repo.get_by_repository_id(db, repository_id, limit=50)
+    executions = await execution_repo.get_by_repository_id(db, repo.id, limit=50)
 
     results: List[Dict[str, Any]] = []
 
@@ -276,8 +277,8 @@ async def list_repository_documents(
         if matching_updates:
             latest_exec, latest_doc = matching_updates[0]
             results.append({
-                "id": f"doc-{repository_id}-{hash(path) % 10000}",
-                "repository_id": str(repository_id),
+                "id": f"doc-{repo.id}-{hash(path) % 10000}",
+                "repository_id": str(repo.id),
                 "doc_path": path,
                 "title": title,
                 "category": category,
@@ -291,8 +292,8 @@ async def list_repository_documents(
             })
         else:
             results.append({
-                "id": f"doc-{repository_id}-{hash(path) % 10000}",
-                "repository_id": str(repository_id),
+                "id": f"doc-{repo.id}-{hash(path) % 10000}",
+                "repository_id": str(repo.id),
                 "doc_path": path,
                 "title": title,
                 "category": category,
@@ -314,14 +315,15 @@ async def list_repository_documents(
     status_code=status.HTTP_200_OK,
 )
 async def get_document_history(
-    repository_id: UUID,
+    repository_id: str,
     doc_path: str = Query(..., description="Path of document to query history for"),
     db: AsyncSession = Depends(get_database_session),
 ) -> List[Dict[str, Any]]:
     """
     Returns the chronological revision history of a specific document across past executions.
     """
-    executions = await execution_repo.get_by_repository_id(db, repository_id, limit=50)
+    repo = await repository_service.get_repository(db, repository_id)
+    executions = await execution_repo.get_by_repository_id(db, repo.id, limit=50)
     history: List[Dict[str, Any]] = []
 
     for exec_item in executions:
@@ -344,3 +346,4 @@ async def get_document_history(
                     })
 
     return history
+

@@ -62,7 +62,7 @@ async def _run_pipeline_background(execution_id: UUID, repo_id: UUID, commit_sha
     status_code=status.HTTP_200_OK,
 )
 async def list_executions(
-    repository_id: Optional[UUID] = Query(default=None, description="Filter by repository ID"),
+    repository_id: Optional[str] = Query(default=None, description="Filter by repository ID or name"),
     status: Optional[ExecutionStatus] = Query(default=None, description="Filter by execution status"),
     branch: Optional[str] = Query(default=None, description="Filter by branch"),
     page: int = Query(default=1, ge=1, description="Page number"),
@@ -72,10 +72,16 @@ async def list_executions(
     """
     List executions across all repositories with optional status/branch filtering.
     """
+    repo_uuid: Optional[UUID] = None
+    if repository_id:
+        repo = await repository_repo.resolve_repository(db, repository_id)
+        if repo:
+            repo_uuid = repo.id
+
     skip = (page - 1) * page_size
     items, total = await execution_service.get_filtered_executions(
         db,
-        repository_id=repository_id,
+        repository_id=repo_uuid,
         status=status,
         branch=branch,
         skip=skip,
@@ -130,11 +136,18 @@ async def create_execution(
     status_code=status.HTTP_200_OK,
 )
 async def get_execution_details(
-    execution_id: UUID,
+    execution_id: str,
     db: AsyncSession = Depends(get_database_session),
 ) -> ExecutionDetailResponse:
     """
     Retrieve full execution record including changed files, agent decisions, diffs, and error logs.
     """
-    execution = await execution_service.get_execution(db, execution_id)
+    try:
+        exec_uuid = UUID(execution_id)
+    except ValueError:
+        from app.core.exceptions import EntityNotFoundException
+        raise EntityNotFoundException("Execution", execution_id)
+
+    execution = await execution_service.get_execution(db, exec_uuid)
     return ExecutionDetailResponse.model_validate(execution)
+

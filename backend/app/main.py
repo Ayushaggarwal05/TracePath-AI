@@ -20,6 +20,11 @@ async def lifespan(app: FastAPI):
     if not settings.is_production:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+            try:
+                from sqlalchemy import text
+                await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS hashed_password VARCHAR(255);"))
+            except Exception as e:
+                logger.debug(f"Schema alter note: {e}")
         logger.info("Database tables verified / created.")
 
     # Reset any stale/orphaned in-flight executions on startup

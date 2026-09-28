@@ -55,6 +55,18 @@ export function useRepositories() {
               default_branch: gh.default_branch || existing.default_branch,
               html_url: gh.html_url || existing.html_url,
               description: gh.description || existing.description,
+              automation: existing.automation || {
+                id: `auto_${existing.id}`,
+                repository_id: existing.id,
+                status: 'INACTIVE',
+                target_branch: existing.default_branch || 'main',
+                doc_paths: ['docs/', 'README.md', 'ARCHITECTURE.md'],
+                auto_commit: false,
+                create_pull_request: true,
+                pr_target_branch: existing.default_branch || 'main',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              },
             });
           } else {
             merged.push({
@@ -92,7 +104,21 @@ export function useRepositories() {
         const rFullName = (r.full_name || '').toLowerCase();
         if (!seenNames.has(rFullName) && !seenNames.has(rName)) {
           seenNames.add(rFullName);
-          merged.unshift(r);
+          merged.unshift({
+            ...r,
+            automation: r.automation || {
+              id: `auto_${r.id}`,
+              repository_id: r.id,
+              status: 'INACTIVE',
+              target_branch: r.default_branch || 'main',
+              doc_paths: ['docs/', 'README.md', 'ARCHITECTURE.md'],
+              auto_commit: false,
+              create_pull_request: true,
+              pr_target_branch: r.default_branch || 'main',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+          });
         }
       });
 

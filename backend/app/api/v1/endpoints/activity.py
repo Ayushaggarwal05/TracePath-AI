@@ -4,7 +4,9 @@ from typing import Any, Dict, List, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.api.dependencies import get_database_session
+from app.api.dependencies import get_current_user, get_database_session
+from app.core.security import CurrentUser
+from app.models.repository_automation import AutomationStatus
 from app.repositories.execution_repository import execution_repo
 from app.repositories.repository_repository import repository_repo
 
@@ -26,46 +28,62 @@ def _to_iso_utc(dt) -> str:
     status_code=status.HTTP_200_OK,
 )
 async def list_activity(
-    repository_id: Optional[UUID] = Query(None, description="Filter by repository ID"),
+    repository_id: Optional[str] = Query(None, description="Filter by repository ID or name"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(50, ge=1, le=100, description="Items per page"),
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> Dict[str, Any]:
     """
     Returns a unified, consolidated chronological activity feed.
     Each execution run is represented as one clean, comprehensive event card.
+    Only repositories that are actively automated produce activation events.
     """
+    repo_uuid: Optional[UUID] = None
+    if repository_id:
+        resolved = await repository_repo.resolve_repository(db, repository_id)
+        if resolved:
+            repo_uuid = resolved.id
+
     limit = max(page_size * page, 50)
     executions, total_execs = await execution_repo.get_filtered(
         db,
-        repository_id=repository_id,
+        repository_id=repo_uuid,
         skip=0,
         limit=limit,
     )
 
-    # Pre-fetch repository names
-    repos = await repository_repo.get_multi(db, limit=100)
+    # Fetch user's registered repositories with their automation status
+    repos, _ = await repository_repo.get_by_user_id(db, user_id=user.id, limit=100), 0
+    if not repos:
+        repos = await repository_repo.get_multi(db, limit=100)
     repo_map = {repo.id: repo for repo in repos}
 
     events: List[Dict[str, Any]] = []
 
-    # 1. Add repository activation events
+    # 1. Add repository activation events ONLY for actively automated repositories
     for repo in repos:
-        if repository_id and repo.id != repository_id:
+        if repo_uuid and repo.id != repo_uuid:
             continue
-        events.append({
-            "id": f"evt-repo-{repo.id}-act",
-            "type": "AUTOMATION_ACTIVATED",
-            "repository_id": str(repo.id),
-            "repository_name": repo.full_name,
-            "title": f"Autonomous pipeline active for {repo.name}",
-            "description": f"Monitoring branch {repo.default_branch} with 3 AI agents.",
-            "actor": "System",
-            "created_at": _to_iso_utc(repo.created_at),
-            "metadata": {
-                "branch": repo.default_branch,
-            },
-        })
+        if repo.automation and (
+            repo.automation.status == AutomationStatus.ACTIVE
+            or str(repo.automation.status).upper() == "ACTIVE"
+        ):
+            act_time = repo.automation.last_activated_at or repo.updated_at or repo.created_at
+            branch = repo.automation.target_branch or repo.default_branch
+            events.append({
+                "id": f"evt-repo-{repo.id}-act",
+                "type": "AUTOMATION_ACTIVATED",
+                "repository_id": str(repo.id),
+                "repository_name": repo.full_name,
+                "title": f"Autonomous pipeline active for {repo.name}",
+                "description": f"Monitoring branch {branch} with 3 AI agents.",
+                "actor": "System",
+                "created_at": _to_iso_utc(act_time),
+                "metadata": {
+                    "branch": branch,
+                },
+            })
 
     # 2. Add one clean, unified event per execution run
     for exec_item in executions:

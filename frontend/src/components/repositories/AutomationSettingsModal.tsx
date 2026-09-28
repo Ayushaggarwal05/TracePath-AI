@@ -3,6 +3,7 @@ import { Repository } from '../../types/repository';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { automationService } from '../../services/automationService';
+import { repositoryService } from '../../services/repositoryService';
 import { useToast } from '../../hooks/useToast';
 import { Plus, Trash2, GitPullRequest, GitCommit, FileText } from 'lucide-react';
 
@@ -53,7 +54,29 @@ export const AutomationSettingsModal: React.FC<AutomationSettingsModalProps> = (
   const handleSave = async () => {
     try {
       setSaving(true);
-      const updated = await automationService.updateAutomation(repository.id, {
+      let repoId = repository.id;
+
+      // If repo is from live GitHub list and starts with gh_, ensure registered in DB
+      if (repoId.startsWith('gh_')) {
+        try {
+          const registered = await repositoryService.registerRepository({
+            github_repo_id: repository.github_repo_id,
+            name: repository.name,
+            full_name: repository.full_name,
+            default_branch: repository.default_branch || 'main',
+            is_private: Boolean(repository.is_private),
+            html_url: repository.html_url || `https://github.com/${repository.full_name}`,
+            description: repository.description || undefined,
+          });
+          if (registered && registered.id) {
+            repoId = registered.id;
+          }
+        } catch {
+          // If already registered or fallback, continue with current repoId
+        }
+      }
+
+      const updated = await automationService.updateAutomation(repoId, {
         target_branch: targetBranch,
         doc_paths: docPaths,
         create_pull_request: createPR,
@@ -63,6 +86,7 @@ export const AutomationSettingsModal: React.FC<AutomationSettingsModalProps> = (
 
       const updatedRepo: Repository = {
         ...repository,
+        id: repoId,
         automation: updated,
       };
 

@@ -61,5 +61,49 @@ class RepositoryRepository(BaseRepository[Repository, RepositoryCreate, Reposito
         result = await db.execute(stmt)
         return result.scalar_one()
 
+    async def resolve_repository(
+        self, db: AsyncSession, repo_identifier: str | UUID, user_id: Optional[UUID] = None
+    ) -> Optional[Repository]:
+        """
+        Resolves a repository flexibly by UUID, GitHub ID, or repo name.
+        """
+        if isinstance(repo_identifier, UUID):
+            return await self.get_by_id_with_relations(db, repo_identifier)
+
+        clean_id = str(repo_identifier).strip()
+        if clean_id.startswith("gh_"):
+            clean_id = clean_id[3:]
+
+        # Try parsing as UUID
+        try:
+            val_uuid = UUID(clean_id)
+            repo = await self.get_by_id_with_relations(db, val_uuid)
+            if repo:
+                return repo
+        except ValueError:
+            pass
+
+        # Try finding by github_repo_id
+        repo = await self.get_by_github_repo_id(db, clean_id)
+        if repo:
+            return repo
+
+        # Try finding by full_name
+        repo = await self.get_by_full_name(db, clean_id)
+        if repo:
+            return repo
+
+        # Try case-insensitive matching by name
+        stmt = (
+            select(Repository)
+            .where(func.lower(Repository.name) == clean_id.lower())
+            .options(selectinload(Repository.automation), selectinload(Repository.executions))
+        )
+        if user_id:
+            stmt = stmt.where(Repository.user_id == user_id)
+        res = await db.execute(stmt)
+        return res.scalars().first()
+
 
 repository_repo = RepositoryRepository()
+

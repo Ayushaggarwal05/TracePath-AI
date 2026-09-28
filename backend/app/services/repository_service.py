@@ -20,8 +20,8 @@ class RepositoryService:
         total = await repository_repo.count_by_user_id(db, user_id=user_id)
         return items, total
 
-    async def get_repository(self, db: AsyncSession, repo_id: UUID) -> Repository:
-        repo = await repository_repo.get_by_id_with_relations(db, repo_id)
+    async def get_repository(self, db: AsyncSession, repo_id: str | UUID, user_id: UUID = None) -> Repository:
+        repo = await repository_repo.resolve_repository(db, repo_id, user_id)
         if not repo:
             raise EntityNotFoundException("Repository", repo_id)
         return repo
@@ -54,7 +54,7 @@ class RepositoryService:
     async def update_repository(
         self,
         db: AsyncSession,
-        repo_id: UUID,
+        repo_id: str | UUID,
         update_data: RepositoryUpdate,
     ) -> Repository:
         repo = await self.get_repository(db, repo_id)
