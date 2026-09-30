@@ -29,11 +29,13 @@ async def lifespan(app: FastAPI):
 
     # Reset any stale/orphaned in-flight executions on startup
     try:
+        from datetime import datetime, timezone
         from app.database.session import AsyncSessionLocal
         from app.models.execution import Execution, ExecutionStatus
         from sqlalchemy import update
+
         async with AsyncSessionLocal() as session:
-            await session.execute(
+            result = await session.execute(
                 update(Execution)
                 .where(Execution.status.in_([
                     ExecutionStatus.PENDING,
@@ -44,10 +46,16 @@ async def lifespan(app: FastAPI):
                 ]))
                 .values(
                     status=ExecutionStatus.FAILED,
-                    error_information={"error": "Server restarted while execution was in progress."},
+                    completion_time=datetime.now(timezone.utc),
+                    error_information={
+                        "stage": "LifecycleRecovery",
+                        "error": "Server restarted while execution was in progress.",
+                    },
                 )
             )
             await session.commit()
+            if result.rowcount and result.rowcount > 0:
+                logger.info(f"Startup reconciliation: marked {result.rowcount} orphaned execution(s) as FAILED.")
     except Exception as e:
         logger.warning(f"Could not reset stale executions on startup: {e}")
 

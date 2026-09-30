@@ -13,6 +13,7 @@ from app.github.interface import IGitHubClient
 from app.github import get_github_client
 from app.models.execution import Execution, ExecutionStatus
 from app.models.github_connection import GitHubConnection
+from app.models.repository import Repository
 from app.pipeline.context_builder import context_builder
 from app.services.execution_service import execution_service
 
@@ -53,7 +54,49 @@ class PipelineOrchestrator:
     Execution Complete (Audit Saved)
     """
 
+    def __init__(self):
+        self._repo_locks: Dict[str, asyncio.Lock] = {}
+        self._lock_mutex = asyncio.Lock()
+
+    async def _get_repo_lock(self, repository_full_name: str) -> asyncio.Lock:
+        clean_key = repository_full_name.strip().lower()
+        async with self._lock_mutex:
+            if clean_key not in self._repo_locks:
+                self._repo_locks[clean_key] = asyncio.Lock()
+            return self._repo_locks[clean_key]
+
     async def execute_sync_pipeline(
+        self,
+        db: AsyncSession,
+        execution_id: UUID,
+        repository_full_name: str,
+        commit_sha: str,
+        branch: str = "main",
+        doc_paths: Optional[List[str]] = None,
+        github_client: Optional[IGitHubClient] = None,
+        auto_commit: bool = True,
+        create_pull_request: bool = False,
+    ) -> Execution:
+        """
+        Executes synchronization pipeline with per-repository sequential concurrency locking.
+        Different repositories run concurrently; multiple rapid commits to the same repository
+        are processed safely in order without Git SHA collision.
+        """
+        repo_lock = await self._get_repo_lock(repository_full_name)
+        async with repo_lock:
+            return await self._execute_pipeline_internal(
+                db=db,
+                execution_id=execution_id,
+                repository_full_name=repository_full_name,
+                commit_sha=commit_sha,
+                branch=branch,
+                doc_paths=doc_paths,
+                github_client=github_client,
+                auto_commit=auto_commit,
+                create_pull_request=create_pull_request,
+            )
+
+    async def _execute_pipeline_internal(
         self,
         db: AsyncSession,
         execution_id: UUID,
@@ -74,18 +117,52 @@ class PipelineOrchestrator:
             message=f"Initializing pipeline execution for {repository_full_name} on branch {branch}...",
         )
 
-        # Step -1: Resolve authenticated GitHub client if not explicitly passed
+        # Step -1: Resolve tenant-scoped authenticated GitHub client if not explicitly passed
         client = github_client
         if not client:
             token = None
+            resolved_owner_username: Optional[str] = None
             try:
-                stmt = select(GitHubConnection).order_by(GitHubConnection.created_at.desc())
-                res = await db.execute(stmt)
-                conn = res.scalars().first()
+                # 1. Query repository to resolve the specific owning user_id
+                from sqlalchemy import func
+                clean_full_name = repository_full_name.strip()
+                stmt_repo = (
+                    select(Repository)
+                    .where(func.lower(Repository.full_name) == clean_full_name.lower())
+                    .order_by(Repository.updated_at.desc())
+                )
+                res_repo = await db.execute(stmt_repo)
+                repo_obj = res_repo.scalars().first()
+
+                conn: Optional[GitHubConnection] = None
+                if repo_obj and repo_obj.user_id:
+                    # 2. Query the specific GitHubConnection belonging to the repository owner
+                    stmt_conn = (
+                        select(GitHubConnection)
+                        .where(GitHubConnection.user_id == repo_obj.user_id)
+                        .order_by(GitHubConnection.updated_at.desc())
+                    )
+                    res_conn = await db.execute(stmt_conn)
+                    conn = res_conn.scalars().first()
+
+                # 3. Fallback only if no repository owner is linked (e.g., local mock or test suites)
+                if not conn:
+                    stmt_fallback = select(GitHubConnection).order_by(GitHubConnection.created_at.desc())
+                    res_fallback = await db.execute(stmt_fallback)
+                    conn = res_fallback.scalars().first()
+
                 if conn and conn.access_token_enc:
                     token = decrypt_token(conn.access_token_enc)
+                    resolved_owner_username = conn.username
+                    _record_event(
+                        telemetry_logs,
+                        stage="Ingestion",
+                        level="INFO",
+                        message=f"Authenticated GitHub client using encrypted token for @{conn.username}.",
+                    )
             except Exception as e:
-                logger.warning(f"Could not retrieve GitHub token from DB: {e}")
+                logger.warning(f"Could not retrieve tenant-scoped GitHub token from DB: {e}")
+
             client = get_github_client(token=token)
 
         # Step -0.5: Resolve real commit SHA if generic or requested latest
