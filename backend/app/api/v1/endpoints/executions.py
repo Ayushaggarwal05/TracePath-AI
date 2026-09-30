@@ -17,6 +17,7 @@ from app.schemas.execution import (
 from app.services.execution_service import execution_service
 from app.pipeline.orchestrator import pipeline_orchestrator
 from app.services.repository_service import repository_service
+from app.repositories.repository_repository import repository_repo
 
 router = APIRouter()
 logger = logging.getLogger("tracepath.executions")

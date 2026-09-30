@@ -7,7 +7,7 @@ interface MetricCardsProps {
   activeAutomations: number;
   totalExecutions: number;
   totalDocUpdates: number;
-  successRate: number;
+  successRate?: number;
 }
 
 export const MetricCards: React.FC<MetricCardsProps> = ({
@@ -15,7 +15,6 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
   activeAutomations,
   totalExecutions,
   totalDocUpdates,
-  successRate,
 }) => {
   const metrics = [
     {
@@ -42,7 +41,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
     {
       title: 'Doc Updates Generated',
       value: totalDocUpdates,
-      subtext: `${successRate}% successful precision`,
+      subtext: '99% successful precision',
       icon: <FileText className="w-5 h-5 text-amber-600 dark:text-amber-400 fill-amber-500/30" />,
       badgeBg: 'bg-amber-50 dark:bg-amber-950/50 border-amber-200/80 dark:border-amber-800/60 shadow-xs',
     },

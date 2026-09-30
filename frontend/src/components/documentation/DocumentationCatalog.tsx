@@ -32,6 +32,16 @@ export const DocumentationCatalog: React.FC<DocumentationCatalogProps> = ({
     }
   };
 
+  if (documents.length === 0) {
+    return (
+      <div className="p-8 text-center rounded-2xl bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
+        <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+          No tracked documentation files registered yet. Defaulting to README.md, ARCHITECTURE.md, and PRD.md upon first sync run.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4">

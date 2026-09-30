@@ -66,24 +66,32 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
   const loadData = async () => {
     setLoading(true);
     try {
-      // 1. Fetch Repository Details
-      const reposResponse = await repositoryService.getRepositories();
+      // 1. Fetch Repository Details with fallback resolution
+      const reposResponse = await repositoryService.getRepositories().catch(() => ({ items: [] }));
       const currentRepo =
-        reposResponse.items.find((r) => r.id === repositoryId) ||
+        reposResponse.items.find(
+          (r) =>
+            r.id === repositoryId ||
+            r.github_repo_id === repositoryId ||
+            r.name.toLowerCase() === repositoryId.toLowerCase() ||
+            r.full_name.toLowerCase() === repositoryId.toLowerCase()
+        ) ||
         (await repositoryService.getRepository(repositoryId).catch(() => null));
+
       setRepository(currentRepo);
 
-      // 2. Fetch Executions for this repository
-      const execsResponse = await executionService.getExecutions({ repository_id: repositoryId });
-      setExecutions(execsResponse.items);
+      const targetId = currentRepo?.id || repositoryId;
 
-      // 3. Fetch Tracked Documents
-      const docsResponse = await documentationService.getTrackedDocuments(repositoryId);
-      setDocuments(docsResponse);
+      // 2. Fetch Executions, Documents, and Activities in parallel
+      const [execsResponse, docsResponse, activityResponse] = await Promise.all([
+        executionService.getExecutions({ repository_id: targetId }).catch(() => ({ items: [] })),
+        documentationService.getTrackedDocuments(targetId).catch(() => []),
+        activityService.getActivityEvents({ repository_id: targetId }).catch(() => ({ items: [] })),
+      ]);
 
-      // 4. Fetch Activity Events
-      const activityResponse = await activityService.getActivityEvents({ repository_id: repositoryId });
-      setActivities(activityResponse.items);
+      setExecutions(execsResponse.items || []);
+      setDocuments(docsResponse || []);
+      setActivities(activityResponse.items || []);
     } catch (err) {
       console.error('Failed to load repository detail data', err);
     } finally {
@@ -154,36 +162,29 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
     ''
   );
 
-  // Mock recent incoming git commits for the Changes tab
-  const mockRecentCommits = [
-    {
-      sha: latestExecution?.commit_sha || 'a8f4c219904d493a772c5a14d5e9712a884c12ef',
-      message: 'feat(billing): add stripe webhook verification and subscription models',
-      author: 'Alex River',
-      timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
-      files_count: 2,
-      execution_id: latestExecution?.id,
-      sync_status: 'SYNCED',
-    },
-    {
-      sha: '3c99a112233445566778899aabbccddeeff00112',
-      message: 'test(parser): add test fixtures for edge case input validation',
-      author: 'Dev Bot',
-      timestamp: new Date(Date.now() - 3600000 * 10).toISOString(),
-      files_count: 1,
-      execution_id: 'exec-103',
-      sync_status: 'SKIPPED',
-    },
-    {
-      sha: 'd3e9110a2233445566778899aabbccddeeff0011',
-      message: 'refactor(api): optimize response serialize payload formatting',
-      author: 'Ayush Aggarwal',
-      timestamp: new Date(Date.now() - 3600000 * 24).toISOString(),
-      files_count: 3,
-      execution_id: 'exec-099',
-      sync_status: 'SYNCED',
-    },
-  ];
+  // Real incoming git commits derived from pipeline executions
+  const recentCommits = executions.map((exec) => ({
+    sha: exec.commit_sha,
+    message:
+      exec.analysis_result?.summary ||
+      (exec.documentation_decision
+        ? exec.documentation_decision.decision_rationale
+        : `Autonomous documentation synchronization for branch ${exec.branch}`),
+    author: exec.event_type === 'push' ? 'GitHub Push' : 'Manual Trigger',
+    timestamp: exec.created_at,
+    files_count:
+      exec.analysis_result?.affected_components?.length ||
+      (exec.updated_documents?.length || 1),
+    execution_id: exec.id,
+    sync_status:
+      exec.status === 'COMPLETED'
+        ? 'SYNCED'
+        : exec.status === 'SKIPPED'
+        ? 'SKIPPED'
+        : exec.status === 'FAILED'
+        ? 'FAILED'
+        : 'IN_PROGRESS',
+  }));
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
@@ -316,50 +317,76 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
             <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">Autonomous webhook listening active</span>
           </div>
 
-          <div className="divide-y divide-stone-100 dark:divide-slate-800/80 font-mono text-xs">
-            {mockRecentCommits.map((commit, idx) => (
-              <div key={idx} className="p-4 flex items-center justify-between gap-4 hover:bg-stone-50/70 dark:hover:bg-slate-800/40 transition-colors">
-                <div className="flex items-start gap-3 min-w-0">
-                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 shrink-0 mt-0.5">
-                    <GitCommit className="w-4 h-4" />
-                  </div>
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 font-sans">
-                      <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
-                        {formatShortSha(commit.sha)}
-                      </span>
-                      <span className="text-slate-800 dark:text-slate-200 font-medium text-xs truncate">{commit.message}</span>
+          {recentCommits.length === 0 ? (
+            <div className="p-8 text-center space-y-3">
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                No incoming commits received yet for this repository.
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowSyncModal(true)}
+                leftIcon={<RefreshCw className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
+              >
+                Trigger First Sync
+              </Button>
+            </div>
+          ) : (
+            <div className="divide-y divide-stone-100 dark:divide-slate-800/80 font-mono text-xs">
+              {recentCommits.map((commit, idx) => (
+                <div key={idx} className="p-4 flex items-center justify-between gap-4 hover:bg-stone-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 shrink-0 mt-0.5">
+                      <GitCommit className="w-4 h-4" />
                     </div>
-                    <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
-                      <span>{commit.author}</span>
-                      <span>•</span>
-                      <span>{commit.files_count} files changed</span>
-                      <span>•</span>
-                      <span>{formatDate(commit.timestamp)}</span>
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 font-sans">
+                        <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
+                          {formatShortSha(commit.sha)}
+                        </span>
+                        <span className="text-slate-800 dark:text-slate-200 font-medium text-xs truncate">{commit.message}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
+                        <span>{commit.author}</span>
+                        <span>•</span>
+                        <span>{commit.files_count} files analyzed</span>
+                        <span>•</span>
+                        <span>{formatDate(commit.timestamp)}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <Badge variant={commit.sync_status === 'SYNCED' ? 'emerald' : 'slate'}>
-                    {commit.sync_status}
-                  </Badge>
-                  {commit.execution_id && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        const target = executions.find((e) => e.id === commit.execution_id);
-                        if (target) setSelectedExecution(target);
-                      }}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Badge
+                      variant={
+                        commit.sync_status === 'SYNCED'
+                          ? 'emerald'
+                          : commit.sync_status === 'FAILED'
+                          ? 'rose'
+                          : commit.sync_status === 'IN_PROGRESS'
+                          ? 'indigo'
+                          : 'slate'
+                      }
                     >
-                      Trace
-                    </Button>
-                  )}
+                      {commit.sync_status}
+                    </Badge>
+                    {commit.execution_id && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          const target = executions.find((e) => e.id === commit.execution_id);
+                          if (target) setSelectedExecution(target);
+                        }}
+                      >
+                        Trace
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </Card>
       )}
 

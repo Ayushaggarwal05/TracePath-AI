@@ -33,8 +33,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   });
 
   const activeAutomations = repositories.filter((r) => r.automation?.status === 'ACTIVE').length;
-  const completedCount = executions.filter((e) => e.status === 'COMPLETED').length;
-  const successRate = executions.length > 0 ? Math.round((completedCount / executions.length) * 100) : 100;
+  const successfulCount = executions.filter((e) => ['COMPLETED', 'SKIPPED'].includes(e.status)).length;
+  const finishedCount = executions.filter((e) => ['COMPLETED', 'SKIPPED', 'FAILED'].includes(e.status)).length;
+  const successRate = finishedCount > 0 ? Math.round((successfulCount / finishedCount) * 100) : 99;
   
   let totalDocUpdates = 0;
   executions.forEach((e) => {
