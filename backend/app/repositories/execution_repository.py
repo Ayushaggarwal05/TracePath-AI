@@ -43,13 +43,20 @@ class ExecutionRepository(BaseRepository[Execution, ExecutionCreate, ExecutionUp
         self,
         db: AsyncSession,
         repository_id: Optional[UUID] = None,
+        user_id: Optional[UUID] = None,
         status: Optional[ExecutionStatus] = None,
         branch: Optional[str] = None,
         skip: int = 0,
         limit: int = 20,
     ) -> Tuple[Sequence[Execution], int]:
+        from app.models.repository import Repository
+
         stmt = select(Execution).options(selectinload(Execution.repository))
         count_stmt = select(func.count()).select_from(Execution)
+
+        if user_id:
+            stmt = stmt.join(Repository, Execution.repository_id == Repository.id).where(Repository.user_id == user_id)
+            count_stmt = count_stmt.join(Repository, Execution.repository_id == Repository.id).where(Repository.user_id == user_id)
 
         if repository_id:
             stmt = stmt.where(Execution.repository_id == repository_id)

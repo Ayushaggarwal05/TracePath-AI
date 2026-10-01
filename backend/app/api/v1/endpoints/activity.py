@@ -49,14 +49,13 @@ async def list_activity(
     executions, total_execs = await execution_repo.get_filtered(
         db,
         repository_id=repo_uuid,
+        user_id=user.id if user else None,
         skip=0,
         limit=limit,
     )
 
     # Fetch user's registered repositories with their automation status
     repos, _ = await repository_repo.get_by_user_id(db, user_id=user.id, limit=100), 0
-    if not repos:
-        repos = await repository_repo.get_multi(db, limit=100)
     repo_map = {repo.id: repo for repo in repos}
 
     events: List[Dict[str, Any]] = []

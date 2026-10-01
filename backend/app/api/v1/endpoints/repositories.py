@@ -35,9 +35,6 @@ def _to_iso_utc(dt) -> str:
     if hasattr(dt, "tzinfo") and dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     return dt.isoformat().replace("+00:00", "Z")
-from app.services.repository_service import repository_service
-
-router = APIRouter()
 
 
 @router.get(

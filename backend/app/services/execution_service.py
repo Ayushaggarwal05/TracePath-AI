@@ -64,6 +64,7 @@ class ExecutionService:
         self,
         db: AsyncSession,
         repository_id: Optional[UUID] = None,
+        user_id: Optional[UUID] = None,
         status: Optional[ExecutionStatus] = None,
         branch: Optional[str] = None,
         skip: int = 0,
@@ -72,6 +73,7 @@ class ExecutionService:
         return await execution_repo.get_filtered(
             db,
             repository_id=repository_id,
+            user_id=user_id,
             status=status,
             branch=branch,
             skip=skip,

@@ -5,7 +5,8 @@ from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.api.dependencies import get_database_session
+from app.api.dependencies import get_current_user, get_database_session
+from app.core.security import CurrentUser
 from app.database.session import AsyncSessionLocal
 from app.models.execution import ExecutionStatus
 from app.schemas.common import PaginatedResponse
@@ -68,6 +69,7 @@ async def list_executions(
     branch: Optional[str] = Query(default=None, description="Filter by branch"),
     page: int = Query(default=1, ge=1, description="Page number"),
     page_size: int = Query(default=20, ge=1, le=100, description="Items per page"),
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> PaginatedResponse[ExecutionResponse]:
     """
@@ -83,6 +85,7 @@ async def list_executions(
     items, total = await execution_service.get_filtered_executions(
         db,
         repository_id=repo_uuid,
+        user_id=user.id if user else None,
         status=status,
         branch=branch,
         skip=skip,

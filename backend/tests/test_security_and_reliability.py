@@ -1,6 +1,7 @@
 import pytest
 import json
 from httpx import AsyncClient
+from app.core.config import settings
 from app.core.security import MOCK_USER_ID
 from app.agents.change_analyzer import change_analyzer_agent
 from app.agents.impact_planner import impact_planner_agent
@@ -138,17 +139,22 @@ async def test_webhook_idempotency_duplicate_push(async_client: AsyncClient):
         },
         "ref": "refs/heads/main",
     }
-
+    body_bytes = json.dumps(webhook_payload).encode("utf-8")
     headers = {
         "X-GitHub-Event": "push",
         "Content-Type": "application/json",
     }
+    if settings.GITHUB_WEBHOOK_SECRET:
+        import hashlib
+        import hmac
+        digest = hmac.new(settings.GITHUB_WEBHOOK_SECRET.encode("utf-8"), body_bytes, hashlib.sha256).hexdigest()
+        headers["X-Hub-Signature-256"] = f"sha256={digest}"
 
     # First event -> accepted (202)
     res1 = await async_client.post(
         "/api/v1/github/webhooks",
         headers=headers,
-        content=json.dumps(webhook_payload),
+        content=body_bytes,
     )
     assert res1.status_code == 202
     data1 = res1.json()
@@ -158,7 +164,7 @@ async def test_webhook_idempotency_duplicate_push(async_client: AsyncClient):
     res2 = await async_client.post(
         "/api/v1/github/webhooks",
         headers=headers,
-        content=json.dumps(webhook_payload),
+        content=body_bytes,
     )
     assert res2.status_code == 202
     data2 = res2.json()
