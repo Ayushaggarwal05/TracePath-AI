@@ -18,15 +18,18 @@ async def lifespan(app: FastAPI):
 
     # For development/testing with SQLite/Postgres auto-create tables if running locally
     if not settings.is_production:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-            try:
-                from sqlalchemy import text
-                await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS hashed_password VARCHAR(255);"))
-                await conn.execute(text("ALTER TABLE github_connections ADD COLUMN IF NOT EXISTS token_status VARCHAR(50) DEFAULT 'VALID';"))
-            except Exception as e:
-                logger.debug(f"Schema alter note: {e}")
-        logger.info("Database tables verified / created.")
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+                try:
+                    from sqlalchemy import text
+                    await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS hashed_password VARCHAR(255);"))
+                    await conn.execute(text("ALTER TABLE github_connections ADD COLUMN IF NOT EXISTS token_status VARCHAR(50) DEFAULT 'VALID';"))
+                except Exception as e:
+                    logger.debug(f"Schema alter note: {e}")
+            logger.info("Database tables verified / created.")
+        except Exception as e:
+            logger.warning(f"Could not verify/create tables on startup (will retry on incoming requests): {e}")
 
     # Reset any stale/orphaned in-flight executions on startup
     try:
