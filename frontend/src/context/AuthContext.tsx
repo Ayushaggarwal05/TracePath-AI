@@ -7,6 +7,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  tokenStatus: 'VALID' | 'EXPIRED' | 'REVOKED';
+  isTokenExpired: boolean;
   login: (email: string, password: string) => Promise<User>;
   signup: (email: string, password: string, fullName?: string) => Promise<User>;
   connectGitHub: (token?: string, username?: string) => Promise<void>;
@@ -31,6 +33,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return !localStorage.getItem(CACHED_USER_KEY);
   });
   const [error, setError] = useState<string | null>(null);
+
+  const tokenStatus =
+    user?.token_status ||
+    user?.github_connections?.[0]?.token_status ||
+    'VALID';
+  const isTokenExpired = user?.github_connected ? tokenStatus !== 'VALID' : false;
 
   const saveUserState = (newUser: User | null) => {
     setUser(newUser);
@@ -124,6 +132,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: !!user,
         isLoading,
         error,
+        tokenStatus,
+        isTokenExpired,
         login,
         signup,
         connectGitHub,

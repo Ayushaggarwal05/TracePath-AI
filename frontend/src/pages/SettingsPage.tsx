@@ -44,6 +44,11 @@ export const SettingsPage: React.FC = () => {
     localStorage.getItem('tracepath_github_user') ||
     'Developer';
 
+  const tokenStatus =
+    user?.token_status ||
+    user?.github_connections?.[0]?.token_status ||
+    'VALID';
+
   // Persistent Form States
   const [defaultTargetBranch, setDefaultTargetBranch] = useState(DEFAULT_GLOBAL_SETTINGS.defaultTargetBranch);
   const [syncMode, setSyncMode] = useState<'commit' | 'pr'>(DEFAULT_GLOBAL_SETTINGS.syncMode);
@@ -217,14 +222,22 @@ export const SettingsPage: React.FC = () => {
                   <p className="text-xs text-slate-600 dark:text-slate-400 font-sans">Your authorized account and permissions for reading commits and synchronizing docs.</p>
                 </div>
               </div>
-              <Badge variant="emerald">Authorized App Connected</Badge>
+              <Badge variant={tokenStatus === 'VALID' ? 'emerald' : tokenStatus === 'EXPIRED' ? 'amber' : 'rose'}>
+                {tokenStatus === 'VALID'
+                  ? 'Authorized PAT Connected'
+                  : tokenStatus === 'EXPIRED'
+                  ? 'PAT Expired'
+                  : 'PAT Revoked'}
+              </Badge>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 font-mono text-xs">
               <div className="p-3.5 rounded-xl bg-[#F7F5F0] dark:bg-slate-900/60 border border-stone-200/90 dark:border-slate-800 space-y-1">
                 <span className="text-slate-500 dark:text-slate-400 text-[11px] block font-sans">Connected GitHub User</span>
                 <span className="text-slate-900 dark:text-slate-100 font-bold block">{connectedUsername}</span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-sans block">Personal Access & OAuth Active</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-sans block">
+                  Status: <strong className={tokenStatus === 'VALID' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}>{tokenStatus}</strong>
+                </span>
               </div>
               <div className="p-3.5 rounded-xl bg-[#F7F5F0] dark:bg-slate-900/60 border border-stone-200/90 dark:border-slate-800 space-y-1">
                 <span className="text-slate-500 dark:text-slate-400 text-[11px] block font-sans">Repository Access Permissions</span>

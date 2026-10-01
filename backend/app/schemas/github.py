@@ -9,6 +9,7 @@ class GitHubConnectionBase(BaseModel):
     username: str
     avatar_url: Optional[str] = None
     installation_id: Optional[str] = None
+    token_status: Optional[str] = "VALID"
 
 
 class GitHubConnectionCreate(GitHubConnectionBase):

@@ -1,3 +1,5 @@
+export type TokenStatus = 'VALID' | 'EXPIRED' | 'REVOKED';
+
 export interface GitHubConnection {
   id: string;
   user_id: string;
@@ -5,6 +7,7 @@ export interface GitHubConnection {
   username: string;
   avatar_url?: string;
   installation_id?: string;
+  token_status?: TokenStatus;
   created_at: string;
 }
 
@@ -17,6 +20,7 @@ export interface User {
   github_username?: string;
   github_avatar_url?: string;
   github_connections?: GitHubConnection[];
+  token_status?: TokenStatus;
   created_at?: string;
   updated_at?: string;
 }

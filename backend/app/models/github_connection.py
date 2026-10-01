@@ -22,6 +22,7 @@ class GitHubConnection(BaseModel):
     avatar_url: Mapped[str] = mapped_column(String(500), nullable=True)
     installation_id: Mapped[str] = mapped_column(String(100), nullable=True)
     access_token_enc: Mapped[str] = mapped_column(String(500), nullable=True)
+    token_status: Mapped[str] = mapped_column(String(50), default="VALID", server_default="VALID", nullable=True)
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="github_connections")

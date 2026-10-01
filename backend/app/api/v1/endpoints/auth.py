@@ -44,6 +44,7 @@ class ConnectGitHubRequest(BaseModel):
 def _format_user_response(user: User) -> Dict[str, Any]:
     """Helper to format sanitized user object."""
     gh_conn = user.github_connections[0] if user.github_connections else None
+    token_status = getattr(gh_conn, "token_status", "VALID") or "VALID" if gh_conn else "VALID"
     return {
         "id": str(user.id),
         "email": user.email,
@@ -52,6 +53,19 @@ def _format_user_response(user: User) -> Dict[str, Any]:
         "github_connected": gh_conn is not None,
         "github_username": gh_conn.username if gh_conn else None,
         "github_avatar_url": gh_conn.avatar_url if gh_conn else None,
+        "token_status": token_status,
+        "github_connections": [
+            {
+                "id": str(conn.id),
+                "user_id": str(conn.user_id),
+                "github_user_id": conn.github_user_id,
+                "username": conn.username,
+                "avatar_url": conn.avatar_url,
+                "token_status": getattr(conn, "token_status", "VALID") or "VALID",
+                "created_at": conn.created_at.isoformat() if conn.created_at else "",
+            }
+            for conn in (user.github_connections or [])
+        ],
         "created_at": user.created_at.isoformat() if user.created_at else None,
     }
 
@@ -324,6 +338,7 @@ async def connect_github_account(
                 connection.username = gh_username
                 connection.avatar_url = avatar_url
                 connection.access_token_enc = encrypted_token
+                connection.token_status = "VALID"
             else:
                 connection = GitHubConnection(
                     user_id=user.id,
@@ -331,6 +346,7 @@ async def connect_github_account(
                     username=gh_username,
                     avatar_url=avatar_url,
                     access_token_enc=encrypted_token,
+                    token_status="VALID",
                 )
                 db.add(connection)
 

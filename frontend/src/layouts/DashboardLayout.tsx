@@ -16,6 +16,7 @@ import {
   X,
   Sun,
   Moon,
+  AlertTriangle,
 } from "lucide-react";
 
 type NavRoute = "dashboard" | "repositories" | "activity" | "settings";
@@ -98,6 +99,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       document.documentElement.classList.remove("dark");
     }
   }, [theme]);
+
+  const tokenStatus =
+    user?.token_status ||
+    user?.github_connections?.[0]?.token_status ||
+    "VALID";
+  const isTokenExpired = user?.github_connected ? tokenStatus !== "VALID" : false;
 
   const { repositories } = useRepositories();
   const [searchQuery, setSearchQuery] = useState("");
@@ -602,7 +609,39 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         {/* Main Content Body */}
         <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div className="max-w-7xl mx-auto">
+            {isTokenExpired && (
+              <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs animate-in fade-in slide-in-from-top-2">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 sm:mt-0">
+                    <AlertTriangle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                        {tokenStatus === "REVOKED"
+                          ? "GitHub Access Token Revoked"
+                          : "GitHub Personal Access Token Expired"}
+                      </p>
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                        {tokenStatus}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                      Autonomous documentation synchronization and webhook commits cannot push to your repositories until you reconnect your token.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => onRouteChange("connect")}
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-colors shrink-0 cursor-pointer"
+                >
+                  Re-authenticate GitHub
+                </button>
+              </div>
+            )}
+            {children}
+          </div>
         </main>
       </div>
 
