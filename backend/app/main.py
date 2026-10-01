@@ -23,6 +23,7 @@ async def lifespan(app: FastAPI):
             try:
                 from sqlalchemy import text
                 await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS hashed_password VARCHAR(255);"))
+                await conn.execute(text("ALTER TABLE github_connections ADD COLUMN IF NOT EXISTS token_status VARCHAR(50) DEFAULT 'VALID';"))
             except Exception as e:
                 logger.debug(f"Schema alter note: {e}")
         logger.info("Database tables verified / created.")
