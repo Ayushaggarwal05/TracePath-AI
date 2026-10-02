@@ -11,7 +11,7 @@ import { useAutomation } from '../hooks/useAutomation';
 import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { Card } from '../components/common/Card';
-import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { LoadingDots } from '../components/common/LoadingDots';
 import { EmptyState } from '../components/common/EmptyState';
 import { ConfirmationModal } from '../components/common/ConfirmationModal';
 import { AutomationSettingsModal } from '../components/repositories/AutomationSettingsModal';
@@ -137,8 +137,8 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
 
   if (loading && !repository) {
     return (
-      <div className="py-20 flex justify-center">
-        <LoadingSpinner label="Loading repository workspace..." />
+      <div className="py-24 flex justify-center bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 rounded-2xl shadow-xs">
+        <LoadingDots size="lg" color="slate" label="Loading repository workspace..." />
       </div>
     );
   }

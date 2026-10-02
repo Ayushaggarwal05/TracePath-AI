@@ -3,7 +3,7 @@ import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { SearchInput } from '../components/common/SearchInput';
-import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { LoadingDots } from '../components/common/LoadingDots';
 import { githubService, GitHubAvailableRepo } from '../services/githubService';
 import { repositoryService } from '../services/repositoryService';
 import { useToast } from '../hooks/useToast';
@@ -177,7 +177,9 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
       </div>
 
       {loading ? (
-        <LoadingSpinner label="Fetching accessible repositories from GitHub..." />
+        <div className="py-20 bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 rounded-2xl shadow-xs">
+          <LoadingDots size="lg" color="slate" label="Fetching accessible repositories from GitHub..." />
+        </div>
       ) : filteredRepos.length === 0 ? (
         <Card className="p-12 text-center space-y-4 border-dashed border-dark-border">
           <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-dark-border flex items-center justify-center mx-auto text-slate-400">

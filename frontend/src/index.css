@@ -26,3 +26,35 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* 4-Dot Bouncing Wave Animation */
+@keyframes dotWave {
+  0%, 80%, 100% {
+    transform: translateY(0) scale(0.85);
+    opacity: 0.35;
+  }
+  40% {
+    transform: translateY(-6px) scale(1.15);
+    opacity: 1;
+  }
+}
+
+.animate-dot-wave-1 {
+  animation: dotWave 1.3s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.animate-dot-wave-2 {
+  animation: dotWave 1.3s ease-in-out infinite;
+  animation-delay: 0.16s;
+}
+
+.animate-dot-wave-3 {
+  animation: dotWave 1.3s ease-in-out infinite;
+  animation-delay: 0.32s;
+}
+
+.animate-dot-wave-4 {
+  animation: dotWave 1.3s ease-in-out infinite;
+  animation-delay: 0.48s;
+}

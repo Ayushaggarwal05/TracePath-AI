@@ -21,11 +21,12 @@ interface DashboardPageProps {
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
-  const { repositories, refetch: refetchRepos } = useRepositories();
-  const { executions, total: totalExecutionsCount, refetch: refetchExecs } = useExecutions({ autoRefresh: true });
+  const { repositories, loading: reposLoading, refetch: refetchRepos } = useRepositories();
+  const { executions, total: totalExecutionsCount, loading: execsLoading, refetch: refetchExecs } = useExecutions({ autoRefresh: true });
   const [selectedExecution, setSelectedExecution] = useState<Execution | null>(null);
   const [activeStreamingExecution, setActiveStreamingExecution] = useState<Execution | null>(null);
   const [isTriggerModalOpen, setIsTriggerModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [diffModalData, setDiffModalData] = useState<{ isOpen: boolean; diff: string; title: string }>({
     isOpen: false,
     diff: '',
@@ -42,9 +43,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
     totalDocUpdates += e.updated_documents?.length || 0;
   });
 
-  const handleRefresh = () => {
-    refetchRepos();
-    refetchExecs();
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([refetchRepos(), refetchExecs()]);
+    } catch (err) {
+      console.error('Refresh error:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   // Poll for status updates while an execution stream modal is open
@@ -79,8 +86,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         </div>
 
         <div className="flex items-center gap-2.5">
-          <Button variant="outline" size="sm" onClick={handleRefresh} leftIcon={<RefreshCw className="w-4 h-4" />}>
-            Refresh
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            isLoading={isRefreshing}
+            leftIcon={!isRefreshing ? <RefreshCw className="w-4 h-4" /> : undefined}
+          >
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
           <Button
             variant="primary"
@@ -100,6 +113,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         totalExecutions={totalExecutionsCount ?? executions.length}
         totalDocUpdates={totalDocUpdates}
         successRate={successRate}
+        loading={isRefreshing || (executions.length === 0 && execsLoading) || (repositories.length === 0 && reposLoading)}
       />
 
       {/* Active Repositories Live Status Bar */}
@@ -115,6 +129,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           <RecentExecutionsTable
             executions={executions}
             repositories={repositories}
+            loading={isRefreshing || (executions.length === 0 && execsLoading)}
             onOpenLiveStream={(exec) => setActiveStreamingExecution(exec)}
             onSelectExecution={async (exec) => {
               setSelectedExecution(exec);

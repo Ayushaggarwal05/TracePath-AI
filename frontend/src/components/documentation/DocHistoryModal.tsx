@@ -3,7 +3,7 @@ import { Modal } from '../common/Modal';
 import { TrackedDocument, DocumentHistoryEntry } from '../../types/documentation';
 import { documentationService } from '../../services/documentationService';
 import { DiffViewer } from '../diff/DiffViewer';
-import { LoadingSpinner } from '../common/LoadingSpinner';
+import { LoadingDots } from '../common/LoadingDots';
 import { Badge } from '../common/Badge';
 import { formatShortSha, formatDate } from '../../utils/formatters';
 import { GitCommit, Clock, ChevronDown, ChevronUp } from 'lucide-react';
@@ -48,7 +48,9 @@ export const DocHistoryModal: React.FC<DocHistoryModalProps> = ({
     >
       <div className="space-y-4">
         {loading ? (
-          <LoadingSpinner label="Loading document history..." />
+          <div className="py-12">
+            <LoadingDots size="md" color="slate" label="Loading document history..." />
+          </div>
         ) : history.length === 0 ? (
           <div className="p-8 text-center text-slate-500 dark:text-slate-400 italic">No revision history found.</div>
         ) : (

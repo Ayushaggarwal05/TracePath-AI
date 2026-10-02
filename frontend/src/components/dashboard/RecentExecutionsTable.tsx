@@ -3,6 +3,7 @@ import { Execution } from '../../types/execution';
 import { Repository } from '../../types/repository';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
+import { LoadingDots } from '../common/LoadingDots';
 import { LivePipelineSegments } from '../common/LivePipelineSegments';
 import { getExecutionStatusStyle } from '../../utils/statusStyles';
 import { formatShortSha, formatTimeAgo } from '../../utils/formatters';
@@ -11,6 +12,7 @@ import { ArrowRight, GitCommit, FileText, FolderGit2, Activity, Compass } from '
 interface RecentExecutionsTableProps {
   executions: Execution[];
   repositories?: Repository[];
+  loading?: boolean;
   onSelectExecution: (execution: Execution) => void;
   onOpenLiveStream?: (execution: Execution) => void;
   onViewAll: () => void;
@@ -19,6 +21,7 @@ interface RecentExecutionsTableProps {
 export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
   executions,
   repositories = [],
+  loading = false,
   onSelectExecution,
   onOpenLiveStream,
   onViewAll,
@@ -33,7 +36,7 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
   });
 
   return (
-    <Card className="p-0 overflow-hidden bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs">
+    <Card className="p-0 overflow-hidden bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 shadow-xs relative">
       <div className="flex items-center justify-between p-5 border-b border-stone-100 dark:border-slate-800 bg-[#F7F5F0] dark:bg-[#131D2E]">
         <div>
           <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Live Sync Stream</h3>
@@ -47,7 +50,11 @@ export const RecentExecutionsTable: React.FC<RecentExecutionsTableProps> = ({
       </div>
 
       <div className="divide-y divide-stone-100 dark:divide-slate-800/80">
-        {sortedExecutions.length === 0 ? (
+        {loading && sortedExecutions.length === 0 ? (
+          <div className="py-12">
+            <LoadingDots size="md" color="slate" label="Fetching live executions..." />
+          </div>
+        ) : sortedExecutions.length === 0 ? (
           <div className="p-8 text-center text-slate-500 dark:text-slate-400 italic text-sm">
             No execution runs recorded yet.
           </div>

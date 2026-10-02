@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card } from '../common/Card';
+import { LoadingDots } from '../common/LoadingDots';
 import { FolderGit2, Bot, FileText, Zap } from 'lucide-react';
 
 interface MetricCardsProps {
@@ -8,6 +9,7 @@ interface MetricCardsProps {
   totalExecutions: number;
   totalDocUpdates: number;
   successRate?: number;
+  loading?: boolean;
 }
 
 export const MetricCards: React.FC<MetricCardsProps> = ({
@@ -15,6 +17,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
   activeAutomations,
   totalExecutions,
   totalDocUpdates,
+  loading = false,
 }) => {
   const metrics = [
     {
@@ -59,11 +62,11 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
               {m.icon}
             </div>
           </div>
-          <div className="text-3xl font-extrabold text-[#0F2742] dark:text-white font-mono tracking-tight">
-            {m.value}
+          <div className="text-3xl font-extrabold text-[#0F2742] dark:text-white font-mono tracking-tight h-9 flex items-center">
+            {loading ? <LoadingDots size="xs" color="slate" inline /> : m.value}
           </div>
           <p className={`text-xs mt-1 font-medium ${i === 0 || i === 1 ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
-            {m.subtext}
+            {loading ? 'Refreshing status...' : m.subtext}
           </p>
         </Card>
       ))}

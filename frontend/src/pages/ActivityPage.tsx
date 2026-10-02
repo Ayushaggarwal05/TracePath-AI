@@ -10,7 +10,7 @@ import { SearchInput } from '../components/common/SearchInput';
 import { ExecutionTimeline } from '../components/activity/ExecutionTimeline';
 import { ActivityFeedList } from '../components/activity/ActivityFeedList';
 import { ExecutionDetailDrawer } from '../components/activity/ExecutionDetailDrawer';
-import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { LoadingDots } from '../components/common/LoadingDots';
 import { EmptyState } from '../components/common/EmptyState';
 import { Button } from '../components/common/Button';
 import { Activity, RefreshCw, Layers, Clock, FolderGit2, ChevronDown } from 'lucide-react';
@@ -21,6 +21,7 @@ export const ActivityPage: React.FC = () => {
   const { repositories } = useRepositories();
   const [activities, setActivities] = useState<ActivityEvent[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Tab mode: 'events' (Chronological Stream) vs 'traces' (Execution Pipeline Traces)
   const [viewMode, setViewMode] = useState<'events' | 'traces'>('events');
@@ -48,9 +49,15 @@ export const ActivityPage: React.FC = () => {
     loadActivities();
   }, []);
 
-  const handleRefresh = () => {
-    refetch();
-    loadActivities();
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([refetch(), loadActivities()]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   // Filtered Executions
@@ -158,9 +165,10 @@ export const ActivityPage: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={handleRefresh}
-            leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+            isLoading={isRefreshing}
+            leftIcon={!isRefreshing ? <RefreshCw className="w-3.5 h-3.5" /> : undefined}
           >
-            Refresh
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
         </div>
       </div>
@@ -257,7 +265,9 @@ export const ActivityPage: React.FC = () => {
       <Card className="p-0 overflow-hidden">
         {viewMode === 'events' ? (
           activityLoading ? (
-            <LoadingSpinner label="Loading chronological activity stream..." />
+            <div className="py-20">
+              <LoadingDots size="lg" color="slate" label="Loading chronological activity stream..." />
+            </div>
           ) : filteredActivities.length === 0 ? (
             <EmptyState
               icon={<Activity className="w-8 h-8" />}
@@ -277,7 +287,9 @@ export const ActivityPage: React.FC = () => {
             />
           )
         ) : executionsLoading ? (
-          <LoadingSpinner label="Loading execution traces..." />
+          <div className="py-20">
+            <LoadingDots size="lg" color="slate" label="Loading execution traces..." />
+          </div>
         ) : filteredExecutions.length === 0 ? (
           <EmptyState
             icon={<Activity className="w-8 h-8" />}

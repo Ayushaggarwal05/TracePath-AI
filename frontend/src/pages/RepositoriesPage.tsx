@@ -8,7 +8,7 @@ import { AutomationSettingsModal } from '../components/repositories/AutomationSe
 import { ConfirmationModal } from '../components/common/ConfirmationModal';
 import { BatchActionsBar } from '../components/repositories/BatchActionsBar';
 import { EmptyState } from '../components/common/EmptyState';
-import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { LoadingDots } from '../components/common/LoadingDots';
 import { Button } from '../components/common/Button';
 import { GitBranch, Plus } from 'lucide-react';
 
@@ -145,7 +145,9 @@ export const RepositoriesPage: React.FC<RepositoriesPageProps> = ({
 
       {/* Repository Cards Grid with White Background */}
       {loading ? (
-        <LoadingSpinner label="Loading repositories..." />
+        <div className="py-20 bg-white dark:bg-[#0D1526] border border-stone-200/90 dark:border-slate-800/90 rounded-2xl shadow-xs">
+          <LoadingDots size="lg" color="slate" label="Loading connected repositories..." />
+        </div>
       ) : sortedRepos.length === 0 ? (
         <EmptyState
           icon={<GitBranch className="w-8 h-8" />}
