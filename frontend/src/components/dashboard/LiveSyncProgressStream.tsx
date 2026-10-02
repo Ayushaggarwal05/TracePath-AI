@@ -49,7 +49,16 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
   onViewDetails,
   onDone,
 }) => {
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const computeElapsed = () => {
+    if (!execution?.created_at) return 0;
+    const startTime = new Date(execution.start_time || execution.created_at).getTime();
+    const endTime = execution.completion_time
+      ? new Date(execution.completion_time).getTime()
+      : Date.now();
+    return Math.max(0, Math.floor((endTime - startTime) / 1000));
+  };
+
+  const [elapsedSeconds, setElapsedSeconds] = useState(computeElapsed());
   const [logs, setLogs] = useState<
     Array<{
       time: string;
@@ -63,16 +72,16 @@ export const LiveSyncProgressStream: React.FC<LiveSyncProgressStreamProps> = ({
   const isFinished =
     execution && ["COMPLETED", "FAILED", "SKIPPED"].includes(execution.status);
 
-  // Timer for elapsed seconds during execution
+  // Real-time synchronization of elapsed seconds
   useEffect(() => {
-    let timer: any = null;
-    if (!isFinished) {
-      timer = setInterval(() => {
-        setElapsedSeconds((prev) => prev + 1);
-      }, 1000);
-    }
+    setElapsedSeconds(computeElapsed());
+    if (isFinished) return;
+
+    const timer = setInterval(() => {
+      setElapsedSeconds(computeElapsed());
+    }, 1000);
     return () => clearInterval(timer);
-  }, [isFinished]);
+  }, [execution?.created_at, execution?.start_time, execution?.completion_time, isFinished]);
 
   // Derive stage status from backend execution state
   const getStageStatuses = (): {

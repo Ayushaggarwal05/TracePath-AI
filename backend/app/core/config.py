@@ -60,6 +60,7 @@ class Settings(BaseSettings):
     GITHUB_APP_CLIENT_SECRET: Optional[str] = None
     GITHUB_APP_PRIVATE_KEY: Optional[str] = None
     GITHUB_WEBHOOK_SECRET: Optional[str] = None
+    WEBHOOK_BASE_URL: str = "https://tracepath-ai-api.onrender.com"
 
     # =========================================================================
     # THREE INDEPENDENT AI AGENT CONFIGURATIONS

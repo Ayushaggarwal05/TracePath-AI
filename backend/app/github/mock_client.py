@@ -119,5 +119,14 @@ class MockGitHubClient(IGitHubClient):
     async def create_branch(self, full_name: str, new_branch: str, base_sha: str) -> bool:
         return True
 
+    async def create_or_ensure_webhook(
+        self, full_name: str, webhook_url: str, secret: Optional[str] = None
+    ) -> Optional[int]:
+        return 999888
+
+    async def delete_webhook(self, full_name: str, webhook_id: int) -> bool:
+        return True
+
 
 mock_github_client = MockGitHubClient()
+

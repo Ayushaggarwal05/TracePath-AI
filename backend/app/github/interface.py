@@ -95,3 +95,16 @@ class IGitHubClient(ABC):
     ) -> str:
         """Create a PR for doc updates and return the PR URL."""
         pass
+
+    @abstractmethod
+    async def create_or_ensure_webhook(
+        self, full_name: str, webhook_url: str, secret: Optional[str] = None
+    ) -> Optional[int]:
+        """Create or verify a repository webhook and return its GitHub webhook ID."""
+        pass
+
+    @abstractmethod
+    async def delete_webhook(self, full_name: str, webhook_id: int) -> bool:
+        """Delete a repository webhook."""
+        pass
+

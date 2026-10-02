@@ -345,3 +345,78 @@ class GitHubAPIClient(IGitHubClient):
                 return True
             response.raise_for_status()
             return True
+
+    async def create_or_ensure_webhook(
+        self, full_name: str, webhook_url: str, secret: Optional[str] = None
+    ) -> Optional[int]:
+        """
+        Creates or verifies a webhook on GitHub repository using the user's PAT/OAuth token.
+        Returns the GitHub webhook ID if successfully created or already existing.
+        """
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # 1. Check existing webhooks on this repository
+            try:
+                list_resp = await client.get(
+                    f"{self.base_url}/repos/{full_name}/hooks",
+                    headers=self._get_headers(),
+                )
+                if list_resp.status_code == 200:
+                    existing_hooks = list_resp.json()
+                    for hook in existing_hooks:
+                        config = hook.get("config", {})
+                        if config.get("url") == webhook_url:
+                            logger.info(f"Webhook already exists on {full_name} (Hook ID: {hook.get('id')})")
+                            return hook.get("id")
+            except Exception as e:
+                logger.warning(f"Could not list existing webhooks on {full_name}: {e}")
+
+            # 2. Create new webhook on the repository
+            payload: Dict[str, Any] = {
+                "name": "web",
+                "active": True,
+                "events": ["push", "pull_request"],
+                "config": {
+                    "url": webhook_url,
+                    "content_type": "json",
+                    "insecure_ssl": "0",
+                },
+            }
+            if secret:
+                payload["config"]["secret"] = secret
+
+            try:
+                create_resp = await client.post(
+                    f"{self.base_url}/repos/{full_name}/hooks",
+                    headers=self._get_headers(),
+                    json=payload,
+                )
+                if create_resp.status_code in (200, 201):
+                    hook_data = create_resp.json()
+                    webhook_id = hook_data.get("id")
+                    logger.info(f"Successfully registered webhook on {full_name} (Hook ID: {webhook_id})")
+                    return webhook_id
+                else:
+                    logger.warning(
+                        f"GitHub webhook creation on {full_name} returned status {create_resp.status_code}: {create_resp.text}"
+                    )
+            except Exception as e:
+                logger.error(f"Failed to create webhook on GitHub repository {full_name}: {e}")
+
+            return None
+
+    async def delete_webhook(self, full_name: str, webhook_id: int) -> bool:
+        """Delete a webhook from the GitHub repository."""
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            try:
+                resp = await client.delete(
+                    f"{self.base_url}/repos/{full_name}/hooks/{webhook_id}",
+                    headers=self._get_headers(),
+                )
+                if resp.status_code in (204, 404):
+                    logger.info(f"Webhook {webhook_id} deleted or not found on {full_name}")
+                    return True
+                logger.warning(f"Webhook deletion returned {resp.status_code}: {resp.text}")
+            except Exception as e:
+                logger.error(f"Failed to delete webhook {webhook_id} on {full_name}: {e}")
+            return False
+

@@ -45,6 +45,10 @@ def verify_github_signature(payload_body: bytes, signature_header: Optional[str]
     return hmac.compare_digest(received_sig, expected_sig)
 
 
+from app.database.session import AsyncSessionLocal
+from app.services.execution_service import execution_service
+
+
 async def _run_orchestrator_in_background(
     execution_id,
     repository_full_name: str,
@@ -55,7 +59,7 @@ async def _run_orchestrator_in_background(
     create_pull_request: bool = False,
 ):
     """Background worker task executed outside the webhook HTTP response lifecycle."""
-    async with async_session_factory() as db_session:
+    async with AsyncSessionLocal() as db_session:
         try:
             await pipeline_orchestrator.execute_sync_pipeline(
                 db=db_session,
@@ -68,7 +72,18 @@ async def _run_orchestrator_in_background(
                 create_pull_request=create_pull_request,
             )
         except Exception as exc:
-            logger.error(f"Background pipeline execution failed: {exc}", exc_info=True)
+            logger.error(f"Background webhook pipeline execution failed for {execution_id}: {exc}", exc_info=True)
+            try:
+                await execution_service.update_execution_progress(
+                    db_session,
+                    execution_id,
+                    update_in={
+                        "status": ExecutionStatus.FAILED,
+                        "error_information": {"stage": "BackgroundDispatcher", "error": str(exc)},
+                    },
+                )
+            except Exception:
+                pass
 
 
 @router.post("/webhooks", status_code=status.HTTP_202_ACCEPTED)
@@ -212,27 +227,31 @@ async def handle_github_webhook(
         "status": ExecutionStatus.PENDING,
     }
     created_execution = await execution_repo.create(db, obj_in=execution_in)
+    await db.commit()
+    await db.refresh(created_execution)
 
     # =========================================================================
-    # 9. Start Background Processing & Return 202 Accepted Fast
+    # 9. Start Background Processing Immediately via asyncio.create_task
     # =========================================================================
     doc_paths = repo.automation.doc_paths if repo.automation else None
     auto_commit = repo.automation.auto_commit if (repo.automation and repo.automation.auto_commit is not None) else True
     create_pr = repo.automation.create_pull_request if (repo.automation and repo.automation.create_pull_request is not None) else False
 
-    background_tasks.add_task(
-        _run_orchestrator_in_background,
-        execution_id=created_execution.id,
-        repository_full_name=repo.full_name,
-        commit_sha=commit_sha,
-        branch=branch,
-        doc_paths=doc_paths,
-        auto_commit=auto_commit,
-        create_pull_request=create_pr,
+    import asyncio
+    asyncio.create_task(
+        _run_orchestrator_in_background(
+            execution_id=created_execution.id,
+            repository_full_name=repo.full_name,
+            commit_sha=commit_sha,
+            branch=branch,
+            doc_paths=doc_paths,
+            auto_commit=auto_commit,
+            create_pull_request=create_pr,
+        )
     )
 
     logger.info(
-        f"Enqueued background execution {created_execution.id} for {repo.full_name} @ {commit_sha[:8]}"
+        f"Enqueued instant background execution {created_execution.id} for {repo.full_name} @ {commit_sha[:8]}"
     )
 
     return {

@@ -42,6 +42,7 @@ class RepositoryAutomation(BaseModel):
     auto_commit: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     create_pull_request: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     pr_target_branch: Mapped[str] = mapped_column(String(100), default="main", nullable=False)
+    github_webhook_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
     last_activated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     last_deactivated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
