@@ -1,6 +1,6 @@
 import React from 'react';
 import { Repository } from '../../types/repository';
-import { GitBranch, Lock, Globe, Settings, Play, Pause, ExternalLink, ChevronRight, FolderGit2, FileText } from 'lucide-react';
+import { GitBranch, Lock, Globe, Settings, Play, Pause, ExternalLink, ChevronRight, FolderGit2, FileText, Loader2 } from 'lucide-react';
 
 interface RepositoryCardProps {
   repository: Repository;
@@ -58,7 +58,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => onViewDetail?.(repository)}
-              className="text-sm font-bold text-slate-900 dark:text-slate-100 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors text-left truncate"
+              className="text-sm font-bold text-slate-900 dark:text-slate-100 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors text-left truncate cursor-pointer"
             >
               {repository.name}
             </button>
@@ -106,8 +106,20 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
           </span>
         )}
 
-        {/* Status Badge: Dark Green for Active, Slate for Inactive */}
-        {isActive ? (
+        {/* Status Badge: Active / Inactive / Activating... / Pausing... */}
+        {isToggling ? (
+          isActive ? (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-950/80 text-amber-300 border border-amber-800 shadow-sm animate-pulse">
+              <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
+              <span>PAUSING...</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-700 shadow-sm animate-pulse">
+              <Loader2 className="w-3 h-3 animate-spin text-emerald-400" />
+              <span>ACTIVATING...</span>
+            </div>
+          )
+        ) : isActive ? (
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-200 border border-emerald-800 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>ACTIVE</span>
@@ -152,27 +164,53 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
           </button>
         )}
 
-        {/* Activate Button (Punchy/Vibrant Green) vs Pause Button (Dark Green Theme) */}
+        {/* Activate Button vs Pause Button */}
         {isActive ? (
           <button
             type="button"
             onClick={() => onToggleAutomation(repository)}
             disabled={isToggling}
-            className="inline-flex items-center justify-center gap-1.5 min-w-[92px] px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950 hover:bg-rose-950 text-emerald-200 hover:text-rose-200 border border-emerald-800 hover:border-rose-800 transition-all shadow-sm group/btn cursor-pointer"
+            className={`inline-flex items-center justify-center gap-1.5 min-w-[96px] px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm ${
+              isToggling
+                ? 'bg-amber-950/60 text-amber-300 border border-amber-800/80 cursor-not-allowed opacity-90'
+                : 'bg-emerald-950 hover:bg-rose-950 text-emerald-200 hover:text-rose-200 border border-emerald-800 hover:border-rose-800 group/btn cursor-pointer'
+            }`}
           >
-            <Pause className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400/40 group-hover/btn:text-rose-400 group-hover/btn:fill-rose-400/40" />
-            <span className="group-hover/btn:hidden">Active</span>
-            <span className="hidden group-hover/btn:inline">Pause</span>
+            {isToggling ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+                <span>Pausing...</span>
+              </>
+            ) : (
+              <>
+                <Pause className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400/40 group-hover/btn:text-rose-400 group-hover/btn:fill-rose-400/40" />
+                <span className="group-hover/btn:hidden">Active</span>
+                <span className="hidden group-hover/btn:inline">Pause</span>
+              </>
+            )}
           </button>
         ) : (
           <button
             type="button"
             onClick={() => onToggleAutomation(repository)}
             disabled={isToggling}
-            className="inline-flex items-center justify-center gap-1.5 min-w-[92px] px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white transition-all shadow-sm shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            className={`inline-flex items-center justify-center gap-1.5 min-w-[96px] px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
+              isToggling
+                ? 'bg-emerald-600/80 text-white border border-emerald-500 cursor-not-allowed opacity-90'
+                : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-[1.02] active:scale-[0.98] cursor-pointer'
+            }`}
           >
-            <Play className="w-3.5 h-3.5 text-white fill-white" />
-            <span>Activate</span>
+            {isToggling ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
+                <span>Activating...</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-3.5 h-3.5 text-white fill-white" />
+                <span>Activate</span>
+              </>
+            )}
           </button>
         )}
       </div>

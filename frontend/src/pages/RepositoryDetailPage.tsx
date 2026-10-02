@@ -202,7 +202,13 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
             <div className="flex items-center gap-2.5">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0F2742] dark:text-slate-100 tracking-tight font-sans">{repository.name}</h2>
               <Badge variant={isAutomationActive ? 'emerald' : 'slate'}>
-                {isAutomationActive ? 'Automation Active' : 'Automation Paused'}
+                {togglingId === repository.id
+                  ? isAutomationActive
+                    ? 'Pausing Automation...'
+                    : 'Activating Automation...'
+                  : isAutomationActive
+                  ? 'Automation Active'
+                  : 'Automation Paused'}
               </Badge>
               {repository.is_private && <Badge variant="slate">Private</Badge>}
             </div>
@@ -218,7 +224,13 @@ export const RepositoryDetailPage: React.FC<RepositoryDetailPageProps> = ({
             isLoading={togglingId === repository.id}
             leftIcon={isAutomationActive ? <PowerOff className="w-3.5 h-3.5" /> : <Power className="w-3.5 h-3.5" />}
           >
-            {isAutomationActive ? 'Pause Automation' : 'Activate Automation'}
+            {togglingId === repository.id
+              ? isAutomationActive
+                ? 'Pausing...'
+                : 'Activating...'
+              : isAutomationActive
+              ? 'Pause Automation'
+              : 'Activate Automation'}
           </Button>
 
           <Button
