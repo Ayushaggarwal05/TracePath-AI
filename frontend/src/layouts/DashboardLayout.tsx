@@ -29,29 +29,48 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-const NAV_ITEMS: Array<{ id: NavRoute; label: string; icon: (isActive: boolean) => React.ReactNode }> =
-  [
-    {
-      id: "dashboard",
-      label: "Dashboard",
-      icon: (isActive) => <LayoutDashboard className={`w-5 h-5 ${isActive ? 'fill-white' : 'fill-slate-400/30'}`} />,
-    },
-    {
-      id: "repositories",
-      label: "Repositories",
-      icon: (isActive) => <FolderGit2 className={`w-5 h-5 ${isActive ? 'fill-white/30' : 'fill-slate-400/30'}`} />,
-    },
-    {
-      id: "activity",
-      label: "Activity",
-      icon: (isActive) => <Activity className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />,
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: (isActive) => <Settings className={`w-5 h-5 ${isActive ? 'fill-white/30' : 'fill-slate-400/30'}`} />,
-    },
-  ];
+const NAV_ITEMS: Array<{
+  id: NavRoute;
+  label: string;
+  icon: (isActive: boolean) => React.ReactNode;
+}> = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: (isActive) => (
+      <LayoutDashboard
+        className={`w-5 h-5 ${isActive ? "fill-white" : "fill-slate-400/30"}`}
+      />
+    ),
+  },
+  {
+    id: "repositories",
+    label: "Repositories",
+    icon: (isActive) => (
+      <FolderGit2
+        className={`w-5 h-5 ${isActive ? "fill-white/30" : "fill-slate-400/30"}`}
+      />
+    ),
+  },
+  {
+    id: "activity",
+    label: "Activity",
+    icon: (isActive) => (
+      <Activity
+        className={`w-5 h-5 ${isActive ? "stroke-[2.5]" : "stroke-2"}`}
+      />
+    ),
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    icon: (isActive) => (
+      <Settings
+        className={`w-5 h-5 ${isActive ? "fill-white/30" : "fill-slate-400/30"}`}
+      />
+    ),
+  },
+];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   user,
@@ -61,20 +80,17 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children,
 }) => {
   const savedUsername =
-    localStorage.getItem("tracepath_github_user") ||
+    user?.github_username ||
     user?.github_connections?.[0]?.username ||
     (user?.email ? user.email.split("@")[0] : "Developer");
   const avatarUrl =
-    localStorage.getItem("tracepath_github_avatar") ||
+    user?.github_avatar_url ||
     user?.github_connections?.[0]?.avatar_url ||
     (savedUsername && savedUsername !== "Developer"
       ? `https://github.com/${savedUsername}.png`
       : "");
 
-  const savedName =
-    localStorage.getItem("tracepath_github_name") ||
-    user?.full_name ||
-    savedUsername;
+  const savedName = user?.full_name || savedUsername;
 
   const displayName = savedName || savedUsername;
   const initial = displayName.charAt(0).toUpperCase();
@@ -104,7 +120,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     user?.token_status ||
     user?.github_connections?.[0]?.token_status ||
     "VALID";
-  const isTokenExpired = user?.github_connected ? tokenStatus !== "VALID" : false;
+  const isTokenExpired = user?.github_connected
+    ? tokenStatus !== "VALID"
+    : false;
 
   const { repositories } = useRepositories();
   const [searchQuery, setSearchQuery] = useState("");
@@ -358,7 +376,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               className="relative w-64 sm:w-80 md:w-96"
             >
               <div className="relative flex items-center w-full">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+                <Search className="w-4 h-4 text-[#0F2742]/60 dark:text-slate-800 absolute left-3.5 pointer-events-none" />
                 <input
                   ref={searchInputRef}
                   type="text"
@@ -369,7 +387,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   }}
                   onFocus={() => setIsSearchOpen(true)}
                   placeholder="Search repositories & workflows..."
-                  className="w-full pl-9 pr-14 py-2 border rounded-2xl text-xs sm:text-sm transition-all shadow-xs bg-[#F4F2EB] dark:bg-slate-900/90 border-stone-200/90 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 focus:bg-white dark:focus:bg-slate-950"
+                  className="w-full pl-9 pr-14 py-2 border rounded-2xl text-xs sm:text-sm transition-all shadow-xs bg-[#F4F2EB] dark:bg-slate-900/90 border-stone-200/90 dark:border-slate-800 text-[#0F2742] dark:text-slate-100 placeholder-[#0F2742]/60 dark:placeholder-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 focus:bg-white dark:focus:bg-slate-950"
                 />
 
                 {searchQuery ? (
@@ -628,7 +646,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                       </span>
                     </div>
                     <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-                      Autonomous documentation synchronization and webhook commits cannot push to your repositories until you reconnect your token.
+                      Autonomous documentation synchronization and webhook
+                      commits cannot push to your repositories until you
+                      reconnect your token.
                     </p>
                   </div>
                 </div>

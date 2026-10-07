@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Repository } from '../types/repository';
 import { repositoryService } from '../services/repositoryService';
 import { githubService } from '../services/githubService';
+import { useAuth } from '../context/AuthContext';
 
 export function useRepositories() {
+  const { user } = useAuth();
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [githubCount, setGithubCount] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
@@ -15,12 +17,16 @@ export function useRepositories() {
       setLoading(true);
       setError(null);
 
-      const savedUser = localStorage.getItem('tracepath_github_user') || undefined;
+      // Only fetch GitHub repos if user has connected GitHub or has a username
+      const githubUsername = user?.github_username || (user?.github_connected ? undefined : null);
 
-      // Fetch both registered DB repos and live GitHub repos in parallel
+      // Fetch registered DB repos (scoped to authenticated session in backend)
+      // and live GitHub repos if connected
       const [dbRes, ghRepos] = await Promise.all([
         repositoryService.getRepositories(1, 100).catch(() => ({ items: [], total: 0 })),
-        githubService.getAvailableRepositories(savedUser).catch(() => []),
+        githubUsername !== null
+          ? githubService.getAvailableRepositories(githubUsername || undefined).catch(() => [])
+          : Promise.resolve([]),
       ]);
 
       const dbMap = new Map<string, Repository>();
@@ -130,7 +136,7 @@ export function useRepositories() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user?.id, user?.github_username, user?.github_connected]);
 
   useEffect(() => {
     fetchRepositories();

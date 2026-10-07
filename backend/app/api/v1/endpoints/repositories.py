@@ -95,12 +95,13 @@ async def register_repository(
 )
 async def get_repository_details(
     repository_id: str,
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> RepositoryDetailResponse:
     """
     Get deep details for a repository including automation config and recent execution history.
     """
-    repo = await repository_service.get_repository(db, repository_id)
+    repo = await repository_service.get_repository(db, repository_id, user_id=user.id)
     return RepositoryDetailResponse.model_validate(repo)
 
 
@@ -113,13 +114,15 @@ async def get_repository_details(
 async def update_repository(
     repository_id: str,
     update_in: RepositoryUpdate,
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> RepositoryResponse:
     """
     Update general settings for a repository.
     """
-    repo = await repository_service.update_repository(db, repository_id, update_in)
-    return RepositoryResponse.model_validate(repo)
+    repo = await repository_service.get_repository(db, repository_id, user_id=user.id)
+    updated = await repository_service.update_repository(db, repo.id, update_in)
+    return RepositoryResponse.model_validate(updated)
 
 
 @router.get(
@@ -130,12 +133,14 @@ async def update_repository(
 )
 async def get_repository_automation(
     repository_id: str,
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> RepositoryAutomationResponse:
     """
     Get the automation status (ACTIVE / INACTIVE) and target documentation configurations.
     """
-    automation = await automation_service.get_automation_by_repo_id(db, repository_id)
+    repo = await repository_service.get_repository(db, repository_id, user_id=user.id)
+    automation = await automation_service.get_automation_by_repo_id(db, repo.id)
     return RepositoryAutomationResponse.model_validate(automation)
 
 
@@ -147,12 +152,14 @@ async def get_repository_automation(
 )
 async def activate_automation(
     repository_id: str,
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> AutomationToggleResponse:
     """
     Activate documentation automation for the repository.
     """
-    return await automation_service.activate_automation(db, repository_id)
+    repo = await repository_service.get_repository(db, repository_id, user_id=user.id)
+    return await automation_service.activate_automation(db, repo.id)
 
 
 @router.post(
@@ -163,12 +170,14 @@ async def activate_automation(
 )
 async def deactivate_automation(
     repository_id: str,
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> AutomationToggleResponse:
     """
     Deactivate documentation automation for the repository.
     """
-    return await automation_service.deactivate_automation(db, repository_id)
+    repo = await repository_service.get_repository(db, repository_id, user_id=user.id)
+    return await automation_service.deactivate_automation(db, repo.id)
 
 
 @router.patch(
@@ -180,12 +189,14 @@ async def deactivate_automation(
 async def update_automation_config(
     repository_id: str,
     update_in: RepositoryAutomationUpdate,
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> RepositoryAutomationResponse:
     """
     Update documentation paths, branches, or commit modes for the repository automation.
     """
-    updated = await automation_service.update_automation_config(db, repository_id, update_in)
+    repo = await repository_service.get_repository(db, repository_id, user_id=user.id)
+    updated = await automation_service.update_automation_config(db, repo.id, update_in)
     return RepositoryAutomationResponse.model_validate(updated)
 
 
@@ -200,12 +211,13 @@ async def list_repository_executions(
     status: Optional[ExecutionStatus] = None,
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> PaginatedResponse[ExecutionResponse]:
     """
     List execution history specifically for this repository.
     """
-    repo = await repository_service.get_repository(db, repository_id)
+    repo = await repository_service.get_repository(db, repository_id, user_id=user.id)
     skip = (page - 1) * page_size
     items, total = await execution_service.get_executions_by_repository(
         db,
@@ -232,13 +244,14 @@ async def list_repository_executions(
 )
 async def list_repository_documents(
     repository_id: str,
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> List[Dict[str, Any]]:
     """
     Returns the real catalog of tracked documentation files for this repository,
     annotated with the latest diff, sync timestamp, and update count from executions.
     """
-    repo = await repository_service.get_repository(db, repository_id)
+    repo = await repository_service.get_repository(db, repository_id, user_id=user.id)
     doc_paths = repo.automation.doc_paths if repo.automation and repo.automation.doc_paths else ["ARCHITECTURE.md", "PRD.md", "README.md"]
     executions = await execution_repo.get_by_repository_id(db, repo.id, limit=50)
 
@@ -314,12 +327,13 @@ async def list_repository_documents(
 async def get_document_history(
     repository_id: str,
     doc_path: str = Query(..., description="Path of document to query history for"),
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> List[Dict[str, Any]]:
     """
     Returns the chronological revision history of a specific document across past executions.
     """
-    repo = await repository_service.get_repository(db, repository_id)
+    repo = await repository_service.get_repository(db, repository_id, user_id=user.id)
     executions = await execution_repo.get_by_repository_id(db, repo.id, limit=50)
     history: List[Dict[str, Any]] = []
 

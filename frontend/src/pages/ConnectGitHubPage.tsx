@@ -25,19 +25,16 @@ export const ConnectGitHubPage: React.FC<ConnectGitHubPageProps> = ({
   onConnected,
   onCancel,
 }) => {
-  const { refreshUser } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [savedUser, setSavedUser] = useState<string | null>(() => {
-    return localStorage.getItem('tracepath_github_user') || null;
+    return user?.github_username || null;
   });
   const [savedAvatar, setSavedAvatar] = useState<string | null>(() => {
-    const stored = localStorage.getItem('tracepath_github_avatar');
-    if (stored) return stored;
-    const user = localStorage.getItem('tracepath_github_user');
-    return user ? `https://github.com/${user}.png` : null;
+    return user?.github_avatar_url || (user?.github_username ? `https://github.com/${user.github_username}.png` : null);
   });
   const [avatarError, setAvatarError] = useState(false);
   const [showSwitchForm, setShowSwitchForm] = useState<boolean>(() => {
-    return !localStorage.getItem('tracepath_github_user');
+    return !user?.github_connected;
   });
   const [connecting, setConnecting] = useState(false);
   const [token, setToken] = useState('');

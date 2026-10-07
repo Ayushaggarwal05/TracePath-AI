@@ -7,6 +7,7 @@ import { LoadingDots } from '../components/common/LoadingDots';
 import { githubService, GitHubAvailableRepo } from '../services/githubService';
 import { repositoryService } from '../services/repositoryService';
 import { useToast } from '../hooks/useToast';
+import { useAuth } from '../context/AuthContext';
 import { GitBranch, Lock, Globe, Star, CheckSquare, Square, ArrowRight, RefreshCw, FolderGit2 } from 'lucide-react';
 
 interface RepositorySelectPageProps {
@@ -16,6 +17,7 @@ interface RepositorySelectPageProps {
 export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
   onComplete,
 }) => {
+  const { user } = useAuth();
   const [availableRepos, setAvailableRepos] = useState<GitHubAvailableRepo[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [search, setSearch] = useState<string>('');
@@ -26,8 +28,12 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
   const loadRepos = async () => {
     try {
       setLoading(true);
-      const savedUser = localStorage.getItem('tracepath_github_user') || undefined;
-      const repos = await githubService.getAvailableRepositories(savedUser);
+      const targetUser = user?.github_username || (user?.github_connected ? undefined : null);
+      if (targetUser === null) {
+        setAvailableRepos([]);
+        return;
+      }
+      const repos = await githubService.getAvailableRepositories(targetUser || undefined);
       setAvailableRepos(repos);
       if (repos && repos.length > 0) {
         setSelectedIds([repos[0].id]);
@@ -42,7 +48,7 @@ export const RepositorySelectPage: React.FC<RepositorySelectPageProps> = ({
   useEffect(() => {
     loadRepos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user?.github_username, user?.github_connected]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>

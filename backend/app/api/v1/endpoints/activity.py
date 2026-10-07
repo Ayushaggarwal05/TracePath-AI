@@ -41,7 +41,7 @@ async def list_activity(
     """
     repo_uuid: Optional[UUID] = None
     if repository_id:
-        resolved = await repository_repo.resolve_repository(db, repository_id)
+        resolved = await repository_repo.resolve_repository(db, repository_id, user_id=user.id)
         if resolved:
             repo_uuid = resolved.id
 

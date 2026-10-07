@@ -5,8 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.api.dependencies import get_current_user
 from app.core.config import settings
-from app.core.security import decrypt_token, encrypt_token, generate_oauth_state, verify_oauth_state
+from app.core.security import CurrentUser, decrypt_token, encrypt_token, generate_oauth_state, verify_oauth_state
 from app.database.session import get_db
 from app.github.client import GitHubAPIClient
 from app.github.interface import GitHubRepoInfo
@@ -223,12 +224,17 @@ async def github_oauth_callback(
 
 @router.get("/status")
 async def get_github_connection_status(
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> Dict[str, Any]:
     """
-    Returns the current user's GitHub connection status without exposing raw or encrypted tokens.
+    Returns the current authenticated user's GitHub connection status without exposing tokens.
     """
-    stmt = select(GitHubConnection).order_by(GitHubConnection.created_at.desc())
+    stmt = (
+        select(GitHubConnection)
+        .where(GitHubConnection.user_id == user.id)
+        .order_by(GitHubConnection.created_at.desc())
+    )
     res = await db.execute(stmt)
     conn = res.scalars().first()
     if conn:
@@ -247,35 +253,39 @@ async def get_github_connection_status(
     }
 
 
-# In-memory and resilient cache for GitHub repositories
+# In-memory user-scoped cache for GitHub repositories
 _REPO_CACHE: Dict[str, List[GitHubRepoInfo]] = {}
 
 @router.get("/repositories", response_model=List[GitHubRepoInfo])
 async def list_github_repositories(
     username: Optional[str] = Query(None, description="GitHub username to pull public repos for"),
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> List[GitHubRepoInfo]:
     """
-    Fetches real repository list accessible to the user directly from GitHub API.
-    Includes persistent caching to seamlessly handle GitHub unauthenticated rate limits.
+    Fetches real repository list accessible to the current authenticated user directly from GitHub API.
+    Strictly isolated per user to prevent multi-tenant data leakage.
     """
-    stmt = select(GitHubConnection).order_by(GitHubConnection.created_at.desc())
+    stmt = (
+        select(GitHubConnection)
+        .where(GitHubConnection.user_id == user.id)
+        .order_by(GitHubConnection.created_at.desc())
+    )
     res = await db.execute(stmt)
     last_conn = res.scalars().first()
     raw_token = None
-    target_username = username
-    if last_conn:
-        if last_conn.access_token_enc:
-            raw_token = decrypt_token(last_conn.access_token_enc)
-        if not target_username:
-            target_username = last_conn.username
+    target_username = username or (last_conn.username if last_conn else None) or user.github_username
 
-    if not target_username:
-        target_username = "Ayushaggarwal05"
+    if last_conn and last_conn.access_token_enc:
+        raw_token = decrypt_token(last_conn.access_token_enc)
 
-    cache_key = f"{target_username}_{'auth' if raw_token else 'pub'}"
+    # If the user has no connection and no username is requested, return empty list (no data leak)
+    if not raw_token and not target_username:
+        return []
 
-    # 1. Fetch using authenticated token (returns private + public repos, 5,000 req/hr)
+    cache_key = f"{user.id}_{target_username}_{'auth' if raw_token else 'pub'}"
+
+    # 1. Fetch using user's authenticated token (returns private + public repos)
     if raw_token:
         try:
             client = GitHubAPIClient(token=raw_token)
@@ -284,9 +294,9 @@ async def list_github_repositories(
                 _REPO_CACHE[cache_key] = repos
                 return repos
         except Exception as err:
-            logger.warning(f"Failed to fetch live repos with token: {err}")
+            logger.warning(f"Failed to fetch live repos with token for user {user.id}: {err}")
 
-    # 2. Fetch public repos for the username directly from GitHub API
+    # 2. Fetch public repos for the specified target username directly from GitHub API
     if target_username:
         try:
             async with httpx.AsyncClient(timeout=10.0) as http_client:
@@ -317,31 +327,13 @@ async def list_github_repositories(
                         return parsed
                 else:
                     logger.warning(
-                        f"GitHub API returned status {res.status_code} for @{target_username} (likely unauthenticated rate limit). Serving cached repositories."
+                        f"GitHub API returned status {res.status_code} for @{target_username}"
                     )
         except Exception as err:
             logger.warning(f"Failed to fetch public repos for @{target_username}: {err}")
 
-    # 3. If live call returned empty/rate limited, return cached repositories
+    # 3. If live call returned empty/rate limited, return this specific user's cached repositories
     if cache_key in _REPO_CACHE and _REPO_CACHE[cache_key]:
         return _REPO_CACHE[cache_key]
-
-    for cached_list in _REPO_CACHE.values():
-        if cached_list:
-            return cached_list
-
-    # 4. Fallback to persisted disk cache if available
-    try:
-        import json, os
-        cache_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "github_repos_cache.json"))
-        if os.path.exists(cache_path):
-            with open(cache_path, "r", encoding="utf-8") as f:
-                raw_items = json.load(f)
-                cached_objs = [GitHubRepoInfo(**item) for item in raw_items]
-                if cached_objs:
-                    _REPO_CACHE[cache_key] = cached_objs
-                    return cached_objs
-    except Exception as e:
-        logger.warning(f"Could not load fallback repos cache: {e}")
 
     return []

@@ -40,9 +40,9 @@ export const SettingsPage: React.FC = () => {
 
   // Dynamic user data
   const connectedUsername =
+    user?.github_username ||
     user?.github_connections?.[0]?.username ||
-    localStorage.getItem('tracepath_github_user') ||
-    'Developer';
+    (user?.email ? user.email.split('@')[0] : 'Developer');
 
   const tokenStatus =
     user?.token_status ||

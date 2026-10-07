@@ -111,13 +111,15 @@ async def list_executions(
 async def create_execution(
     execution_in: ExecutionCreate,
     run_pipeline: bool = Query(default=True, description="Run sync pipeline immediately"),
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> ExecutionDetailResponse:
     """
     Create a new documentation synchronization execution job.
-    Launches the multi-agent pipeline in the background and returns immediately
-    to support real-time frontend streaming and step-by-step progress tracking.
+    Launches the multi-agent pipeline in the background and returns immediately.
     """
+    # Verify repository ownership
+    await repository_service.get_repository(db, execution_in.repository_id, user_id=user.id)
     execution = await execution_service.create_execution(db, execution_in)
 
     if run_pipeline:
@@ -141,6 +143,7 @@ async def create_execution(
 )
 async def get_execution_details(
     execution_id: str,
+    user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_database_session),
 ) -> ExecutionDetailResponse:
     """
@@ -153,5 +156,9 @@ async def get_execution_details(
         raise EntityNotFoundException("Execution", execution_id)
 
     execution = await execution_service.get_execution(db, exec_uuid)
+    if execution and execution.repository_id:
+        # Verify repository ownership
+        await repository_service.get_repository(db, execution.repository_id, user_id=user.id)
+
     return ExecutionDetailResponse.model_validate(execution)
 

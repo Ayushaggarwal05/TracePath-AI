@@ -65,10 +65,19 @@ class RepositoryRepository(BaseRepository[Repository, RepositoryCreate, Reposito
         self, db: AsyncSession, repo_identifier: str | UUID, user_id: Optional[UUID] = None
     ) -> Optional[Repository]:
         """
-        Resolves a repository flexibly by UUID, GitHub ID, or repo name.
+        Resolves a repository flexibly by UUID, GitHub ID, or repo name, strictly scoped by user_id if provided.
         """
+        stmt = select(Repository).options(
+            selectinload(Repository.automation),
+            selectinload(Repository.executions),
+        )
+        if user_id:
+            stmt = stmt.where(Repository.user_id == user_id)
+
         if isinstance(repo_identifier, UUID):
-            return await self.get_by_id_with_relations(db, repo_identifier)
+            stmt = stmt.where(Repository.id == repo_identifier)
+            res = await db.execute(stmt)
+            return res.scalars().first()
 
         clean_id = str(repo_identifier).strip()
         if clean_id.startswith("gh_"):
@@ -77,31 +86,27 @@ class RepositoryRepository(BaseRepository[Repository, RepositoryCreate, Reposito
         # Try parsing as UUID
         try:
             val_uuid = UUID(clean_id)
-            repo = await self.get_by_id_with_relations(db, val_uuid)
+            res = await db.execute(stmt.where(Repository.id == val_uuid))
+            repo = res.scalars().first()
             if repo:
                 return repo
         except ValueError:
             pass
 
         # Try finding by github_repo_id
-        repo = await self.get_by_github_repo_id(db, clean_id)
+        res = await db.execute(stmt.where(Repository.github_repo_id == clean_id))
+        repo = res.scalars().first()
         if repo:
             return repo
 
         # Try finding by full_name
-        repo = await self.get_by_full_name(db, clean_id)
+        res = await db.execute(stmt.where(Repository.full_name == clean_id))
+        repo = res.scalars().first()
         if repo:
             return repo
 
         # Try case-insensitive matching by name
-        stmt = (
-            select(Repository)
-            .where(func.lower(Repository.name) == clean_id.lower())
-            .options(selectinload(Repository.automation), selectinload(Repository.executions))
-        )
-        if user_id:
-            stmt = stmt.where(Repository.user_id == user_id)
-        res = await db.execute(stmt)
+        res = await db.execute(stmt.where(func.lower(Repository.name) == clean_id.lower()))
         return res.scalars().first()
 
 

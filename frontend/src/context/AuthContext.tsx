@@ -119,6 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       await authService.logout();
+      localStorage.removeItem('tracepath_github_user');
       saveUserState(null);
     } finally {
       setIsLoading(false);

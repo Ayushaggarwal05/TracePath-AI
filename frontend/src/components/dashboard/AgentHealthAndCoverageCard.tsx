@@ -11,6 +11,8 @@ import {
   Layers,
 } from 'lucide-react';
 
+import { useAuth } from '../../context/AuthContext';
+
 interface AgentHealthAndCoverageCardProps {
   activeReposCount: number;
 }
@@ -18,7 +20,8 @@ interface AgentHealthAndCoverageCardProps {
 export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProps> = ({
   activeReposCount,
 }) => {
-  const savedUser = localStorage.getItem('tracepath_github_user') || 'Developer';
+  const { user } = useAuth();
+  const activeUser = user?.github_username || (user?.email ? user.email.split('@')[0] : 'Developer');
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -138,7 +141,7 @@ export const AgentHealthAndCoverageCard: React.FC<AgentHealthAndCoverageCardProp
         <div className="p-3 rounded-xl bg-[#F7F5F0] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700/80 flex items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-            <span className="text-slate-800 dark:text-slate-200 font-bold truncate font-mono">@{savedUser}</span>
+            <span className="text-slate-800 dark:text-slate-200 font-bold truncate font-mono">@{activeUser}</span>
           </div>
           <span className="inline-flex items-center gap-1 text-[10px] font-mono text-slate-500 dark:text-slate-400 shrink-0">
             <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 fill-emerald-500/25" />

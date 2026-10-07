@@ -1,11 +1,15 @@
+import logging
 from typing import AsyncGenerator, Optional
 from uuid import UUID
 from fastapi import Cookie, Depends, Header, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.core.security import CurrentUser, decode_access_token, DEFAULT_MOCK_USER, COOKIE_SESSION_NAME
 from app.database.session import get_db
 from app.models.user import User
+
+logger = logging.getLogger("tracepath.dependencies")
 
 
 async def get_database_session() -> AsyncGenerator[AsyncSession, None]:
@@ -23,7 +27,7 @@ async def get_current_user(
     """
     Provides authenticated current user context.
     Extracts session from HTTP-Only cookie or Bearer header,
-    resolving the live Supabase user, or falls back to default context.
+    resolving the live Supabase/Postgres user.
     """
     token = tracepath_session
     if not token and authorization and authorization.startswith("Bearer "):
@@ -33,11 +37,11 @@ async def get_current_user(
         payload = decode_access_token(token)
         if payload and payload.get("sub"):
             try:
-                user_id = UUID(payload["sub"])
-                stmt = select(User).where(User.id == user_id)
+                user_id = UUID(str(payload["sub"]))
+                stmt = select(User).where(User.id == user_id).options(selectinload(User.github_connections))
                 res = await db.execute(stmt)
                 db_user = res.scalars().first()
-                if db_user:
+                if db_user and db_user.is_active:
                     gh_conn = db_user.github_connections[0] if db_user.github_connections else None
                     return CurrentUser(
                         id=db_user.id,
@@ -47,8 +51,12 @@ async def get_current_user(
                         github_user_id=gh_conn.github_user_id if gh_conn else None,
                         github_username=gh_conn.username if gh_conn else None,
                     )
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"Failed to resolve authenticated user from session token: {e}", exc_info=True)
 
-    return DEFAULT_MOCK_USER
+    from fastapi import HTTPException, status
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Authentication required. Please log in.",
+    )
 
