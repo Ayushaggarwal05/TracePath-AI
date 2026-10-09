@@ -190,25 +190,31 @@ Reviewers: @sarahchen, @dev-lead
       {/* =========================================================================
           HERO SECTION (Matching user reference with 3D Robot, Purple Agent Halo & Floating Cards)
          ========================================================================= */}
-      <section className="relative pt-6 sm:pt-10 lg:pt-12 pb-16 sm:pb-24 pl-6 sm:pl-10 lg:pl-16 pr-0 w-full overflow-hidden">
+      <section className="relative pt-4 sm:pt-6 lg:pt-8 pb-16 sm:pb-24 pl-6 sm:pl-10 lg:pl-16 pr-0 w-full overflow-hidden">
         {/* Soft Background Radial Ambient Glows */}
         <div className="absolute top-10 right-0 w-[730px] h-[730px] bg-gradient-to-br from-indigo-200/35 via-purple-200/20 to-cyan-200/25 rounded-full blur-3xl -z-10 pointer-events-none" />
         <div className="absolute top-40 left-0 w-[500px] h-[500px] bg-indigo-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-0 items-center min-h-[660px] lg:min-h-[720px] w-full">
-          {/* LEFT COLUMN: Punchy Copy, Badges & CTAs (Elevated in front with z-30) */}
-          <div className="lg:col-span-6 xl:col-span-6 space-y-6 sm:space-y-7 text-left relative z-30 pr-4 sm:pr-8">
+          {/* LEFT COLUMN: Punchy Copy, Badges & CTAs (Elevated higher in front with z-30) */}
+          <div className="lg:col-span-6 xl:col-span-6 space-y-5 sm:space-y-6 text-left relative z-30 pr-4 sm:pr-8 transform -translate-y-6 sm:-translate-y-10 lg:-translate-y-14 xl:-translate-y-18 transition-transform">
             {/* Top Pill Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EEF2FF] border border-[#C7D2FE] text-[#4F46E5] text-xs sm:text-[13px] font-semibold tracking-wide shadow-xs">
               <Sparkles className="w-4 h-4 text-[#4F46E5] fill-[#4F46E5]/20" />
               <span>Autonomous Multi-Agent Documentation Engine</span>
             </div>
 
-            {/* Main Headline (Huge, Bold, Punchy) */}
+            {/* Main Headline (Tri-Color Lifecycle Gradient) */}
             <h1 className="text-5xl sm:text-6xl lg:text-[4.25rem] xl:text-[5rem] font-black tracking-[-0.04em] text-[#0F172A] leading-[1.0] lg:leading-[0.98]">
-              Your Code.
+              Your{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600">
+                Code.
+              </span>
               <br />
-              Your Docs.
+              Your{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500">
+                Docs.
+              </span>
               <br />
               Always in{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5B4EFF] via-[#8B5CF6] to-[#06B6D4]">
