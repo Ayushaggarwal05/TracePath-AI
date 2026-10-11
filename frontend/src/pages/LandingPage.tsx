@@ -185,12 +185,12 @@ Reviewers: @sarahchen, @dev-lead
   return (
     <div
       id="home"
-      className="bg-[#FFFFFF] text-slate-900 min-h-screen overflow-x-hidden"
+      className="bg-[#FFFFFF] text-slate-900 min-h-screen overflow-x-clip overflow-y-visible"
     >
       {/* =========================================================================
           HERO SECTION (Matching user reference with 3D Robot, Purple Agent Halo & Floating Cards)
          ========================================================================= */}
-      <section className="relative pt-4 sm:pt-6 lg:pt-8 pb-16 sm:pb-24 pl-6 sm:pl-10 lg:pl-16 pr-0 w-full overflow-hidden">
+      <section className="relative pt-4 sm:pt-6 lg:pt-8 pb-16 sm:pb-24 pl-6 sm:pl-10 lg:pl-16 pr-0 w-full overflow-x-clip overflow-y-visible">
         {/* Soft Background Radial Ambient Glows */}
         <div className="absolute top-10 right-0 w-[730px] h-[730px] bg-gradient-to-br from-indigo-200/35 via-purple-200/20 to-cyan-200/25 rounded-full blur-3xl -z-10 pointer-events-none" />
         <div className="absolute top-40 left-0 w-[500px] h-[500px] bg-indigo-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
@@ -305,11 +305,11 @@ Reviewers: @sarahchen, @dev-lead
           </div>
 
           {/* RIGHT COLUMN: Full-Scale 3D AI Robot Engine + Halo + 4 Flanking Floating Cards */}
-          <div className="lg:col-span-6 xl:col-span-6 relative flex items-center justify-end min-h-[580px] sm:min-h-[660px] lg:min-h-[720px] z-0 overflow-visible w-full">
-            {/* Robot Container with Full Size & Elevation */}
-            <div className="relative w-full max-w-[580px] sm:max-w-[660px] lg:max-w-[760px] xl:max-w-[840px] z-0 flex items-center justify-end transform -translate-y-10 sm:-translate-y-16 lg:-translate-y-20 xl:-translate-y-24 scale-100 sm:scale-105 lg:scale-115 xl:scale-120 mr-0 lg:-mr-4 xl:-mr-8 transition-transform">
+          <div className="lg:col-span-6 xl:col-span-6 relative flex items-center justify-end min-h-[580px] sm:min-h-[660px] lg:min-h-[720px] overflow-visible w-full">
+            {/* Robot Container with Full Size & Elevation (using margin to prevent stacking context trapping) */}
+            <div className="relative w-full max-w-[580px] sm:max-w-[660px] lg:max-w-[760px] xl:max-w-[840px] flex items-center justify-end -mt-10 sm:-mt-16 lg:-mt-20 xl:-mt-24 mr-0 lg:-mr-4 xl:-mr-8">
               {/* Outer light purple agent boundary ring behind head with 2px white border (Enlarged) */}
-              <div className="absolute top-[3%] left-1/2 -translate-x-1/2 w-[540px] sm:w-[640px] lg:w-[740px] xl:w-[820px] h-[540px] sm:h-[640px] lg:h-[740px] xl:h-[820px] rounded-full bg-gradient-to-b from-purple-200/40 via-purple-100/30 to-indigo-100/20 border-[2px] border-white shadow-[0_0_60px_rgba(168,85,247,0.22)] pointer-events-none z-0">
+              <div className="absolute top-[3%] left-1/2 -translate-x-1/2 w-[540px] sm:w-[640px] lg:w-[740px] xl:w-[820px] h-[540px] sm:h-[640px] lg:h-[740px] xl:h-[820px] rounded-full bg-gradient-to-b from-purple-200/40 via-purple-100/30 to-indigo-100/20 border-[2px] border-white shadow-[0_0_60px_rgba(168,85,247,0.22)] pointer-events-none z-0 scale-100 sm:scale-105 lg:scale-115 xl:scale-120">
                 {/* Glowing node at top */}
                 <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-indigo-500 shadow-[0_0_14px_rgba(99,102,241,0.9)]" />
                 {/* Glowing node at right */}
@@ -322,7 +322,7 @@ Reviewers: @sarahchen, @dev-lead
               <img
                 src={heroRobotAgentImg}
                 alt="TracePath AI Futuristic Android Engine"
-                className="w-full h-auto object-contain select-none pointer-events-none relative z-10 drop-shadow-[0_20px_45px_rgba(79,70,229,0.14)]"
+                className="w-full h-auto object-contain select-none pointer-events-none relative z-10 scale-100 sm:scale-105 lg:scale-115 xl:scale-120 drop-shadow-[0_20px_45px_rgba(79,70,229,0.14)]"
               />
 
               {/* FLOATING CARD 1 (Flank Left of Head/Ear): Analyzing Repository... */}

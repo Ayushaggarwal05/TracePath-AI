@@ -1,8 +1,9 @@
-import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { ToastContainer } from '../components/common/ToastContainer';
-import { Button } from '../components/common/Button';
-import { Github, LayoutDashboard, Home } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { ToastContainer } from "../components/common/ToastContainer";
+import { Button } from "../components/common/Button";
+import { Footer } from "../components/common/Footer";
+import { Github, LayoutDashboard, Home } from "lucide-react";
 
 interface PublicLayoutProps {
   onNavigateToApp: () => void;
@@ -16,11 +17,25 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
   onNavigateToApp,
   onConnectGitHub,
   onNavigateToLanding,
-  currentRoute = 'landing',
+  currentRoute = "landing",
   children,
 }) => {
   const { user, isAuthenticated } = useAuth();
-  const isConnected = isAuthenticated && (user?.github_connected || localStorage.getItem('tracepath_github_connected') === 'true');
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const isConnected =
+    isAuthenticated &&
+    (user?.github_connected ||
+      localStorage.getItem("tracepath_github_connected") === "true");
 
   const handleLogoClick = () => {
     if (onNavigateToLanding) {
@@ -28,20 +43,24 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
     }
   };
 
-  const isLanding = currentRoute === 'landing';
-  const isAuthPage = currentRoute === 'auth';
+  const isLanding = currentRoute === "landing";
+  const isAuthPage = currentRoute === "auth";
 
   return (
     <div
-      className={`min-h-screen flex flex-col justify-between ${
+      className={`min-h-screen ${
         isLanding
-          ? 'bg-[#FAF9F6] text-slate-900 selection:bg-indigo-500/20 selection:text-indigo-900'
-          : 'bg-[#060913] text-slate-100 selection:bg-rose-500/20 selection:text-rose-300'
+          ? "bg-[#FAF9F6] text-slate-900 selection:bg-indigo-500/20 selection:text-indigo-900"
+          : "flex flex-col justify-between bg-[#060913] text-slate-100 selection:bg-rose-500/20 selection:text-rose-300"
       }`}
     >
       {/* Header Bar */}
       {isLanding ? (
-        <header className="border-b border-slate-100 bg-white/90 backdrop-blur-md sticky top-0 z-50">
+        <header
+          className={`border-b border-slate-100 bg-white/90 backdrop-blur-md sticky top-0 transition-all duration-200 ${
+            isScrolled ? "z-50 shadow-sm" : "z-[5]"
+          }`}
+        >
           <div className="w-full px-6 sm:px-10 lg:px-16 h-20 flex items-center justify-between">
             {/* Logo */}
             <div
@@ -110,7 +129,9 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
                 >
                   <LayoutDashboard className="w-4 h-4 text-white/90" />
                   <span>Go to Dashboard</span>
-                  <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                  <span className="group-hover:translate-x-0.5 transition-transform">
+                    →
+                  </span>
                 </button>
               ) : isAuthenticated ? (
                 <button
@@ -119,7 +140,9 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
                 >
                   <Github className="w-4 h-4 text-white/90" />
                   <span>Connect GitHub</span>
-                  <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                  <span className="group-hover:translate-x-0.5 transition-transform">
+                    →
+                  </span>
                 </button>
               ) : (
                 <button
@@ -127,7 +150,9 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
                   className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#A8203A] hover:bg-[#901B31] text-white font-semibold text-xs sm:text-sm shadow-md shadow-[#A8203A]/25 border border-[#A8203A] transition-all cursor-pointer group"
                 >
                   <span>Sign In / Get Started</span>
-                  <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                  <span className="group-hover:translate-x-0.5 transition-transform">
+                    →
+                  </span>
                 </button>
               )}
             </div>
@@ -203,13 +228,12 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
       {/* Main Content */}
       <main className="flex-1">{children}</main>
 
-      {/* Navy Footer */}
-      <footer className="border-t border-slate-800/80 bg-[#0B111F] py-10 px-6 sm:px-12 text-center text-xs font-mono text-slate-400">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© 2026 TracePath AI. Autonomous GitHub-native documentation synchronization.</p>
-          <p className="text-slate-400">Powered by 3 Independent AI Agents</p>
-        </div>
-      </footer>
+      {/* Professional Multi-Column SaaS Footer */}
+      <Footer
+        onNavigateToLanding={onNavigateToLanding}
+        onConnectGitHub={onConnectGitHub}
+        onNavigateToApp={onNavigateToApp}
+      />
 
       <ToastContainer />
     </div>
