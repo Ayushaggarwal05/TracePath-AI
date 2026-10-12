@@ -3,9 +3,6 @@ import { Modal } from "../components/common/Modal";
 import {
   Github,
   Brain,
-  FileCode,
-  GitCommit,
-  GitPullRequest,
   Zap,
   Bot,
   Cpu,
@@ -13,15 +10,18 @@ import {
   ArrowRight,
   Play,
   ShieldCheck,
-  Layers,
   Sparkles,
   Check,
+  CheckCircle2,
   FileText,
   Code2,
-  Shield,
   FolderGit2,
   Lock,
-  GitBranch,
+  Activity,
+  Workflow,
+  ChevronDown,
+  ChevronUp,
+  FileCode2,
 } from "lucide-react";
 import heroRobotAgentImg from "../assets/hero-robot-agent.png";
 
@@ -36,6 +36,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const [demoStep, setDemoStep] = useState<number>(0);
+  const [activePipelineStep, setActivePipelineStep] = useState<number>(0);
+  const [activeDocTab, setActiveDocTab] = useState<string>("readme");
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [billingAnnual, setBillingAnnual] = useState(true);
 
   const handleAction = () => {
     if (onConnectGitHub) {
@@ -44,49 +48,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       onGetStarted();
     }
   };
-
-  const steps = [
-    {
-      num: "01",
-      title: "Code Changes",
-      desc: "Engineers push commits or open pull requests to your connected GitHub repositories.",
-      icon: <GitCommit className="w-5 h-5 text-indigo-600" />,
-      tag: "GitHub Webhook",
-      bgIcon: "bg-indigo-50 border-indigo-100",
-    },
-    {
-      num: "02",
-      title: "AI Understands",
-      desc: "Agent 1 extracts semantic AST diffs, models, endpoints, and architectural changes without hallucinating.",
-      icon: <Brain className="w-5 h-5 text-purple-600" />,
-      tag: "Analysis Agent",
-      bgIcon: "bg-purple-50 border-purple-100",
-    },
-    {
-      num: "03",
-      title: "Doc Impact",
-      desc: "Agent 2 correlates diffs against PRD, Architecture, and ADR docs to eliminate unnecessary noise.",
-      icon: <Cpu className="w-5 h-5 text-amber-600" />,
-      tag: "Decision Agent",
-      bgIcon: "bg-amber-50 border-amber-100",
-    },
-    {
-      num: "04",
-      title: "Doc Update",
-      desc: "Agent 3 generates minimal, targeted documentation edits preserving headings and exact styling.",
-      icon: <FileCheck2 className="w-5 h-5 text-emerald-600" />,
-      tag: "Generator Agent",
-      bgIcon: "bg-emerald-50 border-emerald-100",
-    },
-    {
-      num: "05",
-      title: "Automatic Sync",
-      desc: "Backend directly commits the unified diff or opens a clean reviewable Pull Request on GitHub.",
-      icon: <GitPullRequest className="w-5 h-5 text-blue-600" />,
-      tag: "GitHub Sync",
-      bgIcon: "bg-blue-50 border-blue-100",
-    },
-  ];
 
   const demoStages = [
     {
@@ -172,7 +133,7 @@ diff --git a/backend/app/core/auth.py b/backend/app/core/auth.py
       agent: "GitHub Integration",
       badge: "PR Ready",
       content: `🚀 Pull Request #142 Created Automatically
----------------------------------------------------
+----------------------------------------------------
 Title: docs: sync ARCHITECTURE.md and ADR-004 with commit 7c4e2a1
 Branch: tracepath/docs-update-7c4e2a1 -> main
 Status: All CI checks passed (2 modified documentation files)
@@ -182,13 +143,141 @@ Reviewers: @sarahchen, @dev-lead
     },
   ];
 
+  const docTargets = [
+    {
+      id: "readme",
+      name: "README.md",
+      type: "Markdown Guide",
+      badge: "MD",
+      badgeColor: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
+      description:
+        "Installation, environment variables, quickstart commands, and CLI documentation.",
+      preview: `# Authentication Engine
+
+## Token Rotation
+TracePath AI keeps your developer quickstarts up to date.
+- \`npm install @acme/auth\`
+- Supports **OAuth2 Refresh Token Rotation (RTR)** with automatic revocation.
+
+\`\`\`bash
+# Start with auto-synced configuration
+acme-auth --verify-tokens
+\`\`\``,
+    },
+    {
+      id: "arch",
+      name: "ARCHITECTURE.md",
+      type: "System Blueprint",
+      badge: "DIAG",
+      badgeColor: "bg-purple-500/15 text-purple-400 border-purple-500/30",
+      description:
+        "Component topology, data flow, token lifecycle, and service boundaries.",
+      preview: `## 4. Security & Token Architecture
+
+\`\`\`mermaid
+flowchart LR
+    Client -->|Refresh Token| AuthServer[Auth Service]
+    AuthServer -->|Revoke Old| TokenStore[(Redis Store)]
+    AuthServer -->|Issue New Pair| Client
+\`\`\`
+
+When a refresh token is exchanged, the previous token is immediately added to the revocation blacklist.`,
+    },
+    {
+      id: "prd",
+      name: "PRD.md",
+      type: "Product Specs",
+      badge: "SPEC",
+      badgeColor: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+      description:
+        "User requirements, acceptance criteria, and technical constraints.",
+      preview: `## Feature Spec: Token Revocation Protocol
+
+### User Story
+As an authenticated engineer, I require token family revocation so compromised sessions cannot be replayed.
+
+### Acceptance Criteria
+- [x] Rotate refresh token on every exchange request.
+- [x] Invalidate token family upon detecting replayed revoked tokens.
+- [x] Maintain sub-50ms token generation latency.`,
+    },
+    {
+      id: "adr",
+      name: "ADR-004-AUTH.md",
+      type: "Decision Log",
+      badge: "LOG",
+      badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+      description:
+        "Architecture Decision Records with context, decision, and consequences.",
+      preview: `# ADR-004: Refresh Token Rotation (RTR) Strategy
+
+## Status
+Accepted (Auto-synced from Commit 7c4e2a1)
+
+## Context
+Replay attacks pose risks if long-lived refresh tokens are intercepted.
+
+## Decision
+Adopt strict Refresh Token Rotation with token family tracking.
+
+## Consequences
+- Requires Redis-backed revocation blacklist.
+- Eliminates replay vulnerabilities across public clients.`,
+    },
+    {
+      id: "api",
+      name: "OPENAPI / REST",
+      type: "Endpoints & Models",
+      badge: "API",
+      badgeColor: "bg-rose-500/15 text-rose-400 border-rose-500/30",
+      description:
+        "RESTful route definitions, parameter schemas, and response types.",
+      preview: `paths:
+  /api/v2/auth/refresh:
+    post:
+      summary: Rotate OAuth2 Token Pair
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token, client_id]
+      responses:
+        '200':
+          description: New token pair issued`,
+    },
+  ];
+
+  const faqs = [
+    {
+      q: "How does TracePath AI prevent hallucinations in technical documentation?",
+      a: "TracePath AI uses Tree-sitter AST (Abstract Syntax Tree) parsing to extract exact function signatures, endpoints, and schema diffs directly from code. Agent 2 uses deterministic prompt guardrails with confidence thresholds—if code has no architectural impact, it skips editing rather than guessing.",
+    },
+    {
+      q: "Do you store or train AI models on our proprietary codebase?",
+      a: "Zero Code Retention. Code is processed ephemerally in RAM during webhook evaluation and discarded immediately after generating the pull request. Your proprietary code is never cached, stored on permanent disk, or used to train any model.",
+    },
+    {
+      q: "Can our engineering team review doc edits before anything merges to main?",
+      a: "Yes! By default, TracePath AI opens a reviewable GitHub Pull Request with clear commit explanations, diff highlights, and assigned reviewers. You retain full control to inspect, edit, or approve changes before they hit production.",
+    },
+    {
+      q: "How does TracePath AI handle large monorepos (Turborepo, Nx, Lerna)?",
+      a: "TracePath AI understands package boundaries. When a pull request touches `packages/api`, it correlates changes only to the relevant package READMEs and root architecture specs, avoiding noisy updates across unaffected workspaces.",
+    },
+    {
+      q: "What GitHub permissions and OAuth scopes are required?",
+      a: "Only fine-grained repository access. We require read access to code for diff extraction and write access to pull requests. We never request organization admin, billing, or unrelated repository scopes.",
+    },
+  ];
+
   return (
     <div
       id="home"
       className="bg-[#FFFFFF] text-slate-900 min-h-screen overflow-x-clip overflow-y-visible"
     >
       {/* =========================================================================
-          HERO SECTION (Matching user reference with 3D Robot, Purple Agent Halo & Floating Cards)
+          HERO SECTION (3D Robot, Purple Agent Halo, 4 Floating Cards & Sandwich Z-Stack)
          ========================================================================= */}
       <section className="relative pt-4 sm:pt-6 lg:pt-8 pb-16 sm:pb-24 pl-6 sm:pl-10 lg:pl-16 pr-0 w-full overflow-x-clip overflow-y-visible">
         {/* Soft Background Radial Ambient Glows */}
@@ -248,9 +337,8 @@ Reviewers: @sarahchen, @dev-lead
               </button>
             </div>
 
-            {/* Bottom 4-Column Feature Highlights Bar (Guaranteed in front with z-30) */}
+            {/* Bottom 4-Column Feature Highlights Bar */}
             <div className="pt-8 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-2 items-center relative z-30">
-              {/* Feature 1 */}
               <div className="flex items-center gap-2.5">
                 <Zap className="w-4 h-4 text-indigo-600 shrink-0" />
                 <div>
@@ -263,7 +351,6 @@ Reviewers: @sarahchen, @dev-lead
                 </div>
               </div>
 
-              {/* Feature 2 */}
               <div className="flex items-center gap-2.5 sm:border-l sm:border-slate-200/80 sm:pl-3">
                 <Code2 className="w-4 h-4 text-indigo-600 shrink-0" />
                 <div>
@@ -276,7 +363,6 @@ Reviewers: @sarahchen, @dev-lead
                 </div>
               </div>
 
-              {/* Feature 3 */}
               <div className="flex items-center gap-2.5 sm:border-l sm:border-slate-200/80 sm:pl-3">
                 <Bot className="w-4 h-4 text-emerald-600 shrink-0" />
                 <div>
@@ -289,9 +375,8 @@ Reviewers: @sarahchen, @dev-lead
                 </div>
               </div>
 
-              {/* Feature 4 */}
               <div className="flex items-center gap-2.5 sm:border-l sm:border-slate-200/80 sm:pl-3">
-                <Shield className="w-4 h-4 text-purple-600 shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-purple-600 shrink-0" />
                 <div>
                   <h4 className="text-xs font-bold text-slate-900 leading-tight">
                     Production Ready
@@ -306,26 +391,23 @@ Reviewers: @sarahchen, @dev-lead
 
           {/* RIGHT COLUMN: Full-Scale 3D AI Robot Engine + Halo + 4 Flanking Floating Cards */}
           <div className="lg:col-span-6 xl:col-span-6 relative flex items-center justify-end min-h-[580px] sm:min-h-[660px] lg:min-h-[720px] overflow-visible w-full">
-            {/* Robot Container with Full Size & Elevation (using margin to prevent stacking context trapping) */}
+            {/* Robot Container with Margin Offset to Prevent Stacking Context Trapping */}
             <div className="relative w-full max-w-[580px] sm:max-w-[660px] lg:max-w-[760px] xl:max-w-[840px] flex items-center justify-end -mt-10 sm:-mt-16 lg:-mt-20 xl:-mt-24 mr-0 lg:-mr-4 xl:-mr-8">
-              {/* Outer light purple agent boundary ring behind head with 2px white border (Enlarged) */}
+              {/* Layer 1 (Bottom of Sandwich): Purple Halo Ring at z-0 */}
               <div className="absolute top-[3%] left-1/2 -translate-x-1/2 w-[540px] sm:w-[640px] lg:w-[740px] xl:w-[820px] h-[540px] sm:h-[640px] lg:h-[740px] xl:h-[820px] rounded-full bg-gradient-to-b from-purple-200/40 via-purple-100/30 to-indigo-100/20 border-[2px] border-white shadow-[0_0_60px_rgba(168,85,247,0.22)] pointer-events-none z-0 scale-100 sm:scale-105 lg:scale-115 xl:scale-120">
-                {/* Glowing node at top */}
                 <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-indigo-500 shadow-[0_0_14px_rgba(99,102,241,0.9)]" />
-                {/* Glowing node at right */}
                 <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.9)]" />
-                {/* Glowing node at left */}
                 <div className="absolute top-1/3 -left-1.5 -translate-y-1/2 w-3 h-3 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(192,132,252,0.9)]" />
               </div>
 
-              {/* Armored Robot Image on Transparent Background */}
+              {/* Layer 3 (Top of Sandwich, In Front of Header): Robot Image at z-10 */}
               <img
                 src={heroRobotAgentImg}
                 alt="TracePath AI Futuristic Android Engine"
                 className="w-full h-auto object-contain select-none pointer-events-none relative z-10 scale-100 sm:scale-105 lg:scale-115 xl:scale-120 drop-shadow-[0_20px_45px_rgba(79,70,229,0.14)]"
               />
 
-              {/* FLOATING CARD 1 (Flank Left of Head/Ear): Analyzing Repository... */}
+              {/* FLOATING CARD 1: Analyzing Repository... */}
               <div className="absolute top-[20%] -left-8 sm:-left-12 lg:-left-16 xl:-left-20 z-30 animate-float-slow">
                 <div className="flex flex-col gap-1.5 px-4 py-3 rounded-2xl bg-white/95 backdrop-blur-2xl border border-white/90 shadow-[0_16px_36px_rgba(15,23,42,0.09)] min-w-[210px] sm:min-w-[240px]">
                   <div className="flex items-center gap-2.5">
@@ -336,14 +418,13 @@ Reviewers: @sarahchen, @dev-lead
                       Analyzing Repository...
                     </span>
                   </div>
-                  {/* Glowing Purple Progress Bar */}
                   <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden relative mt-1">
                     <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full w-3/4 animate-pulse" />
                   </div>
                 </div>
               </div>
 
-              {/* FLOATING CARD 2 (Flank Left of Neck/Chest): Generating Documentation... */}
+              {/* FLOATING CARD 2: Generating Documentation... */}
               <div className="absolute top-[42%] -left-10 sm:-left-14 lg:-left-20 xl:-left-32 z-30 animate-float-delayed">
                 <div className="flex flex-col gap-1.5 px-4 py-3 rounded-2xl bg-white/95 backdrop-blur-2xl border border-white/90 shadow-[0_16px_36px_rgba(15,23,42,0.09)] min-w-[220px] sm:min-w-[250px]">
                   <div className="flex items-center gap-2.5">
@@ -354,14 +435,13 @@ Reviewers: @sarahchen, @dev-lead
                       Generating Documentation...
                     </span>
                   </div>
-                  {/* Glowing Teal Progress Bar */}
                   <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden relative mt-1">
                     <div className="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full w-4/5 animate-pulse" />
                   </div>
                 </div>
               </div>
 
-              {/* FLOATING CARD 3 (Flank Right of Head/Ear): Compact GitHub Doc Checklist */}
+              {/* FLOATING CARD 3: Compact GitHub Doc Checklist */}
               <div className="absolute top-[14%] right-2 sm:right-4 lg:right-6 xl:right-16 z-30 animate-float-slow">
                 <div className="p-3.5 sm:p-4 rounded-[18px] bg-white/95 backdrop-blur-xl border border-white/90 shadow-[0_12px_28px_rgba(15,23,42,0.07)] space-y-2.5 min-w-[125px] sm:min-w-[138px]">
                   <div>
@@ -390,7 +470,7 @@ Reviewers: @sarahchen, @dev-lead
                 </div>
               </div>
 
-              {/* FLOATING CARD 4 (Flank Right of Shoulder): Code / Sync Terminal */}
+              {/* FLOATING CARD 4: Code / Sync Terminal */}
               <div className="absolute top-[44%] right-2 sm:right-4 lg:right-6 xl:right-8 z-30 animate-float-delayed">
                 <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-xl border border-white/80 shadow-[0_16px_36px_rgba(15,23,42,0.08)] font-mono text-xs space-y-1 min-w-[185px] sm:min-w-[205px]">
                   <p className="text-indigo-400/80">// sync complete</p>
@@ -407,161 +487,301 @@ Reviewers: @sarahchen, @dev-lead
       </section>
 
       {/* =========================================================================
-          SECTION: HOW IT WORKS (Autonomous 5-Step Pipeline)
+          ECOSYSTEM & STACK COMPATIBILITY RIBBON (Directly Below Hero)
          ========================================================================= */}
-      <section
-        id="how-it-works"
-        className="py-20 bg-[#F9F8F6] border-t border-stone-200/80"
-      >
-        <div className="max-w-7xl mx-auto px-6 sm:px-12 space-y-12">
-          <div className="text-center space-y-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-indigo-50 text-indigo-700 border border-indigo-200/80">
-              <Layers className="w-3.5 h-3.5" />
-              Autonomous Pipeline
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight">
-              How TracePath AI Keeps Docs Synchronized
-            </h2>
-            <p className="text-sm sm:text-base text-slate-500 max-w-xl mx-auto">
-              From code commit to validated documentation pull request in
-              seconds.
-            </p>
+      <section className="py-7 border-y border-stone-200/80 bg-white/60 backdrop-blur-sm">
+        <div className="max-w-8xl mx-auto px-6 sm:px-10 lg:px-16 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-500 uppercase tracking-widest shrink-0">
+            <Activity className="w-4 h-4 text-indigo-500" />
+            <span>Compatible Stacks & Monorepos</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
-            {steps.map((step, idx) => (
-              <div
-                key={idx}
-                onClick={() => {
-                  setDemoStep(idx);
-                  setIsDemoModalOpen(true);
-                }}
-                className="group relative flex flex-col justify-between bg-white border border-stone-200/90 hover:border-indigo-400/80 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all cursor-pointer"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-mono text-xs font-extrabold text-slate-400 group-hover:text-indigo-600 transition-colors">
-                      {step.num}
-                    </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-stone-100 text-slate-600 border border-stone-200">
-                      {step.tag}
-                    </span>
-                  </div>
-                  <div
-                    className={`p-3 rounded-xl border w-fit mb-4 ${step.bgIcon}`}
-                  >
-                    {step.icon}
-                  </div>
-                  <h3 className="text-sm font-bold text-slate-900 mb-1 group-hover:text-indigo-600 transition-colors">
-                    {step.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    {step.desc}
-                  </p>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] font-semibold text-indigo-600 group-hover:text-indigo-700">
-                  <span>View Stage</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-mono font-semibold text-slate-600">
+            <span className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200 transition-colors">
+              TypeScript / JS
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200 transition-colors">
+              Python (FastAPI / Django)
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200 transition-colors">
+              Go (Golang)
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200 transition-colors">
+              Rust
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200/70 transition-colors">
+              Turborepo & Nx
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200 transition-colors">
+              Next.js
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200 transition-colors">
+              Docker / K8s
+            </span>
           </div>
         </div>
       </section>
 
       {/* =========================================================================
-          SECTION: 3 INDEPENDENT AI AGENTS SHOWCASE
+          SECTION 1: INTERACTIVE LIVE CODE ➔ DOCS PIPELINE (How It Works)
          ========================================================================= */}
-      <section id="features" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 sm:px-12 space-y-12">
-          <div className="text-center space-y-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-purple-50 text-purple-700 border border-purple-200/80">
-              <Bot className="w-3.5 h-3.5" />
-              Multi-Agent Architecture
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight">
-              Three Specialized Agents Working in Harmony
+      <section
+        id="features"
+        className="py-24 bg-[#EAE2D4] border-b border-[#D8CEBC]"
+      >
+        <div className="max-w-8xl mx-auto px-6 sm:px-10 lg:px-16 space-y-14">
+          {/* Header */}
+          <div className="text-center space-y-4 max-w-5xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-xs">
+              <Workflow className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Interactive Pipeline Engine</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] font-black text-[#0F172A] tracking-tight leading-[1.08]">
+              Watch Code Changes Translate to Docs in Real-Time
             </h2>
-            <p className="text-sm sm:text-base text-slate-500 max-w-xl mx-auto">
-              Each AI agent executes an isolated responsibility to maintain 100%
-              deterministic accuracy.
+            <p className="text-base sm:text-lg text-indigo-900 leading-relaxed font-medium max-w-2xl mx-auto">
+              Click any stage in the autonomous 5-node pipeline to inspect the
+              live AST diff, decision scoring, and generated pull request.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Agent 1 Card */}
-            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200/90 shadow-xs space-y-4 hover:shadow-md transition-all">
-              <div className="flex items-center justify-between">
-                <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100">
-                  <Brain className="w-6 h-6" />
+          {/* Interactive 5 Stage Navigator */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {demoStages.map((stage, idx) => {
+              const isActive = activePipelineStep === idx;
+              return (
+                <button
+                  key={stage.id}
+                  onClick={() => setActivePipelineStep(idx)}
+                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+                    isActive
+                      ? "bg-white border-indigo-500 shadow-lg shadow-indigo-500/10 ring-2 ring-indigo-500/20"
+                      : "bg-white/90 border-[#D8CEBC] hover:border-slate-400 hover:bg-white"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`text-xs font-mono font-bold ${isActive ? "text-indigo-600" : "text-slate-500"}`}
+                    >
+                      0{idx + 1}
+                    </span>
+                    <span
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
+                        isActive
+                          ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                          : "bg-[#DDD3C2] text-slate-700 font-semibold"
+                      }`}
+                    >
+                      {stage.badge}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3
+                      className={`text-xs font-bold ${isActive ? "text-slate-900" : "text-slate-800"}`}
+                    >
+                      {stage.title}
+                    </h3>
+                    <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                      {stage.agent}
+                    </p>
+                  </div>
+
+                  <div
+                    className={`h-1 w-full rounded-full ${isActive ? "bg-indigo-600" : "bg-[#DDD3C2]"}`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Live Dark Console Playground */}
+          <div className="rounded-3xl bg-[#070B14] border border-slate-800 shadow-2xl overflow-hidden">
+            {/* Console Window Header */}
+            <div className="px-6 py-4 bg-[#0B1120] border-b border-slate-800/80 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-rose-500/80" />
+                  <span className="w-3 h-3 rounded-full bg-amber-500/80" />
+                  <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
                 </div>
-                <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-indigo-100/70 text-indigo-800">
-                  Agent 1
+                <span className="text-xs font-mono text-slate-400 hidden sm:inline">
+                  tracepath-daemon · {demoStages[activePipelineStep].agent}
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-slate-900">
-                Change Analyzer Agent
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Parses the raw commit diff and extracts semantic intent, changed
-                functions, API routes, data models, and architectural
-                implications.
-              </p>
-              <div className="pt-2 border-t border-stone-200/60 font-mono text-[11px] text-slate-500 space-y-1">
-                <p>✓ AST syntax tree parsing</p>
-                <p>✓ Structured JSON schema output</p>
-                <p>✓ Zero-hallucination verification</p>
+
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 text-[11px] font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Deterministic 100%</span>
+                </span>
+                <span className="text-xs font-mono text-slate-400 px-2 py-1 rounded bg-slate-900 border border-slate-800">
+                  Step {activePipelineStep + 1} of 5
+                </span>
+              </div>
+            </div>
+
+            {/* Console Code View */}
+            <div className="p-6 sm:p-8 font-mono text-xs sm:text-sm text-slate-200 overflow-x-auto leading-relaxed">
+              <pre className="whitespace-pre-wrap">
+                {demoStages[activePipelineStep].content}
+              </pre>
+            </div>
+
+            {/* Bottom Pipeline Progress Bar */}
+            <div className="px-6 py-3.5 bg-[#0B1120]/70 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono text-slate-400">
+              <span>Ready for automatic review & merge</span>
+              <button
+                onClick={() =>
+                  setActivePipelineStep(
+                    (prev) => (prev + 1) % demoStages.length,
+                  )
+                }
+                className="flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 transition-colors font-semibold cursor-pointer"
+              >
+                <span>Next Stage ➔</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION 2: MULTI-AGENT COMMAND CENTER (3 Specialized AI Agents)
+         ========================================================================= */}
+      <section className="py-24 bg-white border-b border-stone-200/80">
+        <div className="max-w-8xl mx-auto px-6 sm:px-10 lg:px-16 space-y-14">
+          {/* Header */}
+          <div className="text-center space-y-3 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-purple-50 text-purple-700 border border-purple-200/80 shadow-xs">
+              <Bot className="w-3.5 h-3.5 text-purple-600" />
+              <span>Multi-Agent Architecture</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] tracking-tight">
+              Three Specialized AI Agents Working in Harmony
+            </h2>
+            <p className="text-base text-slate-500 leading-relaxed">
+              Each AI agent executes an isolated, specialized responsibility to
+              ensure zero hallucinations and surgical precision.
+            </p>
+          </div>
+
+          {/* 3-Agent Bento Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Agent 1 Card */}
+            <div className="group relative p-8 rounded-3xl bg-[#FAF9F6] border border-stone-200 hover:border-indigo-500/50 hover:shadow-xl transition-all duration-300 space-y-5 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600">
+                    <Brain className="w-6 h-6" />
+                  </div>
+                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-indigo-100 text-indigo-800">
+                    Agent 1
+                  </span>
+                </div>
+
+                <h3 className="text-xl font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                  Change Analyzer Agent
+                </h3>
+
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Parses raw AST syntax diffs across Git commits. Extracts
+                  modified routes, function signatures, data models, and
+                  architectural implications without guessing.
+                </p>
+
+                <div className="p-3 rounded-xl bg-white border border-stone-200 font-mono text-[11px] text-slate-600 space-y-1.5 shadow-inner">
+                  <div className="flex items-center justify-between text-indigo-700 font-bold">
+                    <span>Tree-Sitter Engine</span>
+                    <span className="text-emerald-600">Active</span>
+                  </div>
+                  <p>• Function: rotate_refresh_token()</p>
+                  <p>• Intent: FEATURE_ENHANCEMENT</p>
+                  <p>• Schema: OAuth2 Token Rotation</p>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-stone-200/70 flex items-center justify-between text-xs font-mono text-slate-500">
+                <span>Zero Hallucination</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
               </div>
             </div>
 
             {/* Agent 2 Card */}
-            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200/90 shadow-xs space-y-4 hover:shadow-md transition-all">
-              <div className="flex items-center justify-between">
-                <div className="p-3 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100">
-                  <Cpu className="w-6 h-6" />
+            <div className="group relative p-8 rounded-3xl bg-[#FAF9F6] border border-stone-200 hover:border-amber-500/50 hover:shadow-xl transition-all duration-300 space-y-5 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600">
+                    <Cpu className="w-6 h-6" />
+                  </div>
+                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800">
+                    Agent 2
+                  </span>
                 </div>
-                <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-amber-100/70 text-amber-800">
-                  Agent 2
-                </span>
+
+                <h3 className="text-xl font-extrabold text-slate-900 group-hover:text-amber-600 transition-colors">
+                  Impact Planner Agent
+                </h3>
+
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Correlates code changes against your existing documentation
+                  matrix. Evaluates PRDs, Architecture diagrams, and ADRs with
+                  confidence scores to eliminate spam PRs.
+                </p>
+
+                <div className="p-3 rounded-xl bg-white border border-stone-200 font-mono text-[11px] text-slate-600 space-y-1.5 shadow-inner">
+                  <div className="flex items-center justify-between text-amber-700 font-bold">
+                    <span>Impact Decision Matrix</span>
+                    <span className="text-emerald-600">99.4% Match</span>
+                  </div>
+                  <p>• ARCHITECTURE.md: UPDATE REQUIRED</p>
+                  <p>• ADR-004-AUTH.md: UPDATE REQUIRED</p>
+                  <p>• PRD.md: SKIPPED (Up to Date)</p>
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-slate-900">
-                Impact Planner Agent
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Evaluates existing documentation against the code analysis to
-                determine which specific files require updates, and skips when
-                docs are already accurate.
-              </p>
-              <div className="pt-2 border-t border-stone-200/60 font-mono text-[11px] text-slate-500 space-y-1">
-                <p>✓ Prevents spam PRs on refactors</p>
-                <p>✓ Multi-document cross checking</p>
-                <p>✓ Confidence score thresholds</p>
+
+              <div className="pt-4 border-t border-stone-200/70 flex items-center justify-between text-xs font-mono text-slate-500">
+                <span>Spam Filtered</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
               </div>
             </div>
 
             {/* Agent 3 Card */}
-            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200/90 shadow-xs space-y-4 hover:shadow-md transition-all">
-              <div className="flex items-center justify-between">
-                <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
-                  <FileCode className="w-6 h-6" />
+            <div className="group relative p-8 rounded-3xl bg-[#FAF9F6] border border-stone-200 hover:border-emerald-500/50 hover:shadow-xl transition-all duration-300 space-y-5 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600">
+                    <FileCheck2 className="w-6 h-6" />
+                  </div>
+                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800">
+                    Agent 3
+                  </span>
                 </div>
-                <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-100/70 text-emerald-800">
-                  Agent 3
-                </span>
+
+                <h3 className="text-xl font-extrabold text-slate-900 group-hover:text-emerald-600 transition-colors">
+                  Documentation Generator
+                </h3>
+
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Applies minimal, surgical Markdown diffs preserving your exact
+                  formatting, line breaks, and heading hierarchy. Opens
+                  ready-to-merge GitHub Pull Requests autonomously.
+                </p>
+
+                <div className="p-3 rounded-xl bg-white border border-stone-200 font-mono text-[11px] text-slate-600 space-y-1.5 shadow-inner">
+                  <div className="flex items-center justify-between text-emerald-700 font-bold">
+                    <span>Pull Request Author</span>
+                    <span className="text-indigo-600">PR Ready</span>
+                  </div>
+                  <p>• Unified git diff formatting</p>
+                  <p>• Preserves headings & styling</p>
+                  <p>• Automated CI check pass</p>
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-slate-900">
-                Documentation Generator
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Applies minimal, surgical Markdown diffs to the affected files
-                while strictly maintaining existing headings, formatting, and
-                codebase style.
-              </p>
-              <div className="pt-2 border-t border-stone-200/60 font-mono text-[11px] text-slate-500 space-y-1">
-                <p>✓ Unified git diff formatting</p>
-                <p>✓ Preserves Markdown formatting</p>
-                <p>✓ Direct commit or Pull Request</p>
+
+              <div className="pt-4 border-t border-stone-200/70 flex items-center justify-between text-xs font-mono text-slate-500">
+                <span>Autonomous Git Sync</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
               </div>
             </div>
           </div>
@@ -569,69 +789,155 @@ Reviewers: @sarahchen, @dev-lead
       </section>
 
       {/* =========================================================================
-          SECTION: ENTERPRISE & SECURITY HIGHLIGHTS (Docs & Pricing Anchor)
+          SECTION 3: TARGET DOCUMENT SPEC SWITCHER (Interactive File Previews)
          ========================================================================= */}
-      <section
-        id="docs"
-        className="py-20 bg-[#FAF9F6] border-t border-stone-200/80"
-      >
-        <div className="max-w-7xl mx-auto px-6 sm:px-12 space-y-12">
-          <div className="text-center space-y-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-indigo-50 text-indigo-700 border border-indigo-200/80">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Security First
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight">
-              Enterprise-Grade Security & Privacy
+      <section className="py-24 bg-[#EAE2D4] border-b border-[#D8CEBC]">
+        <div className="max-w-8xl mx-auto px-6 sm:px-10 lg:px-16 space-y-14">
+          <div className="text-center space-y-3 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-cyan-50 text-cyan-800 border border-cyan-200/80 shadow-xs">
+              <FileCode2 className="w-3.5 h-3.5 text-cyan-600" />
+              <span>Supported Document Formats</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] tracking-tight">
+              Surgically Maintained Without Format Drift
             </h2>
-            <p className="text-sm sm:text-base text-slate-500 max-w-xl mx-auto">
-              Your source code and tokens are protected with industry-standard
-              cryptographic guarantees.
+            <p className="text-base text-indigo-900 leading-relaxed font-medium">
+              TracePath AI updates your standard documentation targets while
+              strictly respecting your team's markdown conventions.
+            </p>
+          </div>
+
+          {/* Interactive Document Tabs */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Tab List */}
+            <div className="lg:col-span-5 space-y-3">
+              {docTargets.map((doc) => {
+                const isSelected = activeDocTab === doc.id;
+                return (
+                  <button
+                    key={doc.id}
+                    onClick={() => setActiveDocTab(doc.id)}
+                    className={`w-full p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-4 ${
+                      isSelected
+                        ? "bg-white border-indigo-500 shadow-lg shadow-indigo-500/10 ring-2 ring-indigo-500/15"
+                        : "bg-white/90 border-[#D8CEBC] hover:border-slate-400 hover:bg-white"
+                    }`}
+                  >
+                    <div
+                      className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border shrink-0 ${doc.badgeColor}`}
+                    >
+                      {doc.badge}
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm font-bold text-slate-900">
+                          {doc.name}
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-sans">
+                          ({doc.type})
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        {doc.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Right Live File Preview Card */}
+            <div className="lg:col-span-7 rounded-3xl bg-[#0B1120] border border-slate-800 shadow-2xl p-6 sm:p-8 text-slate-200 font-mono text-xs sm:text-sm leading-relaxed space-y-4">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-800 text-xs">
+                <div className="flex items-center gap-2 text-slate-300">
+                  <FileText className="w-4 h-4 text-indigo-400" />
+                  <span className="font-bold">
+                    {docTargets.find((d) => d.id === activeDocTab)?.name}
+                  </span>
+                </div>
+                <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/40 text-[10px]">
+                  Syntax Verified
+                </span>
+              </div>
+
+              <pre className="whitespace-pre-wrap overflow-x-auto text-slate-300">
+                {docTargets.find((d) => d.id === activeDocTab)?.preview}
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION 4: ENTERPRISE CRYPTOGRAPHIC SECURITY (Bento Grid)
+         ========================================================================= */}
+      <section className="py-24 bg-white border-b border-stone-200/80">
+        <div className="max-w-8xl mx-auto px-6 sm:px-10 lg:px-16 space-y-14">
+          <div className="text-center space-y-3 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Zero Trust Security</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] tracking-tight">
+              Enterprise Cryptographic Privacy & Security
+            </h2>
+            <p className="text-base text-slate-500 leading-relaxed">
+              Engineered with strict zero-code-retention protocols so your
+              proprietary repository logic is never exposed.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="p-6 rounded-2xl bg-white border border-stone-200/90 shadow-xs space-y-2">
-              <Lock className="w-5 h-5 text-indigo-600" />
-              <h4 className="text-sm font-bold text-slate-900">
-                AES-256 Encryption
+            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200 space-y-3 shadow-xs hover:shadow-md transition-all">
+              <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 w-fit">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h4 className="text-base font-bold text-slate-900">
+                Zero Code Retention
               </h4>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                GitHub Personal Access Tokens are encrypted at rest using Fernet
-                authenticated cryptography.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Repository code is processed ephemerally in RAM and immediately
+                discarded. Never cached, stored, or trained on.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white border border-stone-200/90 shadow-xs space-y-2">
-              <FolderGit2 className="w-5 h-5 text-purple-600" />
-              <h4 className="text-sm font-bold text-slate-900">
-                Multi-Tenant Isolation
+            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200 space-y-3 shadow-xs hover:shadow-md transition-all">
+              <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 w-fit">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h4 className="text-base font-bold text-slate-900">
+                AES-256 Token Encryption
               </h4>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Row-Level Security (RLS) and user-scoped database queries ensure
-                strict tenant separation.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                GitHub credentials and personal access tokens are encrypted at
+                rest using Fernet-authenticated cryptographic keys.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white border border-stone-200/90 shadow-xs space-y-2">
-              <GitBranch className="w-5 h-5 text-emerald-600" />
-              <h4 className="text-sm font-bold text-slate-900">
-                Granular Scopes
+            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200 space-y-3 shadow-xs hover:shadow-md transition-all">
+              <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-600 border border-purple-500/20 w-fit">
+                <FolderGit2 className="w-6 h-6" />
+              </div>
+              <h4 className="text-base font-bold text-slate-900">
+                Fine-Grained Scopes
               </h4>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Supports Fine-Grained GitHub Tokens limited only to specific
-                documentation repositories.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Connect only specific repositories with minimal read/write pull
+                request permissions. No organization admin scopes needed.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white border border-stone-200/90 shadow-xs space-y-2">
-              <Zap className="w-5 h-5 text-amber-600" />
-              <h4 className="text-sm font-bold text-slate-900">
+            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200 space-y-3 shadow-xs hover:shadow-md transition-all">
+              <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600 border border-amber-500/20 w-fit">
+                <Zap className="w-6 h-6" />
+              </div>
+              <h4 className="text-base font-bold text-slate-900">
                 HMAC-SHA256 Signatures
               </h4>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Every webhook payload is authenticated against your GitHub
-                secret in constant time.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Every incoming webhook request is validated against your GitHub
+                secret using constant-time cryptographic verification.
               </p>
             </div>
           </div>
@@ -639,41 +945,297 @@ Reviewers: @sarahchen, @dev-lead
       </section>
 
       {/* =========================================================================
-          SECTION: PRICING / CALL TO ACTION BANNER
+          SECTION 5: DEVELOPER PRICING TIERS (#pricing)
          ========================================================================= */}
       <section
         id="pricing"
-        className="py-20 bg-white border-t border-stone-200/80"
+        className="py-24 bg-[#EAE2D4] border-b border-[#D8CEBC]"
       >
-        <div className="max-w-5xl mx-auto px-6 sm:px-12">
-          <div className="relative rounded-3xl bg-[#0B111F] text-white p-8 sm:p-14 overflow-hidden shadow-2xl">
-            {/* Ambient Background Glow in Dark Banner */}
+        <div className="max-w-8xl mx-auto px-6 sm:px-10 lg:px-16 space-y-14">
+          {/* Header & Toggle */}
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Transparent Developer Pricing</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] tracking-tight">
+              Predictable Plans for Every Stage
+            </h2>
+            <p className="text-base text-indigo-900 leading-relaxed font-medium">
+              Start free forever on open-source and individual projects. Scale
+              up for multi-package monorepos and team workflows.
+            </p>
+
+            {/* Monthly / Annual Toggle */}
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <span
+                className={`text-xs font-semibold ${!billingAnnual ? "text-slate-900" : "text-slate-500"}`}
+              >
+                Monthly
+              </span>
+              <button
+                onClick={() => setBillingAnnual(!billingAnnual)}
+                className="w-12 h-6 rounded-full bg-slate-300 p-1 relative transition-colors cursor-pointer"
+              >
+                <div
+                  className={`w-4 h-4 rounded-full bg-indigo-600 transition-transform ${billingAnnual ? "translate-x-6" : "translate-x-0"}`}
+                />
+              </button>
+              <span
+                className={`text-xs font-semibold ${billingAnnual ? "text-indigo-600" : "text-slate-500"}`}
+              >
+                Annual{" "}
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono">
+                  Save 20%
+                </span>
+              </span>
+            </div>
+          </div>
+
+          {/* Pricing Cards Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            {/* Plan 1: Developer / Open Source */}
+            <div className="p-8 rounded-3xl bg-white border border-[#D8CEBC] space-y-6 flex flex-col justify-between shadow-xs hover:shadow-lg transition-all">
+              <div className="space-y-4">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
+                  Open Source & Personal
+                </span>
+                <h3 className="text-2xl font-extrabold text-slate-900">
+                  Developer
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Everything you need to automate documentation across public
+                  repositories and side projects.
+                </p>
+
+                <div className="pt-2 flex items-baseline gap-1">
+                  <span className="text-4xl font-extrabold text-slate-900">
+                    $0
+                  </span>
+                  <span className="text-xs font-mono text-slate-400">
+                    / forever
+                  </span>
+                </div>
+
+                <ul className="space-y-2.5 pt-4 border-t border-stone-100 text-xs text-slate-700">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Unlimited Public Repositories</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Automated AST Diff Analysis</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>README & PRD Synchronization</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>GitHub Pull Request Authoring</span>
+                  </li>
+                </ul>
+              </div>
+
+              <button
+                onClick={handleAction}
+                className="w-full py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
+              >
+                Get Started Free
+              </button>
+            </div>
+
+            {/* Plan 2: Team / Monorepo (Featured) */}
+            <div className="p-8 rounded-3xl bg-[#0B1120] text-white border-2 border-indigo-500 space-y-6 flex flex-col justify-between shadow-2xl relative">
+              <div className="absolute -top-3.5 right-6 px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-[10px] font-mono font-extrabold uppercase tracking-wider text-white shadow-md">
+                Most Popular
+              </div>
+
+              <div className="space-y-4">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
+                  Growing Teams & Monorepos
+                </span>
+                <h3 className="text-2xl font-extrabold text-white">Team Pro</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Full multi-repository engine with Turborepo support and
+                  priority webhook execution.
+                </p>
+
+                <div className="pt-2 flex items-baseline gap-1">
+                  <span className="text-4xl font-extrabold text-white">
+                    {billingAnnual ? "$24" : "$29"}
+                  </span>
+                  <span className="text-xs font-mono text-slate-400">
+                    / repository · mo
+                  </span>
+                </div>
+
+                <ul className="space-y-2.5 pt-4 border-t border-slate-800 text-xs text-slate-300">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
+                    <span>Everything in Developer, plus:</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
+                    <span>Private Repositories Supported</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
+                    <span>Turborepo & Nx Monorepo Awareness</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
+                    <span>ARCHITECTURE & ADR-*.md Sync</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-indigo-400 shrink-0" />
+                    <span>Priority Webhook Execution Queue</span>
+                  </li>
+                </ul>
+              </div>
+
+              <button
+                onClick={handleAction}
+                className="w-full py-3.5 rounded-2xl bg-[#A8203A] hover:bg-[#901B31] text-white font-bold text-xs shadow-lg shadow-[#A8203A]/30 transition-all cursor-pointer"
+              >
+                Connect GitHub & Start
+              </button>
+            </div>
+
+            {/* Plan 3: Enterprise */}
+            <div className="p-8 rounded-3xl bg-white border border-[#D8CEBC] space-y-6 flex flex-col justify-between shadow-xs hover:shadow-lg transition-all">
+              <div className="space-y-4">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
+                  Custom Architecture & SLA
+                </span>
+                <h3 className="text-2xl font-extrabold text-slate-900">
+                  Enterprise
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Tailored deployments for enterprise organizations with custom
+                  security and compliance needs.
+                </p>
+
+                <div className="pt-2 flex items-baseline gap-1">
+                  <span className="text-4xl font-extrabold text-slate-900">
+                    Custom
+                  </span>
+                  <span className="text-xs font-mono text-slate-400">
+                    / annual SLA
+                  </span>
+                </div>
+
+                <ul className="space-y-2.5 pt-4 border-t border-stone-100 text-xs text-slate-700">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Self-Hosted & VPC Runners</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Bring-Your-Own LLM API Keys</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>SSO, SAML & Okta Integration</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Dedicated 99.99% Uptime SLA</span>
+                  </li>
+                </ul>
+              </div>
+
+              <button
+                onClick={handleAction}
+                className="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors cursor-pointer"
+              >
+                Talk to Engineering
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION 6: DEVELOPER FAQ ACCORDION
+         ========================================================================= */}
+      <section className="py-24 bg-white border-b border-stone-200/80">
+        <div className="max-w-4xl mx-auto px-6 sm:px-10 space-y-12">
+          <div className="text-center space-y-3">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-indigo-600">
+              Frequently Asked Questions
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight">
+              Questions Developers Ask
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {faqs.map((faq, idx) => {
+              const isOpen = openFaqIndex === idx;
+              return (
+                <div
+                  key={idx}
+                  className="rounded-2xl border border-stone-200/90 overflow-hidden transition-all bg-[#FAF9F6]"
+                >
+                  <button
+                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                    className="w-full p-5 text-left font-bold text-sm text-slate-900 flex items-center justify-between gap-4 cursor-pointer hover:text-indigo-600 transition-colors"
+                  >
+                    <span>{faq.q}</span>
+                    {isOpen ? (
+                      <ChevronUp className="w-4 h-4 text-indigo-600 shrink-0" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                    )}
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-stone-200/50 pt-3">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION 7: BOTTOM CALL TO ACTION BANNER
+         ========================================================================= */}
+      <section className="py-20 bg-[#FAF9F6]">
+        <div className="max-w-6xl mx-auto px-6 sm:px-10">
+          <div className="relative rounded-3xl bg-[#070B14] text-white p-8 sm:p-14 overflow-hidden shadow-2xl border border-slate-800">
+            {/* Background Glows */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 text-center space-y-6 max-w-2xl mx-auto">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-indigo-900/60 text-indigo-300 border border-indigo-700/50">
-                <Sparkles className="w-3.5 h-3.5" />
-                Free for Public & Private Repositories
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-indigo-950/80 text-indigo-300 border border-indigo-700/50">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Zero Manual Documentation Drift</span>
               </span>
 
               <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-                Never write or debug stale documentation again.
+                Ready to sync your documentation forever?
               </h2>
 
               <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
-                Connect your GitHub account in 30 seconds and let TracePath AI
-                maintain your documentation autonomously.
+                Connect your GitHub repository in 30 seconds. TracePath AI
+                handles AST parsing, decision correlation, and pull request
+                authoring automatically.
               </p>
 
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <button
                   onClick={handleAction}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-[#A8203A] hover:bg-[#901B31] text-white font-bold text-base shadow-xl shadow-[#A8203A]/30 border border-[#A8203A] transition-all cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-[#A8203A] hover:bg-[#901B31] text-white font-bold text-base shadow-xl shadow-[#A8203A]/30 border border-[#A8203A] transition-all cursor-pointer group"
                 >
                   <Github className="w-5 h-5 text-white" />
-                  <span>Get Started with GitHub</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>Connect GitHub</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
@@ -682,7 +1244,7 @@ Reviewers: @sarahchen, @dev-lead
       </section>
 
       {/* =========================================================================
-          INTERACTIVE DEMO MODAL
+          INTERACTIVE DEMO MODAL (For Header Demo Button)
          ========================================================================= */}
       <Modal
         isOpen={isDemoModalOpen}
@@ -691,7 +1253,6 @@ Reviewers: @sarahchen, @dev-lead
         maxWidth="2xl"
       >
         <div className="space-y-6">
-          {/* Stage Tabs */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 p-1.5 bg-stone-100 rounded-2xl">
             {demoStages.map((stage, idx) => (
               <button
@@ -708,7 +1269,6 @@ Reviewers: @sarahchen, @dev-lead
             ))}
           </div>
 
-          {/* Active Stage Details */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -724,13 +1284,11 @@ Reviewers: @sarahchen, @dev-lead
               </span>
             </div>
 
-            {/* Code / Output Container */}
-            <pre className="p-4 rounded-2xl bg-[#0B111F] text-slate-200 text-xs font-mono overflow-x-auto leading-relaxed border border-slate-800 shadow-inner">
+            <pre className="p-4 rounded-2xl bg-[#0B1120] text-slate-200 text-xs font-mono overflow-x-auto leading-relaxed border border-slate-800 shadow-inner">
               {demoStages[demoStep].content}
             </pre>
           </div>
 
-          {/* Navigation Controls */}
           <div className="flex items-center justify-between pt-4 border-t border-stone-200">
             <button
               disabled={demoStep === 0}

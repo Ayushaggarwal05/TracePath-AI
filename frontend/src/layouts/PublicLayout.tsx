@@ -86,35 +86,23 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
               </div>
             </div>
 
-            {/* Center Navigation Menu */}
-            <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+            {/* Center Navigation Menu (Streamlined: Home, Features, Pricing) */}
+            <nav className="hidden md:flex items-center gap-9 text-sm font-semibold text-slate-600">
               <a
                 href="#home"
-                className="relative text-indigo-600 font-bold hover:text-indigo-700 transition-colors py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-indigo-600 after:rounded-full"
+                className="text-slate-600 hover:text-indigo-600 transition-colors py-1"
               >
                 Home
               </a>
               <a
                 href="#features"
-                className="text-slate-600 hover:text-slate-900 transition-colors"
+                className="text-slate-600 hover:text-indigo-600 transition-colors py-1"
               >
                 Features
               </a>
               <a
-                href="#how-it-works"
-                className="text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                How It Works
-              </a>
-              <a
-                href="#docs"
-                className="text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                Docs
-              </a>
-              <a
                 href="#pricing"
-                className="text-slate-600 hover:text-slate-900 transition-colors"
+                className="text-slate-600 hover:text-indigo-600 transition-colors py-1"
               >
                 Pricing
               </a>
