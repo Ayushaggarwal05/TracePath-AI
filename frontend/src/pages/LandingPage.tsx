@@ -393,8 +393,8 @@ Adopt strict Refresh Token Rotation with token family tracking.
           <div className="lg:col-span-6 xl:col-span-6 relative flex items-center justify-end min-h-[580px] sm:min-h-[660px] lg:min-h-[720px] overflow-visible w-full">
             {/* Robot Container with Margin Offset to Prevent Stacking Context Trapping */}
             <div className="relative w-full max-w-[580px] sm:max-w-[660px] lg:max-w-[760px] xl:max-w-[840px] flex items-center justify-end -mt-10 sm:-mt-16 lg:-mt-20 xl:-mt-24 mr-0 lg:-mr-4 xl:-mr-8">
-              {/* Layer 1 (Bottom of Sandwich): Purple Halo Ring at z-0 */}
-              <div className="absolute top-[3%] left-1/2 -translate-x-1/2 w-[540px] sm:w-[640px] lg:w-[740px] xl:w-[820px] h-[540px] sm:h-[640px] lg:h-[740px] xl:h-[820px] rounded-full bg-gradient-to-b from-purple-200/40 via-purple-100/30 to-indigo-100/20 border-[2px] border-white shadow-[0_0_60px_rgba(168,85,247,0.22)] pointer-events-none z-0 scale-100 sm:scale-105 lg:scale-115 xl:scale-120">
+              {/* Layer 1 (Bottom of Sandwich): Purple Halo Ring at z-0 with bottom chord clipped */}
+              <div className="absolute top-[3%] left-1/2 -translate-x-1/2 w-[540px] sm:w-[640px] lg:w-[740px] xl:w-[820px] h-[540px] sm:h-[640px] lg:h-[740px] xl:h-[820px] rounded-full bg-gradient-to-b from-purple-200/40 via-purple-100/30 to-indigo-100/20 border-[2px] border-white shadow-[0_0_60px_rgba(168,85,247,0.22)] pointer-events-none z-0 scale-100 sm:scale-105 lg:scale-115 xl:scale-120 [clip-path:inset(-80px_-80px_20%_-80px)]">
                 <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-indigo-500 shadow-[0_0_14px_rgba(99,102,241,0.9)]" />
                 <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.9)]" />
                 <div className="absolute top-1/3 -left-1.5 -translate-y-1/2 w-3 h-3 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(192,132,252,0.9)]" />
@@ -993,7 +993,7 @@ Adopt strict Refresh Token Rotation with token family tracking.
           </div>
 
           {/* Pricing Cards Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.06fr_1fr] gap-6 xl:gap-8 items-center pt-6 pb-8">
             {/* Plan 1: Developer / Open Source */}
             <div className="p-8 rounded-3xl bg-white border border-[#D8CEBC] space-y-6 flex flex-col justify-between shadow-xs hover:shadow-lg transition-all">
               <div className="space-y-4">
@@ -1045,24 +1045,25 @@ Adopt strict Refresh Token Rotation with token family tracking.
               </button>
             </div>
 
-            {/* Plan 2: Team / Monorepo (Featured) */}
-            <div className="p-8 rounded-3xl bg-[#0B1120] text-white border-2 border-indigo-500 space-y-6 flex flex-col justify-between shadow-2xl relative">
-              <div className="absolute -top-3.5 right-6 px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-[10px] font-mono font-extrabold uppercase tracking-wider text-white shadow-md">
-                Most Popular
+            {/* Plan 2: Team / Monorepo (Featured & Zoomed Pop-Up) */}
+            <div className="p-8 sm:p-9 lg:p-10 lg:py-12 rounded-3xl bg-[#0B1120] text-white border-2 border-indigo-500 space-y-7 flex flex-col justify-between shadow-[0_25px_60px_-15px_rgba(79,70,229,0.35)] relative z-20 lg:scale-[1.05] xl:scale-[1.07] ring-1 ring-indigo-400/40 transition-all duration-300 hover:scale-[1.08] hover:shadow-[0_30px_70px_-15px_rgba(79,70,229,0.45)]">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-[11px] font-mono font-extrabold uppercase tracking-wider text-white shadow-lg shadow-indigo-500/30 flex items-center gap-1.5 whitespace-nowrap">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-200" />
+                <span>Most Popular</span>
               </div>
 
               <div className="space-y-4">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
                   Growing Teams & Monorepos
                 </span>
-                <h3 className="text-2xl font-extrabold text-white">Team Pro</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h3 className="text-2xl sm:text-3xl font-black text-white">Team Pro</h3>
+                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                   Full multi-repository engine with Turborepo support and
                   priority webhook execution.
                 </p>
 
                 <div className="pt-2 flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-white">
+                  <span className="text-4xl sm:text-5xl font-black text-white">
                     {billingAnnual ? "$24" : "$29"}
                   </span>
                   <span className="text-xs font-mono text-slate-400">
@@ -1070,24 +1071,24 @@ Adopt strict Refresh Token Rotation with token family tracking.
                   </span>
                 </div>
 
-                <ul className="space-y-2.5 pt-4 border-t border-slate-800 text-xs text-slate-300">
-                  <li className="flex items-center gap-2">
+                <ul className="space-y-3 pt-4 border-t border-slate-800 text-xs sm:text-[13px] text-slate-300">
+                  <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-indigo-400 shrink-0" />
                     <span>Everything in Developer, plus:</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-indigo-400 shrink-0" />
                     <span>Private Repositories Supported</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-indigo-400 shrink-0" />
                     <span>Turborepo & Nx Monorepo Awareness</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-indigo-400 shrink-0" />
                     <span>ARCHITECTURE & ADR-*.md Sync</span>
                   </li>
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-indigo-400 shrink-0" />
                     <span>Priority Webhook Execution Queue</span>
                   </li>
@@ -1096,7 +1097,7 @@ Adopt strict Refresh Token Rotation with token family tracking.
 
               <button
                 onClick={handleAction}
-                className="w-full py-3.5 rounded-2xl bg-[#A8203A] hover:bg-[#901B31] text-white font-bold text-xs shadow-lg shadow-[#A8203A]/30 transition-all cursor-pointer"
+                className="w-full py-4 rounded-2xl bg-[#A8203A] hover:bg-[#901B31] text-white font-extrabold text-sm shadow-xl shadow-[#A8203A]/30 transition-all cursor-pointer hover:shadow-2xl hover:scale-[1.01] active:scale-[0.99]"
               >
                 Connect GitHub & Start
               </button>
