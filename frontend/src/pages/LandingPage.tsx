@@ -20,7 +20,6 @@ import {
   Activity,
   Workflow,
   ChevronDown,
-  ChevronUp,
   FileCode2,
 } from "lucide-react";
 import heroRobotAgentImg from "../assets/hero-robot-agent.png";
@@ -251,22 +250,32 @@ Adopt strict Refresh Token Rotation with token family tracking.
   const faqs = [
     {
       q: "How does TracePath AI prevent hallucinations in technical documentation?",
+      tag: "AST Accuracy",
+      highlight: "Tree-sitter AST Syntax Verification · 0% Guesswork",
       a: "TracePath AI uses Tree-sitter AST (Abstract Syntax Tree) parsing to extract exact function signatures, endpoints, and schema diffs directly from code. Agent 2 uses deterministic prompt guardrails with confidence thresholds—if code has no architectural impact, it skips editing rather than guessing.",
     },
     {
       q: "Do you store or train AI models on our proprietary codebase?",
+      tag: "Zero-Trust Security",
+      highlight: "Ephemeral In-Memory RAM · Never Stored or Used for Training",
       a: "Zero Code Retention. Code is processed ephemerally in RAM during webhook evaluation and discarded immediately after generating the pull request. Your proprietary code is never cached, stored on permanent disk, or used to train any model.",
     },
     {
       q: "Can our engineering team review doc edits before anything merges to main?",
+      tag: "Pull Request Guardrails",
+      highlight: "Reviewable GitHub PR · Complete Human-in-the-Loop Control",
       a: "Yes! By default, TracePath AI opens a reviewable GitHub Pull Request with clear commit explanations, diff highlights, and assigned reviewers. You retain full control to inspect, edit, or approve changes before they hit production.",
     },
     {
       q: "How does TracePath AI handle large monorepos (Turborepo, Nx, Lerna)?",
+      tag: "Monorepo Scalability",
+      highlight: "Boundary-Aware Correlator · Zero Noisy Workspace Updates",
       a: "TracePath AI understands package boundaries. When a pull request touches `packages/api`, it correlates changes only to the relevant package READMEs and root architecture specs, avoiding noisy updates across unaffected workspaces.",
     },
     {
       q: "What GitHub permissions and OAuth scopes are required?",
+      tag: "Fine-Grained Scopes",
+      highlight: "Least-Privilege Repo Scope · No Org Admin Rights",
       a: "Only fine-grained repository access. We require read access to code for diff extraction and write access to pull requests. We never request organization admin, billing, or unrelated repository scopes.",
     },
   ];
@@ -509,7 +518,7 @@ Adopt strict Refresh Token Rotation with token family tracking.
             <span className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200 transition-colors">
               Rust
             </span>
-            <span className="px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200/70 transition-colors">
+            <span className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200 transition-colors">
               Turborepo & Nx
             </span>
             <span className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200/80 border border-stone-200 transition-colors">
@@ -1158,47 +1167,139 @@ Adopt strict Refresh Token Rotation with token family tracking.
       </section>
 
       {/* =========================================================================
-          SECTION 6: DEVELOPER FAQ ACCORDION
+          SECTION 6: DEVELOPER FAQ ACCORDION (Interactive 2-Column Split)
          ========================================================================= */}
       <section className="py-24 bg-white border-b border-stone-200/80">
-        <div className="max-w-4xl mx-auto px-6 sm:px-10 space-y-12">
-          <div className="text-center space-y-3">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-indigo-600">
-              Frequently Asked Questions
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight">
-              Questions Developers Ask
-            </h2>
-          </div>
-
-          <div className="space-y-3">
-            {faqs.map((faq, idx) => {
-              const isOpen = openFaqIndex === idx;
-              return (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-stone-200/90 overflow-hidden transition-all bg-[#FAF9F6]"
-                >
-                  <button
-                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                    className="w-full p-5 text-left font-bold text-sm text-slate-900 flex items-center justify-between gap-4 cursor-pointer hover:text-indigo-600 transition-colors"
-                  >
-                    <span>{faq.q}</span>
-                    {isOpen ? (
-                      <ChevronUp className="w-4 h-4 text-indigo-600 shrink-0" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
-                    )}
-                  </button>
-
-                  {isOpen && (
-                    <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-stone-200/50 pt-3">
-                      {faq.a}
-                    </div>
-                  )}
+        <div className="max-w-8xl mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+            
+            {/* Left Column: Authoritative Editorial Header & Direct Trust Card */}
+            <div className="lg:col-span-5 lg:sticky lg:top-28 space-y-6">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-xs">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Developer Knowledge Base</span>
                 </div>
-              );
-            })}
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] tracking-tight leading-[1.08]">
+                  Everything You Need to Know
+                </h2>
+                <p className="text-base text-slate-600 leading-relaxed font-medium">
+                  Engineered for mission-critical codebases. Transparent answers about AST parsing, zero-retention security, and automated Git pull request guardrails.
+                </p>
+              </div>
+
+              {/* Developer Trust Card (Amber & Green Touch, No Navy Blue) */}
+              <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-[#141510] via-[#16140D] to-[#0F1410] text-white border border-stone-800/80 shadow-2xl space-y-4 relative overflow-hidden">
+                {/* Ambient Amber & Green Radial Glows */}
+                <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-6 -left-6 w-44 h-44 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="flex items-start gap-3.5 relative z-10">
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-amber-500/20 to-emerald-500/20 border border-amber-500/30 text-amber-400 shrink-0 shadow-inner">
+                    <ShieldCheck className="w-6 h-6 text-emerald-400" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-bold text-white">Enterprise Compliance Ready</h4>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider">
+                        VPC / SSO
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300/90 leading-relaxed">
+                      Self-hosted VPC runners, custom LLM keys, and SSO integrations are available for security-first engineering teams.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Interactive Elevated Accordion Cards */}
+            <div className="lg:col-span-7 space-y-4">
+              {faqs.map((faq, idx) => {
+                const isOpen = openFaqIndex === idx;
+                return (
+                  <div
+                    key={idx}
+                    className={`rounded-2xl border transition-all duration-300 overflow-hidden relative ${
+                      isOpen
+                        ? "bg-white border-emerald-600 shadow-xl shadow-emerald-500/15 ring-2 ring-emerald-500/20"
+                        : "bg-[#FAF9F6] border-stone-200/90 hover:border-slate-300 hover:bg-white hover:shadow-md"
+                    }`}
+                  >
+                    {/* Left Glowing Indicator Accent */}
+                    {isOpen && (
+                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-emerald-600 via-teal-500 to-emerald-700" />
+                    )}
+
+                    <button
+                      onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                      className="w-full p-5 sm:p-6 text-left flex items-start sm:items-center justify-between gap-4 cursor-pointer group"
+                    >
+                      <div className="flex items-start sm:items-center gap-3.5 flex-1">
+                        {/* Number Index */}
+                        <span
+                          className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg shrink-0 transition-colors ${
+                            isOpen
+                              ? "bg-emerald-600 text-white shadow-xs"
+                              : "bg-stone-200/80 text-slate-600 group-hover:bg-emerald-50 group-hover:text-emerald-700"
+                          }`}
+                        >
+                          0{idx + 1}
+                        </span>
+
+                        <div className="space-y-1">
+                          {/* Tag */}
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-[10px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded-full ${
+                                isOpen
+                                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold"
+                                  : "bg-stone-200/60 text-slate-500"
+                              }`}
+                            >
+                              {faq.tag}
+                            </span>
+                          </div>
+
+                          <h3
+                            className={`text-sm sm:text-base font-bold transition-colors ${
+                              isOpen
+                                ? "text-slate-900"
+                                : "text-slate-800 group-hover:text-emerald-700"
+                            }`}
+                          >
+                            {faq.q}
+                          </h3>
+                        </div>
+                      </div>
+
+                      {/* Rotating Tactile Chevron */}
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+                          isOpen
+                            ? "rotate-180 bg-emerald-600 text-white shadow-md shadow-emerald-500/30"
+                            : "bg-stone-100 text-slate-500 group-hover:bg-emerald-50 group-hover:text-emerald-700"
+                        }`}
+                      >
+                        <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                      </div>
+                    </button>
+
+                    {/* Expanded Answer Body */}
+                    {isOpen && (
+                      <div className="px-5 sm:px-6 pb-6 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-stone-100/90 space-y-3.5">
+                        <p>{faq.a}</p>
+
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-[11px] sm:text-xs font-mono text-emerald-800 font-semibold">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>{faq.highlight}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
@@ -1206,7 +1307,7 @@ Adopt strict Refresh Token Rotation with token family tracking.
       {/* =========================================================================
           SECTION 7: BOTTOM CALL TO ACTION BANNER
          ========================================================================= */}
-      <section className="py-20 bg-[#FAF9F6]">
+      <section className="py-20 bg-[#EAE2D4]">
         <div className="max-w-6xl mx-auto px-6 sm:px-10">
           <div className="relative rounded-3xl bg-[#070B14] text-white p-8 sm:p-14 overflow-hidden shadow-2xl border border-slate-800">
             {/* Background Glows */}
@@ -1261,7 +1362,7 @@ Adopt strict Refresh Token Rotation with token family tracking.
                 onClick={() => setDemoStep(idx)}
                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
                   demoStep === idx
-                    ? "bg-white text-indigo-600 shadow-xs"
+                    ? "bg-white text-emerald-700 shadow-xs"
                     : "text-slate-600 hover:text-slate-900 hover:bg-stone-200/60"
                 }`}
               >
@@ -1273,7 +1374,7 @@ Adopt strict Refresh Token Rotation with token family tracking.
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80">
+                <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                   {demoStages[demoStep].agent}
                 </span>
                 <span className="text-xs text-slate-500">
@@ -1307,7 +1408,7 @@ Adopt strict Refresh Token Rotation with token family tracking.
                       Math.min(demoStages.length - 1, prev + 1),
                     )
                   }
-                  className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-xs hover:bg-indigo-700 cursor-pointer"
+                  className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-xs hover:bg-emerald-700 cursor-pointer"
                 >
                   <span>Next Stage</span>
                   <ArrowRight className="w-3.5 h-3.5" />
