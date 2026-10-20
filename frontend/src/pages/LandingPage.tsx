@@ -15,12 +15,12 @@ import {
   CheckCircle2,
   FileText,
   Code2,
-  FolderGit2,
   Lock,
   Activity,
   Workflow,
   ChevronDown,
   FileCode2,
+  X,
 } from "lucide-react";
 import heroRobotAgentImg from "../assets/hero-robot-agent.png";
 
@@ -808,11 +808,12 @@ Adopt strict Refresh Token Rotation with token family tracking.
               <span>Supported Document Formats</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] tracking-tight">
-              Surgically Maintained Without Format Drift
+              Every Doc in Your Repo, Kept in Perfect Sync
             </h2>
-            <p className="text-base text-indigo-900 leading-relaxed font-medium">
-              TracePath AI updates your standard documentation targets while
-              strictly respecting your team's markdown conventions.
+            <p className="text-base text-stone-700 leading-relaxed font-medium">
+              From READMEs and Mermaid architecture diagrams to ADRs and OpenAPI
+              specs—updated with pinpoint precision without breaking your
+              formatting.
             </p>
           </div>
 
@@ -879,74 +880,286 @@ Adopt strict Refresh Token Rotation with token family tracking.
       </section>
 
       {/* =========================================================================
-          SECTION 4: ENTERPRISE CRYPTOGRAPHIC SECURITY (Bento Grid)
+          SECTION 4: PERMISSION AUDIT MATRIX (What We Access vs. What We Block)
          ========================================================================= */}
       <section className="py-24 bg-white border-b border-stone-200/80">
-        <div className="max-w-8xl mx-auto px-6 sm:px-10 lg:px-16 space-y-14">
+        <div className="max-w-8xl mx-auto px-6 sm:px-10 lg:px-16 space-y-12">
+          {/* Section Header */}
           <div className="text-center space-y-3 max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-xs">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Zero Trust Security</span>
+              <span>Permission & Privacy Matrix</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] tracking-tight">
-              Enterprise Cryptographic Privacy & Security
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] tracking-tight leading-[1.08]">
+              What We Access vs. What We Block
             </h2>
-            <p className="text-base text-slate-500 leading-relaxed">
-              Engineered with strict zero-code-retention protocols so your
-              proprietary repository logic is never exposed.
+            <p className="text-base text-slate-600 leading-relaxed font-medium">
+              Radical transparency for security-first engineering teams.
+              TracePath AI operates under strict least-privilege principles: see
+              the exact cryptographic boundaries enforced on your repository.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200 space-y-3 shadow-xs hover:shadow-md transition-all">
-              <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 w-fit">
-                <ShieldCheck className="w-6 h-6" />
+          {/* Top Protocol Strip */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 px-6 rounded-2xl bg-stone-100/80 border border-stone-200/80 text-xs font-mono text-slate-600">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+              <span className="font-bold text-slate-800">
+                Zero Trust Perimeter Active
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[11px] sm:text-xs text-slate-500 font-semibold">
+              <span className="flex items-center gap-1.5 text-slate-700">
+                <Check className="w-3.5 h-3.5 text-emerald-600" /> TLS 1.3
+                In-Flight
+              </span>
+              <span className="flex items-center gap-1.5 text-slate-700">
+                <Check className="w-3.5 h-3.5 text-emerald-600" /> Fernet
+                AES-256 at Rest
+              </span>
+              <span className="flex items-center gap-1.5 text-slate-700">
+                <Check className="w-3.5 h-3.5 text-emerald-600" /> HMAC-SHA256
+                Handshakes
+              </span>
+              <span className="flex items-center gap-1.5 text-slate-700">
+                <Check className="w-3.5 h-3.5 text-emerald-600" /> 0 KB Code
+                Persisted
+              </span>
+            </div>
+          </div>
+
+          {/* The 2-Column Comparison Matrix */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            {/* LEFT PANEL: Explicitly Granted (Least Privilege) */}
+            <div className="p-7 sm:p-9 rounded-3xl bg-white border-2 border-emerald-500/40 shadow-xl shadow-emerald-500/5 space-y-6 flex flex-col justify-between relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-52 h-52 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="space-y-6 relative z-10">
+                {/* Panel Header */}
+                <div className="flex items-center justify-between border-b border-emerald-100 pb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600">
+                      <ShieldCheck className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-extrabold text-slate-900">
+                        Explicitly Granted
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Least-privilege operational scopes
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono font-extrabold uppercase px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200/80">
+                    3 Scopes Active
+                  </span>
+                </div>
+
+                {/* Scope Items */}
+                <div className="space-y-4">
+                  <div className="p-4 rounded-2xl bg-emerald-50/40 border border-emerald-100/80 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <h4 className="text-sm font-bold text-slate-900">
+                          Git Commit & Webhook Diffs
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-emerald-100/80 text-emerald-800">
+                        RAM ONLY
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed pl-6">
+                      Payload diffs stream ephemerally directly into RAM for AST
+                      analysis. Never written to disk, never cached permanently.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-emerald-50/40 border border-emerald-100/80 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <h4 className="text-sm font-bold text-slate-900">
+                          AST Syntax Graph Inspection
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-emerald-100/80 text-emerald-800">
+                        SIGNATURES ONLY
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed pl-6">
+                      Tree-sitter parser inspects only public function
+                      signatures, API routes, and schema models. Internal
+                      business logic is ignored.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-emerald-50/40 border border-emerald-100/80 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <h4 className="text-sm font-bold text-slate-900">
+                          Pull Request & Branch Authoring
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-emerald-100/80 text-emerald-800">
+                        HUMAN IN LOOP
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed pl-6">
+                      Opens isolated markdown pull requests for your team to
+                      review. Nothing merges to main without human approval.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <h4 className="text-base font-bold text-slate-900">
-                Zero Code Retention
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Repository code is processed ephemerally in RAM and immediately
-                discarded. Never cached, stored, or trained on.
-              </p>
+
+              <div className="pt-4 border-t border-emerald-100/80 flex items-center justify-between text-xs font-mono text-emerald-800">
+                <span>Cryptographic Boundary: Enforced</span>
+                <span className="font-bold">Least-Privilege RBAC ✓</span>
+              </div>
             </div>
 
-            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200 space-y-3 shadow-xs hover:shadow-md transition-all">
-              <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 w-fit">
-                <Lock className="w-6 h-6" />
+            {/* RIGHT PANEL: Strictly Blocked & Denied (Zero Access) */}
+            <div className="p-7 sm:p-9 rounded-3xl bg-white border-2 border-rose-500/40 shadow-xl shadow-rose-500/5 space-y-6 flex flex-col justify-between relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-52 h-52 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="space-y-6 relative z-10">
+                {/* Panel Header */}
+                <div className="flex items-center justify-between border-b border-rose-100 pb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-600">
+                      <Lock className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-extrabold text-slate-900">
+                        Strictly Blocked & Denied
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Cryptographic zero-access boundary
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono font-extrabold uppercase px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-200/80">
+                    Zero Access Enforced
+                  </span>
+                </div>
+
+                {/* Blocked Items */}
+                <div className="space-y-3">
+                  <div className="p-3.5 rounded-2xl bg-rose-50/40 border border-rose-100/80 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <X className="w-4 h-4 text-rose-600 shrink-0" />
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-900">
+                          Permanent Disk Storage of Code
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-rose-100/80 text-rose-800">
+                        0 BYTES STORED
+                      </span>
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed pl-6">
+                      Zero code retention guarantee. Proprietary source code is
+                      never saved to database or disk.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-rose-50/40 border border-rose-100/80 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <X className="w-4 h-4 text-rose-600 shrink-0" />
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-900">
+                          Model Training on Your Code
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-rose-100/80 text-rose-800">
+                        ZERO TRAINING
+                      </span>
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed pl-6">
+                      Strict non-training policy. Your code is never used to
+                      train or fine-tune public or private LLM weights.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-rose-50/40 border border-rose-100/80 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <X className="w-4 h-4 text-rose-600 shrink-0" />
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-900">
+                          Organization Admin & Owner Scopes
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-rose-100/80 text-rose-800">
+                        BLOCKED
+                      </span>
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed pl-6">
+                      Never requested. TracePath AI cannot access team
+                      membership, billing, or organization configurations.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-rose-50/40 border border-rose-100/80 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <X className="w-4 h-4 text-rose-600 shrink-0" />
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-900">
+                          Secrets, SSH Keys & Deploy Tokens
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-rose-100/80 text-rose-800">
+                        BLOCKED
+                      </span>
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed pl-6">
+                      Protected by GitHub OAuth boundaries. Repository secrets
+                      and environment variables remain untouchable.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <h4 className="text-base font-bold text-slate-900">
-                AES-256 Token Encryption
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                GitHub credentials and personal access tokens are encrypted at
-                rest using Fernet-authenticated cryptographic keys.
+
+              <div className="pt-4 border-t border-rose-100/80 flex items-center justify-between text-xs font-mono text-rose-800">
+                <span>Perimeter Security: Verified</span>
+                <span className="font-bold">Zero Trust Enforced ✓</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Hard Engineering Metrics */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200/90 text-center space-y-1">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+                0 Bytes
+              </span>
+              <p className="text-xs text-slate-500 font-medium">
+                Permanent Code on Disk
               </p>
             </div>
-
-            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200 space-y-3 shadow-xs hover:shadow-md transition-all">
-              <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-600 border border-purple-500/20 w-fit">
-                <FolderGit2 className="w-6 h-6" />
-              </div>
-              <h4 className="text-base font-bold text-slate-900">
-                Fine-Grained Scopes
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Connect only specific repositories with minimal read/write pull
-                request permissions. No organization admin scopes needed.
+            <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200/90 text-center space-y-1">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+                256-Bit
+              </span>
+              <p className="text-xs text-slate-500 font-medium">
+                Fernet AES Token Encryption
               </p>
             </div>
-
-            <div className="p-7 rounded-3xl bg-[#FAF9F6] border border-stone-200 space-y-3 shadow-xs hover:shadow-md transition-all">
-              <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600 border border-amber-500/20 w-fit">
-                <Zap className="w-6 h-6" />
-              </div>
-              <h4 className="text-base font-bold text-slate-900">
-                HMAC-SHA256 Signatures
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Every incoming webhook request is validated against your GitHub
-                secret using constant-time cryptographic verification.
+            <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200/90 text-center space-y-1">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+                0%
+              </span>
+              <p className="text-xs text-slate-500 font-medium">
+                Model Training Allowed
+              </p>
+            </div>
+            <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200/90 text-center space-y-1">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+                100%
+              </span>
+              <p className="text-xs text-slate-500 font-medium">
+                Human-in-the-Loop PR Review
               </p>
             </div>
           </div>
@@ -1065,7 +1278,9 @@ Adopt strict Refresh Token Rotation with token family tracking.
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
                   Growing Teams & Monorepos
                 </span>
-                <h3 className="text-2xl sm:text-3xl font-black text-white">Team Pro</h3>
+                <h3 className="text-2xl sm:text-3xl font-black text-white">
+                  Team Pro
+                </h3>
                 <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                   Full multi-repository engine with Turborepo support and
                   priority webhook execution.
@@ -1172,7 +1387,6 @@ Adopt strict Refresh Token Rotation with token family tracking.
       <section className="py-24 bg-white border-b border-stone-200/80">
         <div className="max-w-8xl mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-            
             {/* Left Column: Authoritative Editorial Header & Direct Trust Card */}
             <div className="lg:col-span-5 lg:sticky lg:top-28 space-y-6">
               <div className="space-y-4">
@@ -1184,7 +1398,9 @@ Adopt strict Refresh Token Rotation with token family tracking.
                   Everything You Need to Know
                 </h2>
                 <p className="text-base text-slate-600 leading-relaxed font-medium">
-                  Engineered for mission-critical codebases. Transparent answers about AST parsing, zero-retention security, and automated Git pull request guardrails.
+                  Engineered for mission-critical codebases. Transparent answers
+                  about AST parsing, zero-retention security, and automated Git
+                  pull request guardrails.
                 </p>
               </div>
 
@@ -1200,13 +1416,17 @@ Adopt strict Refresh Token Rotation with token family tracking.
                   </div>
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-bold text-white">Enterprise Compliance Ready</h4>
+                      <h4 className="text-sm font-bold text-white">
+                        Enterprise Compliance Ready
+                      </h4>
                       <span className="px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider">
                         VPC / SSO
                       </span>
                     </div>
                     <p className="text-xs text-stone-300/90 leading-relaxed">
-                      Self-hosted VPC runners, custom LLM keys, and SSO integrations are available for security-first engineering teams.
+                      Self-hosted VPC runners, custom LLM keys, and SSO
+                      integrations are available for security-first engineering
+                      teams.
                     </p>
                   </div>
                 </div>

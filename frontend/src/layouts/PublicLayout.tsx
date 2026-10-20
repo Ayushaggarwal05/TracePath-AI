@@ -10,6 +10,7 @@ interface PublicLayoutProps {
   onConnectGitHub?: () => void;
   onNavigateToLanding?: () => void;
   currentRoute?: string;
+  showFooter?: boolean;
   children: React.ReactNode;
 }
 
@@ -18,6 +19,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
   onConnectGitHub,
   onNavigateToLanding,
   currentRoute = "landing",
+  showFooter,
   children,
 }) => {
   const { user, isAuthenticated } = useAuth();
@@ -45,6 +47,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
 
   const isLanding = currentRoute === "landing";
   const isAuthPage = currentRoute === "auth";
+  const shouldShowFooter = showFooter !== undefined ? showFooter : isLanding;
 
   return (
     <div
@@ -217,11 +220,13 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({
       <main className="flex-1">{children}</main>
 
       {/* Professional Multi-Column SaaS Footer */}
-      <Footer
-        onNavigateToLanding={onNavigateToLanding}
-        onConnectGitHub={onConnectGitHub}
-        onNavigateToApp={onNavigateToApp}
-      />
+      {shouldShowFooter && (
+        <Footer
+          onNavigateToLanding={onNavigateToLanding}
+          onConnectGitHub={onConnectGitHub}
+          onNavigateToApp={onNavigateToApp}
+        />
+      )}
 
       <ToastContainer />
     </div>
